@@ -1,0 +1,8 @@
+### 测试分配算法
+GET http://localhost:28080/api/cigarette/test-algorithm
+
+### 测试优化算法
+GET http://localhost:28080/api/optimized-algorithm/test-optimized-algorithm
+
+### 写回分配矩阵
+POST http://localhost:28080/api/cigarette/write-back?year=2024&month=1&weekSeq=1
