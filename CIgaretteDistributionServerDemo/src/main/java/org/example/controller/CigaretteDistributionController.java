@@ -7,9 +7,11 @@ import org.example.dto.UpdateCigaretteRequestDto;
 import org.example.entity.DemoTestAdvData;
 import org.example.entity.DemoTestClientNumData;
 import org.example.entity.DemoTestData;
+import org.example.entity.DemoTestBusinessFormatClientNumData;
 import org.example.repository.DemoTestAdvDataRepository;
 import org.example.repository.DemoTestClientNumDataRepository;
 import org.example.repository.DemoTestDataRepository;
+import org.example.repository.DemoTestBusinessFormatClientNumDataRepository;
 import org.example.service.CigaretteDistributionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,6 +41,9 @@ public class CigaretteDistributionController {
     
     @Autowired
     private DemoTestClientNumDataRepository clientNumDataRepository;
+    
+    @Autowired
+    private DemoTestBusinessFormatClientNumDataRepository businessFormatClientNumDataRepository;
     
     @Autowired
     private DemoTestDataRepository testDataRepository;
@@ -846,5 +851,224 @@ public class CigaretteDistributionController {
             response.put("message", "KMP匹配测试失败: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
+    }
+    
+    /**
+     * 测试业态类型客户数矩阵
+     */
+    @GetMapping("/test-business-format-matrix")
+    public ResponseEntity<Map<String, Object>> testBusinessFormatMatrix() {
+        log.info("测试业态类型客户数矩阵");
+        
+        try {
+            // 获取业态类型客户数矩阵
+            BigDecimal[][] businessFormatCustomerMatrix = distributionService.getBusinessFormatCustomerMatrix();
+            
+            // 获取所有业态类型列表
+            List<String> allBusinessFormats = distributionService.getAllBusinessFormatList();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "查询成功");
+            response.put("matrixSize", businessFormatCustomerMatrix.length + "x" + businessFormatCustomerMatrix[0].length);
+            response.put("businessFormatCount", allBusinessFormats.size());
+            response.put("businessFormats", allBusinessFormats);
+            
+            // 构建矩阵数据
+            List<Map<String, Object>> matrixData = new ArrayList<>();
+            for (int i = 0; i < businessFormatCustomerMatrix.length; i++) {
+                Map<String, Object> businessFormatData = new HashMap<>();
+                businessFormatData.put("businessFormatIndex", i);
+                businessFormatData.put("businessFormatName", allBusinessFormats.get(i));
+                
+                // 添加所有档位数据
+                Map<String, Object> gradeData = new HashMap<>();
+                for (int j = 0; j < 30; j++) {
+                    String columnName = "D" + (30 - j);
+                    gradeData.put(columnName, businessFormatCustomerMatrix[i][j]);
+                }
+                businessFormatData.put("gradeData", gradeData);
+                
+                matrixData.add(businessFormatData);
+            }
+            response.put("matrixData", matrixData);
+            
+            log.info("查询成功，矩阵大小: {}x30, 业态类型数量: {}", businessFormatCustomerMatrix.length, allBusinessFormats.size());
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("查询失败", e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "查询失败: " + e.getMessage());
+            response.put("error", e.toString());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    /**
+     * 测试业态类型KMP匹配功能
+     */
+    @GetMapping("/test-business-format-kmp-matching")
+    public ResponseEntity<Map<String, Object>> testBusinessFormatKmpMatching() {
+        log.info("测试业态类型KMP匹配功能");
+        
+        try {
+            // 获取所有业态类型
+            String businessFormatSql = "SELECT BusinessFormat FROM demo_test_businessFormat_clientNumData ORDER BY id ASC";
+            List<Map<String, Object>> businessFormatData = distributionService.getJdbcTemplate().queryForList(businessFormatSql);
+            List<String> allBusinessFormats = businessFormatData.stream()
+                .map(row -> (String) row.get("BusinessFormat"))
+                .collect(java.util.stream.Collectors.toList());
+            
+            // 获取投放区域
+            String advDataSql = "SELECT cig_code, cig_name, delivery_area, delivery_etype FROM demo_test_advdata WHERE delivery_etype = '档位+业态类型'";
+            List<Map<String, Object>> advDataList = distributionService.getJdbcTemplate().queryForList(advDataSql);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "业态类型KMP匹配测试完成");
+            response.put("allBusinessFormats", allBusinessFormats);
+            
+            List<Map<String, Object>> testResults = new ArrayList<>();
+            for (Map<String, Object> advData : advDataList) {
+                String cigCode = (String) advData.get("cig_code");
+                String cigName = (String) advData.get("cig_name");
+                String deliveryArea = (String) advData.get("delivery_area");
+                String deliveryEtype = (String) advData.get("delivery_etype");
+                
+                Map<String, Object> testResult = new HashMap<>();
+                testResult.put("cigCode", cigCode);
+                testResult.put("cigName", cigName);
+                testResult.put("deliveryArea", deliveryArea);
+                testResult.put("deliveryEtype", deliveryEtype);
+                
+                if (deliveryArea != null && !deliveryArea.trim().isEmpty()) {
+                    // 使用KMP匹配业态类型
+                    List<String> matchedBusinessFormats = distributionService.getKmpMatcher().matchPatterns(deliveryArea, allBusinessFormats);
+                    testResult.put("matchedBusinessFormats", matchedBusinessFormats);
+                    testResult.put("matchCount", matchedBusinessFormats.size());
+                } else {
+                    testResult.put("matchedBusinessFormats", new ArrayList<>());
+                    testResult.put("matchCount", 0);
+                }
+                
+                testResults.add(testResult);
+            }
+            
+            response.put("testResults", testResults);
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("业态类型KMP匹配测试失败", e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "业态类型KMP匹配测试失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    /**
+     * 测试业态类型分配算法
+     */
+    @GetMapping("/test-business-format-algorithm")
+    public ResponseEntity<Map<String, Object>> testBusinessFormatAlgorithm() {
+        log.info("开始测试业态类型分配算法");
+        
+        try {
+            // 获取业态类型的预投放量数据
+            String advDataSql = "SELECT cig_code, cig_name, adv, delivery_area, delivery_etype FROM demo_test_advdata WHERE delivery_etype = '档位+业态类型'";
+            List<Map<String, Object>> advDataList = distributionService.getJdbcTemplate().queryForList(advDataSql);
+            
+            List<Map<String, Object>> testResults = new ArrayList<>();
+            
+            for (Map<String, Object> advData : advDataList) {
+                String cigCode = (String) advData.get("cig_code");
+                String cigName = (String) advData.get("cig_name");
+                BigDecimal adv = (BigDecimal) advData.get("adv");
+                String deliveryArea = (String) advData.get("delivery_area");
+                
+                Map<String, Object> result = new HashMap<>();
+                result.put("cigCode", cigCode);
+                result.put("cigName", cigName);
+                result.put("adv", adv);
+                result.put("deliveryArea", deliveryArea);
+                
+                if (deliveryArea != null && !deliveryArea.trim().isEmpty()) {
+                    // 获取目标业态类型
+                    List<String> targetBusinessFormats = distributionService.getTargetBusinessFormatList(deliveryArea);
+                    result.put("targetBusinessFormats", targetBusinessFormats);
+                    
+                    if (!targetBusinessFormats.isEmpty()) {
+                        // 计算分配矩阵
+                        BigDecimal[][] allocationMatrix = distributionService.calculateBusinessFormatDistributionMatrix(
+                            targetBusinessFormats, adv);
+                        
+                        // 计算实际投放量
+                        BigDecimal actualAmount = calculateActualAmountForBusinessFormat(allocationMatrix, targetBusinessFormats);
+                        result.put("actualAmount", actualAmount);
+                        result.put("error", adv.subtract(actualAmount).abs());
+                        
+                        // 验证约束
+                        result.put("constraintValid", validateConstraints(allocationMatrix));
+                        
+                        // 输出完整的分配矩阵
+                        Map<String, Object> allocationResult = new HashMap<>();
+                        for (int i = 0; i < targetBusinessFormats.size(); i++) {
+                            Map<String, Object> businessFormatAllocation = new HashMap<>();
+                            businessFormatAllocation.put("businessFormat", targetBusinessFormats.get(i));
+                            
+                            // 添加所有30个档位的分配值
+                            for (int j = 0; j < 30; j++) {
+                                String columnName = "d" + (30 - j);
+                                businessFormatAllocation.put(columnName, allocationMatrix[i][j]);
+                            }
+                            
+                            allocationResult.put("businessFormat_" + i, businessFormatAllocation);
+                        }
+                        result.put("allocationMatrix", allocationResult);
+                    }
+                }
+                
+                testResults.add(result);
+            }
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "业态类型算法测试完成");
+            response.put("results", testResults);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("业态类型算法测试失败", e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "业态类型算法测试失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    /**
+     * 计算业态类型实际投放量
+     */
+    private BigDecimal calculateActualAmountForBusinessFormat(BigDecimal[][] allocationMatrix, List<String> targetBusinessFormats) {
+        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal[][] businessFormatCustomerMatrix = distributionService.getBusinessFormatCustomerMatrix();
+        List<String> allBusinessFormats = distributionService.getAllBusinessFormatList();
+        
+        for (int i = 0; i < allocationMatrix.length; i++) {
+            String targetBusinessFormat = targetBusinessFormats.get(i);
+            int businessFormatIndex = allBusinessFormats.indexOf(targetBusinessFormat);
+            
+            if (businessFormatIndex >= 0) {
+                for (int j = 0; j < 30; j++) {
+                    if (allocationMatrix[i][j] != null && businessFormatCustomerMatrix[businessFormatIndex][j] != null) {
+                        total = total.add(allocationMatrix[i][j].multiply(businessFormatCustomerMatrix[businessFormatIndex][j]));
+                    }
+                }
+            }
+        }
+        return total;
     }
 }

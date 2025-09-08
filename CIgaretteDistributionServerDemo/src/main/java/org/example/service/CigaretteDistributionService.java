@@ -4,9 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.entity.DemoTestAdvData;
 import org.example.entity.DemoTestClientNumData;
 import org.example.entity.DemoTestData;
+import org.example.entity.DemoTestBusinessFormatClientNumData;
 import org.example.repository.DemoTestAdvDataRepository;
 import org.example.repository.DemoTestClientNumDataRepository;
 import org.example.repository.DemoTestDataRepository;
+import org.example.repository.DemoTestBusinessFormatClientNumDataRepository;
 import org.example.service.algorithm.CigaretteDistributionAlgorithm;
 import org.example.util.KmpMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.math.BigDecimal;
 import org.example.dto.UpdateCigaretteRequestDto;
 
 @Slf4j
@@ -30,6 +31,9 @@ public class CigaretteDistributionService {
     
     @Autowired
     private DemoTestClientNumDataRepository clientNumDataRepository;
+    
+    @Autowired
+    private DemoTestBusinessFormatClientNumDataRepository businessFormatClientNumDataRepository;
     
     @Autowired
     private DemoTestDataRepository testDataRepository;
@@ -48,6 +52,12 @@ public class CigaretteDistributionService {
     
     // 缓存区域客户数矩阵
     private BigDecimal[][] regionCustomerMatrix;
+    
+    // 缓存业态类型列表
+    private List<String> allBusinessFormatList;
+    
+    // 缓存业态类型客户数矩阵
+    private BigDecimal[][] businessFormatCustomerMatrix;
     
     /**
      * 获取JdbcTemplate实例
@@ -88,6 +98,24 @@ public class CigaretteDistributionService {
             log.info("投放区域列表初始化完成，共{}个区域", allRegionList.size());
         }
         return allRegionList;
+    }
+    
+    /**
+     * 获取所有业态类型列表（按id从小到大排序去重）
+     */
+    @Cacheable("allBusinessFormatList")
+    public List<String> getAllBusinessFormatList() {
+        if (allBusinessFormatList == null) {
+            log.info("初始化业态类型列表");
+            allBusinessFormatList = businessFormatClientNumDataRepository.findAllByOrderByIdAsc()
+                    .stream()
+                    .map(DemoTestBusinessFormatClientNumData::getBusinessFormatCode)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
+            log.info("业态类型列表初始化完成，共{}个业态类型", allBusinessFormatList.size());
+        }
+        return allBusinessFormatList;
     }
     
     /**
@@ -148,6 +176,63 @@ public class CigaretteDistributionService {
     }
     
     /**
+     * 获取业态类型客户数矩阵
+     */
+    @Cacheable("businessFormatCustomerMatrix")
+    public BigDecimal[][] getBusinessFormatCustomerMatrix() {
+        if (businessFormatCustomerMatrix == null) {
+            log.info("初始化业态类型客户数矩阵");
+            List<DemoTestBusinessFormatClientNumData> businessFormatClientNumDataList = businessFormatClientNumDataRepository.findAllByOrderByIdAsc();
+            List<String> businessFormats = getAllBusinessFormatList();
+            
+            businessFormatCustomerMatrix = new BigDecimal[businessFormats.size()][30];
+            
+            for (int i = 0; i < businessFormats.size(); i++) {
+                String businessFormat = businessFormats.get(i);
+                DemoTestBusinessFormatClientNumData clientData = businessFormatClientNumDataList.stream()
+                        .filter(data -> businessFormat.equals(data.getBusinessFormatCode()))
+                        .findFirst()
+                        .orElse(null);
+                
+                if (clientData != null) {
+                    businessFormatCustomerMatrix[i][0] = clientData.getD30();
+                    businessFormatCustomerMatrix[i][1] = clientData.getD29();
+                    businessFormatCustomerMatrix[i][2] = clientData.getD28();
+                    businessFormatCustomerMatrix[i][3] = clientData.getD27();
+                    businessFormatCustomerMatrix[i][4] = clientData.getD26();
+                    businessFormatCustomerMatrix[i][5] = clientData.getD25();
+                    businessFormatCustomerMatrix[i][6] = clientData.getD24();
+                    businessFormatCustomerMatrix[i][7] = clientData.getD23();
+                    businessFormatCustomerMatrix[i][8] = clientData.getD22();
+                    businessFormatCustomerMatrix[i][9] = clientData.getD21();
+                    businessFormatCustomerMatrix[i][10] = clientData.getD20();
+                    businessFormatCustomerMatrix[i][11] = clientData.getD19();
+                    businessFormatCustomerMatrix[i][12] = clientData.getD18();
+                    businessFormatCustomerMatrix[i][13] = clientData.getD17();
+                    businessFormatCustomerMatrix[i][14] = clientData.getD16();
+                    businessFormatCustomerMatrix[i][15] = clientData.getD15();
+                    businessFormatCustomerMatrix[i][16] = clientData.getD14();
+                    businessFormatCustomerMatrix[i][17] = clientData.getD13();
+                    businessFormatCustomerMatrix[i][18] = clientData.getD12();
+                    businessFormatCustomerMatrix[i][19] = clientData.getD11();
+                    businessFormatCustomerMatrix[i][20] = clientData.getD10();
+                    businessFormatCustomerMatrix[i][21] = clientData.getD9();
+                    businessFormatCustomerMatrix[i][22] = clientData.getD8();
+                    businessFormatCustomerMatrix[i][23] = clientData.getD7();
+                    businessFormatCustomerMatrix[i][24] = clientData.getD6();
+                    businessFormatCustomerMatrix[i][25] = clientData.getD5();
+                    businessFormatCustomerMatrix[i][26] = clientData.getD4();
+                    businessFormatCustomerMatrix[i][27] = clientData.getD3();
+                    businessFormatCustomerMatrix[i][28] = clientData.getD2();
+                    businessFormatCustomerMatrix[i][29] = clientData.getD1();
+                }
+            }
+            log.info("业态类型客户数矩阵初始化完成，矩阵大小: {}x30", businessFormats.size());
+        }
+        return businessFormatCustomerMatrix;
+    }
+    
+    /**
      * 获取卷烟的待投放区域列表
      * @param deliveryArea 投放区域字段值
      * @return 匹配成功的投放区域列表
@@ -158,6 +243,19 @@ public class CigaretteDistributionService {
         List<String> targetRegions = kmpMatcher.matchPatterns(deliveryArea, allRegions);
         log.info("匹配成功的投放区域: {}", targetRegions);
         return targetRegions;
+    }
+    
+    /**
+     * 获取卷烟的待投放业态类型列表
+     * @param deliveryArea 投放区域字段值
+     * @return 匹配成功的业态类型列表
+     */
+    public List<String> getTargetBusinessFormatList(String deliveryArea) {
+        log.info("获取卷烟投放业态类型，投放区域字段值: {}", deliveryArea);
+        List<String> allBusinessFormats = getAllBusinessFormatList();
+        List<String> targetBusinessFormats = kmpMatcher.matchPatterns(deliveryArea, allBusinessFormats);
+        log.info("匹配成功的业态类型: {}", targetBusinessFormats);
+        return targetBusinessFormats;
     }
     
     /**
@@ -183,6 +281,31 @@ public class CigaretteDistributionService {
         }
         
         return distributionAlgorithm.calculateDistribution(targetRegions, targetRegionCustomerMatrix, targetAmount);
+    }
+    
+    /**
+     * 计算卷烟分配矩阵（业态类型）
+     * @param targetBusinessFormats 目标业态类型列表
+     * @param targetAmount 预投放量
+     * @return 分配矩阵 [业态类型数][档位数]
+     */
+    public BigDecimal[][] calculateBusinessFormatDistributionMatrix(List<String> targetBusinessFormats, BigDecimal targetAmount) {
+        log.info("计算卷烟业态类型分配矩阵，目标业态类型数: {}, 预投放量: {}", targetBusinessFormats.size(), targetAmount);
+        BigDecimal[][] businessFormatCustomerMatrix = getBusinessFormatCustomerMatrix();
+        
+        // 根据目标业态类型筛选客户数矩阵
+        BigDecimal[][] targetBusinessFormatCustomerMatrix = new BigDecimal[targetBusinessFormats.size()][30];
+        List<String> allBusinessFormats = getAllBusinessFormatList();
+        
+        for (int i = 0; i < targetBusinessFormats.size(); i++) {
+            String targetBusinessFormat = targetBusinessFormats.get(i);
+            int businessFormatIndex = allBusinessFormats.indexOf(targetBusinessFormat);
+            if (businessFormatIndex >= 0) {
+                System.arraycopy(businessFormatCustomerMatrix[businessFormatIndex], 0, targetBusinessFormatCustomerMatrix[i], 0, 30);
+            }
+        }
+        
+        return distributionAlgorithm.calculateDistribution(targetBusinessFormats, targetBusinessFormatCustomerMatrix, targetAmount);
     }
     
     /**
@@ -569,7 +692,7 @@ public class CigaretteDistributionService {
     }
 
     /**
-     * 将算法输出的分配矩阵写回数据库demo_test_data表
+     * 将算法输出的分配矩阵写回数据库demo_test_data表（支持业态类型）
      * @param year 年份
      * @param month 月份
      * @param weekSeq 周序号
@@ -586,6 +709,50 @@ public class CigaretteDistributionService {
             String advDataSql = "SELECT cig_code, cig_name, adv, delivery_area, delivery_method, delivery_etype FROM demo_test_advdata";
             List<Map<String, Object>> advDataList = jdbcTemplate.queryForList(advDataSql);
             log.info("预投放量数据数量: {}", advDataList.size());
+            
+            // 获取业态类型数据（通过Repository，避免列名不一致问题）
+            List<DemoTestBusinessFormatClientNumData> businessFormatEntities = businessFormatClientNumDataRepository.findAllByOrderByIdAsc();
+            List<String> allBusinessFormats = businessFormatEntities.stream()
+                .map(DemoTestBusinessFormatClientNumData::getBusinessFormatCode)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+            log.info("业态类型数量: {}", allBusinessFormats.size());
+
+            BigDecimal[][] businessFormatCustomerMatrix = new BigDecimal[businessFormatEntities.size()][30];
+            for (int i = 0; i < businessFormatEntities.size(); i++) {
+                DemoTestBusinessFormatClientNumData row = businessFormatEntities.get(i);
+                businessFormatCustomerMatrix[i][0] = row.getD30();
+                businessFormatCustomerMatrix[i][1] = row.getD29();
+                businessFormatCustomerMatrix[i][2] = row.getD28();
+                businessFormatCustomerMatrix[i][3] = row.getD27();
+                businessFormatCustomerMatrix[i][4] = row.getD26();
+                businessFormatCustomerMatrix[i][5] = row.getD25();
+                businessFormatCustomerMatrix[i][6] = row.getD24();
+                businessFormatCustomerMatrix[i][7] = row.getD23();
+                businessFormatCustomerMatrix[i][8] = row.getD22();
+                businessFormatCustomerMatrix[i][9] = row.getD21();
+                businessFormatCustomerMatrix[i][10] = row.getD20();
+                businessFormatCustomerMatrix[i][11] = row.getD19();
+                businessFormatCustomerMatrix[i][12] = row.getD18();
+                businessFormatCustomerMatrix[i][13] = row.getD17();
+                businessFormatCustomerMatrix[i][14] = row.getD16();
+                businessFormatCustomerMatrix[i][15] = row.getD15();
+                businessFormatCustomerMatrix[i][16] = row.getD14();
+                businessFormatCustomerMatrix[i][17] = row.getD13();
+                businessFormatCustomerMatrix[i][18] = row.getD12();
+                businessFormatCustomerMatrix[i][19] = row.getD11();
+                businessFormatCustomerMatrix[i][20] = row.getD10();
+                businessFormatCustomerMatrix[i][21] = row.getD9();
+                businessFormatCustomerMatrix[i][22] = row.getD8();
+                businessFormatCustomerMatrix[i][23] = row.getD7();
+                businessFormatCustomerMatrix[i][24] = row.getD6();
+                businessFormatCustomerMatrix[i][25] = row.getD5();
+                businessFormatCustomerMatrix[i][26] = row.getD4();
+                businessFormatCustomerMatrix[i][27] = row.getD3();
+                businessFormatCustomerMatrix[i][28] = row.getD2();
+                businessFormatCustomerMatrix[i][29] = row.getD1();
+            }
+            log.info("业态类型客户数矩阵大小: {}x30", businessFormatCustomerMatrix.length);
             
             // 使用JdbcTemplate直接获取投放区域列表
             String regionSql = "SELECT URBAN_RURAL_CODE FROM demo_test_clientNumdata ORDER BY id ASC";
@@ -637,45 +804,87 @@ public class CigaretteDistributionService {
                 cigResult.put("adv", adv);
                 
                 try {
-                    // 直接从advData获取投放区域
+                    // 直接从advData获取投放区域和投放类型
                     String deliveryArea = (String) advData.get("delivery_area");
+                    String deliveryEtype = (String) advData.get("delivery_etype");
+                    
+                    cigResult.put("deliveryArea", deliveryArea);
+                    cigResult.put("deliveryEtype", deliveryEtype);
                     
                     if (deliveryArea != null && !deliveryArea.trim().isEmpty()) {
-                        cigResult.put("deliveryArea", deliveryArea);
+                        BigDecimal[][] allocationMatrix = null;
+                        List<String> targetList = null;
+                        String targetType = null;
                         
-                        // 使用KMP匹配投放区域
-                        List<String> targetRegions = kmpMatcher.matchPatterns(deliveryArea, allRegions);
-                        cigResult.put("targetRegions", targetRegions);
-                        
-                        if (!targetRegions.isEmpty()) {
-                            // 根据目标区域筛选客户数矩阵
-                            BigDecimal[][] targetRegionCustomerMatrix = new BigDecimal[targetRegions.size()][30];
-                            for (int i = 0; i < targetRegions.size(); i++) {
-                                String targetRegion = targetRegions.get(i);
-                                int regionIndex = allRegions.indexOf(targetRegion);
-                                if (regionIndex >= 0) {
-                                    System.arraycopy(regionCustomerMatrix[regionIndex], 0, targetRegionCustomerMatrix[i], 0, 30);
+                        // 根据DELIVERY_ETYPE决定处理方式
+                        if ("档位+业态类型".equals(deliveryEtype)) {
+                            // 使用业态类型处理
+                            targetList = kmpMatcher.matchPatterns(deliveryArea, allBusinessFormats);
+                            cigResult.put("targetBusinessFormats", targetList);
+                            targetType = "业态类型";
+                            
+                            if (!targetList.isEmpty()) {
+                                // 根据目标业态类型筛选客户数矩阵
+                                BigDecimal[][] targetBusinessFormatCustomerMatrix = new BigDecimal[targetList.size()][30];
+                                for (int i = 0; i < targetList.size(); i++) {
+                                    String targetBusinessFormat = targetList.get(i);
+                                    int businessFormatIndex = allBusinessFormats.indexOf(targetBusinessFormat);
+                                    if (businessFormatIndex >= 0) {
+                                        System.arraycopy(businessFormatCustomerMatrix[businessFormatIndex], 0, targetBusinessFormatCustomerMatrix[i], 0, 30);
+                                    }
                                 }
+                                
+                                // 执行分配算法
+                                allocationMatrix = distributionAlgorithm.calculateDistribution(
+                                    targetList, targetBusinessFormatCustomerMatrix, adv);
+                                
+                                // 计算实际投放量
+                                BigDecimal actualAmount = calculateActualAmount(allocationMatrix, targetBusinessFormatCustomerMatrix);
+                                cigResult.put("actualAmount", actualAmount);
+                                cigResult.put("error", adv.subtract(actualAmount).abs());
+                                cigResult.put("errorPercentage", adv.subtract(actualAmount).abs()
+                                    .divide(adv, 4, BigDecimal.ROUND_HALF_UP)
+                                    .multiply(new BigDecimal("100")));
                             }
+                        } else if("档位+城乡分类代码".equals(deliveryEtype)) {
+                            // 使用城乡分类代码处理
+                            targetList = kmpMatcher.matchPatterns(deliveryArea, allRegions);
+                            cigResult.put("targetRegions", targetList);
+                            targetType = "城乡分类代码";
                             
-                            // 执行分配算法
-                            BigDecimal[][] allocationMatrix = distributionAlgorithm.calculateDistribution(
-                                targetRegions, targetRegionCustomerMatrix, adv);
-                            
-                            // 计算实际投放量
-                            BigDecimal actualAmount = calculateActualAmount(allocationMatrix, targetRegionCustomerMatrix);
-                            cigResult.put("actualAmount", actualAmount);
-                            cigResult.put("error", adv.subtract(actualAmount).abs());
-                            cigResult.put("errorPercentage", adv.subtract(actualAmount).abs()
-                                .divide(adv, 4, BigDecimal.ROUND_HALF_UP)
-                                .multiply(new BigDecimal("100")));
-                            
+                            if (!targetList.isEmpty()) {
+                                // 根据目标区域筛选客户数矩阵
+                                BigDecimal[][] targetRegionCustomerMatrix = new BigDecimal[targetList.size()][30];
+                                for (int i = 0; i < targetList.size(); i++) {
+                                    String targetRegion = targetList.get(i);
+                                    int regionIndex = allRegions.indexOf(targetRegion);
+                                    if (regionIndex >= 0) {
+                                        System.arraycopy(regionCustomerMatrix[regionIndex], 0, targetRegionCustomerMatrix[i], 0, 30);
+                                    }
+                                }
+                                
+                                // 执行分配算法
+                                allocationMatrix = distributionAlgorithm.calculateDistribution(
+                                    targetList, targetRegionCustomerMatrix, adv);
+                                
+                                // 计算实际投放量
+                                BigDecimal actualAmount = calculateActualAmount(allocationMatrix, targetRegionCustomerMatrix);
+                                cigResult.put("actualAmount", actualAmount);
+                                cigResult.put("error", adv.subtract(actualAmount).abs());
+                                cigResult.put("errorPercentage", adv.subtract(actualAmount).abs()
+                                    .divide(adv, 4, BigDecimal.ROUND_HALF_UP)
+                                    .multiply(new BigDecimal("100")));
+                            }
+                        }
+                        
+                        if (allocationMatrix != null && !targetList.isEmpty()) {
                             // 验证约束
                             boolean constraintValid = validateNonIncreasingConstraint(allocationMatrix);
                             cigResult.put("constraintValid", constraintValid);
+                            cigResult.put("targetType", targetType);
                             
                             // 写回数据库
-                            boolean writeBackSuccess = writeBackToDatabase(allocationMatrix, targetRegions, 
+                            boolean writeBackSuccess = writeBackToDatabase(allocationMatrix, targetList, 
                                 cigCode, cigName, year, month, weekSeq);
                             
                             if (writeBackSuccess) {
@@ -689,9 +898,9 @@ public class CigaretteDistributionService {
                             
                             // 添加分配矩阵详情
                             Map<String, Object> allocationDetails = new HashMap<>();
-                            for (int i = 0; i < targetRegions.size(); i++) {
+                            for (int i = 0; i < targetList.size(); i++) {
                                 Map<String, Object> regionAllocation = new HashMap<>();
-                                regionAllocation.put("region", targetRegions.get(i));
+                                regionAllocation.put("target", targetList.get(i));
                                 
                                 // 添加所有30个档位的分配值
                                 for (int j = 0; j < 30; j++) {
@@ -740,10 +949,10 @@ public class CigaretteDistributionService {
     }
     
     /**
-     * 将分配矩阵写回数据库
+     * 将分配矩阵写回数据库（支持业态类型和城乡分类代码）
      */
     private boolean writeBackToDatabase(BigDecimal[][] allocationMatrix, 
-                                      List<String> targetRegions,
+                                      List<String> targetList,
                                       String cigCode, 
                                       String cigName,
                                       Integer year, 
@@ -763,12 +972,12 @@ public class CigaretteDistributionService {
                 "d5=VALUES(d5), d4=VALUES(d4), d3=VALUES(d3), d2=VALUES(d2), d1=VALUES(d1), " +
                 "bz=VALUES(bz)";
             
-            // 为每个区域执行插入或更新
-            for (int i = 0; i < targetRegions.size(); i++) {
-                String region = targetRegions.get(i);
+            // 为每个目标（区域或业态类型）执行插入或更新
+            for (int i = 0; i < targetList.size(); i++) {
+                String target = targetList.get(i);
                 
                 Object[] params = {
-                    cigCode, cigName, region, year, month, weekSeq,
+                    cigCode, cigName, target, year, month, weekSeq,
                     allocationMatrix[i][0],  // D30
                     allocationMatrix[i][1],  // D29
                     allocationMatrix[i][2],  // D28
@@ -804,7 +1013,7 @@ public class CigaretteDistributionService {
                 
                 // 执行SQL
                 jdbcTemplate.update(insertSql, params);
-                log.debug("区域 {} 的分配矩阵已写入数据库", region);
+                log.debug("目标 {} 的分配矩阵已写入数据库", target);
             }
             
             log.info("卷烟 {} 的分配矩阵已成功写回数据库", cigName);
