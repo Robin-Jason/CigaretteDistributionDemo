@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.math.BigDecimal;
 import org.example.dto.UpdateCigaretteRequestDto;
+import org.example.dto.DeleteAreasRequestDto;
 
 @Slf4j
 @Service
@@ -1233,6 +1234,141 @@ public class CigaretteDistributionService {
             data.setD3(request.getDistribution().get(27));
             data.setD2(request.getDistribution().get(28));
             data.setD1(request.getDistribution().get(29));
+        }
+    }
+    
+    /**
+     * 删除指定卷烟的投放区域记录
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> deleteDeliveryAreas(DeleteAreasRequestDto request) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            log.info("开始删除投放区域，卷烟: {} - {}, 年份: {}, 月份: {}, 周序号: {}, 要删除的区域: {}", 
+                    request.getCigName(), request.getCigCode(), request.getYear(), 
+                    request.getMonth(), request.getWeekSeq(), request.getAreasToDelete());
+            
+            // 1. 验证参数
+            if (!validateDeleteRequest(request)) {
+                result.put("success", false);
+                result.put("message", "请求参数无效");
+                return result;
+            }
+            
+            // 2. 查询要删除的记录
+            List<DemoTestData> recordsToDelete = testDataRepository.findByYearAndMonthAndWeekSeq(
+                    request.getYear(), request.getMonth(), request.getWeekSeq())
+                    .stream()
+                    .filter(record -> request.getCigCode().equals(record.getCigCode()) && 
+                                    request.getCigName().equals(record.getCigName()) &&
+                                    request.getAreasToDelete().contains(record.getDeliveryArea()))
+                    .collect(Collectors.toList());
+            
+            if (recordsToDelete.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "未找到要删除的记录");
+                return result;
+            }
+            
+            // 3. 执行批量删除
+            int deletedCount = 0;
+            for (DemoTestData record : recordsToDelete) {
+                try {
+                    testDataRepository.delete(record);
+                    deletedCount++;
+                    log.debug("删除记录，ID: {}, 投放区域: {}", record.getId(), record.getDeliveryArea());
+                } catch (Exception e) {
+                    log.error("删除记录失败，ID: {}, 投放区域: {}, 错误: {}", 
+                            record.getId(), record.getDeliveryArea(), e.getMessage());
+                }
+            }
+            
+            // 4. 记录删除结果
+            log.info("删除投放区域完成，总共删除 {} 条记录", deletedCount);
+            
+            result.put("success", true);
+            result.put("message", "删除成功");
+            result.put("deletedCount", deletedCount);
+            result.put("requestedDeleteCount", recordsToDelete.size());
+            
+            return result;
+            
+        } catch (Exception e) {
+            log.error("删除投放区域时发生错误", e);
+            result.put("success", false);
+            result.put("message", "删除过程中发生错误: " + e.getMessage());
+            return result;
+        }
+    }
+    
+    /**
+     * 验证删除请求参数
+     */
+    private boolean validateDeleteRequest(DeleteAreasRequestDto request) {
+        if (request == null) {
+            return false;
+        }
+        
+        if (request.getCigCode() == null || request.getCigCode().trim().isEmpty()) {
+            log.warn("卷烟代码为空");
+            return false;
+        }
+        
+        if (request.getCigName() == null || request.getCigName().trim().isEmpty()) {
+            log.warn("卷烟名称为空");
+            return false;
+        }
+        
+        if (request.getYear() == null || request.getYear() <= 0) {
+            log.warn("年份无效: {}", request.getYear());
+            return false;
+        }
+        
+        if (request.getMonth() == null || request.getMonth() < 1 || request.getMonth() > 12) {
+            log.warn("月份无效: {}", request.getMonth());
+            return false;
+        }
+        
+        if (request.getWeekSeq() == null || request.getWeekSeq() < 1 || request.getWeekSeq() > 5) {
+            log.warn("周序号无效: {}", request.getWeekSeq());
+            return false;
+        }
+        
+        if (request.getAreasToDelete() == null || request.getAreasToDelete().isEmpty()) {
+            log.warn("要删除的投放区域列表为空");
+            return false;
+        }
+        
+        // 检查是否有重复的区域
+        Set<String> uniqueAreas = new HashSet<>(request.getAreasToDelete());
+        if (uniqueAreas.size() != request.getAreasToDelete().size()) {
+            log.warn("要删除的投放区域列表包含重复项");
+        }
+        
+        return true;
+    }
+    
+    /**
+     * 获取指定卷烟在指定时间的所有投放区域
+     */
+    public List<String> getCurrentDeliveryAreas(String cigCode, String cigName, 
+                                               Integer year, Integer month, Integer weekSeq) {
+        try {
+            List<DemoTestData> records = testDataRepository.findByYearAndMonthAndWeekSeq(year, month, weekSeq);
+            
+            return records.stream()
+                    .filter(record -> cigCode.equals(record.getCigCode()) && 
+                                    cigName.equals(record.getCigName()))
+                    .map(DemoTestData::getDeliveryArea)
+                    .filter(area -> area != null && !area.trim().isEmpty())
+                    .distinct()
+                    .sorted()
+                    .collect(Collectors.toList());
+                    
+        } catch (Exception e) {
+            log.error("获取当前投放区域失败", e);
+            return new ArrayList<>();
         }
     }
 }

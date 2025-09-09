@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.dto.QueryRequestDto;
 import org.example.dto.UpdateRequestDto;
 import org.example.dto.UpdateCigaretteRequestDto;
+import org.example.dto.DeleteAreasRequestDto;
+import org.example.dto.CigaretteImportRequestDto;
+import org.example.dto.RegionClientNumImportRequestDto;
 import org.example.entity.DemoTestAdvData;
 import org.example.entity.DemoTestClientNumData;
 import org.example.entity.DemoTestData;
@@ -11,6 +14,7 @@ import org.example.repository.DemoTestAdvDataRepository;
 import org.example.repository.DemoTestClientNumDataRepository;
 import org.example.repository.DemoTestDataRepository;
 import org.example.service.CigaretteDistributionService;
+import org.example.service.ExcelImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +47,11 @@ public class CigaretteDistributionController {
     @Autowired
     private DemoTestDataRepository testDataRepository;
     
+    @Autowired
+    private ExcelImportService excelImportService;
+    
     /**
-     * 查询卷烟分配数据 - 合并档位相同但投放区域不同的记录
+     * 查询卷烟分配数据 - 返回原始数据并添加预投放量和实际投放量
      */
     @PostMapping("/query")
     public ResponseEntity<Map<String, Object>> queryCigaretteDistribution(@Valid @RequestBody QueryRequestDto request) {
@@ -55,17 +62,71 @@ public class CigaretteDistributionController {
             List<DemoTestData> rawDataList = testDataRepository.findByYearAndMonthAndWeekSeq(
                     request.getYear(), request.getMonth(), request.getWeekSeq());
             
-            // 合并档位相同但投放区域不同的记录，并添加预投放量和实际投放量
-            List<Map<String, Object>> mergedResult = mergeRecordsByAllocationWithAdvAndActual(rawDataList);
+            // 直接返回原始数据，添加预投放量和实际投放量
+            List<Map<String, Object>> result = new ArrayList<>();
+            for (DemoTestData data : rawDataList) {
+                Map<String, Object> record = new HashMap<>();
+                record.put("id", data.getId());
+                record.put("cigCode", data.getCigCode());
+                record.put("cigName", data.getCigName());
+                record.put("deliveryArea", data.getDeliveryArea());
+                record.put("year", data.getYear());
+                record.put("month", data.getMonth());
+                record.put("weekSeq", data.getWeekSeq());
+                record.put("remark", data.getBz());
+                
+                // 获取预投放量、投放类型和扩展投放类型（从demo_test_ADVdata表）
+                Map<String, Object> advInfo = getAdvDataInfo(data.getCigCode(), data.getCigName());
+                record.put("advAmount", advInfo.get("advAmount")); // 预投放量
+                record.put("deliveryMethod", advInfo.get("deliveryMethod")); // 投放类型
+                record.put("deliveryEtype", advInfo.get("deliveryEtype")); // 扩展投放类型
+                
+                // 从服务层获取实际投放量
+                BigDecimal actualDelivery = distributionService.calculateActualAmountForRecord(data);
+                record.put("actualDelivery", actualDelivery);
+                
+                // 添加所有档位数据
+                record.put("d30", data.getD30());
+                record.put("d29", data.getD29());
+                record.put("d28", data.getD28());
+                record.put("d27", data.getD27());
+                record.put("d26", data.getD26());
+                record.put("d25", data.getD25());
+                record.put("d24", data.getD24());
+                record.put("d23", data.getD23());
+                record.put("d22", data.getD22());
+                record.put("d21", data.getD21());
+                record.put("d20", data.getD20());
+                record.put("d19", data.getD19());
+                record.put("d18", data.getD18());
+                record.put("d17", data.getD17());
+                record.put("d16", data.getD16());
+                record.put("d15", data.getD15());
+                record.put("d14", data.getD14());
+                record.put("d13", data.getD13());
+                record.put("d12", data.getD12());
+                record.put("d11", data.getD11());
+                record.put("d10", data.getD10());
+                record.put("d9", data.getD9());
+                record.put("d8", data.getD8());
+                record.put("d7", data.getD7());
+                record.put("d6", data.getD6());
+                record.put("d5", data.getD5());
+                record.put("d4", data.getD4());
+                record.put("d3", data.getD3());
+                record.put("d2", data.getD2());
+                record.put("d1", data.getD1());
+                
+                result.add(record);
+            }
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "查询成功");
-            response.put("data", mergedResult);
-            response.put("total", mergedResult.size());
-            response.put("originalTotal", rawDataList.size());
+            response.put("data", result);
+            response.put("total", result.size());
             
-            log.info("查询成功，原始记录{}条，合并后{}条", rawDataList.size(), mergedResult.size());
+            log.info("查询成功，返回{}条原始记录", result.size());
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
@@ -693,6 +754,31 @@ public class CigaretteDistributionController {
     }
     
     /**
+     * 获取预投放量、投放类型和扩展投放类型（从demo_test_ADVdata表）
+     */
+    private Map<String, Object> getAdvDataInfo(String cigCode, String cigName) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            DemoTestAdvData advData = advDataRepository.findByCigCodeAndCigName(cigCode, cigName);
+            if (advData != null) {
+                result.put("advAmount", advData.getAdv() != null ? advData.getAdv() : BigDecimal.ZERO);
+                result.put("deliveryMethod", advData.getDeliveryMethod() != null ? advData.getDeliveryMethod() : "");
+                result.put("deliveryEtype", advData.getDeliveryEtype() != null ? advData.getDeliveryEtype() : "");
+            } else {
+                result.put("advAmount", BigDecimal.ZERO);
+                result.put("deliveryMethod", "");
+                result.put("deliveryEtype", "");
+            }
+        } catch (Exception e) {
+            log.warn("获取预投放量和投放类型失败，卷烟代码: {}, 卷烟名称: {}, 错误: {}", cigCode, cigName, e.getMessage());
+            result.put("advAmount", BigDecimal.ZERO);
+            result.put("deliveryMethod", "");
+            result.put("deliveryEtype", "");
+        }
+        return result;
+    }
+    
+    /**
      * 计算实际投放量
      */
     private BigDecimal calculateActualAmount(BigDecimal[][] allocationMatrix, List<String> targetRegions) {
@@ -845,6 +931,198 @@ public class CigaretteDistributionController {
             response.put("success", false);
             response.put("message", "KMP匹配测试失败: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    /**
+     * 删除指定卷烟的投放区域记录
+     */
+    @PostMapping("/delete-delivery-areas")
+    public ResponseEntity<Map<String, Object>> deleteDeliveryAreas(@Valid @RequestBody DeleteAreasRequestDto request) {
+        log.info("接收删除投放区域请求，卷烟代码: {}, 卷烟名称: {}, 要删除的区域: {}", 
+                request.getCigCode(), request.getCigName(), request.getAreasToDelete());
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // 1. 验证请求参数
+            if (request.getAreasToDelete() == null || request.getAreasToDelete().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "要删除的投放区域列表不能为空");
+                response.put("error", "INVALID_PARAMETERS");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // 2. 查询当前该卷烟的所有投放区域
+            List<DemoTestData> currentRecords = testDataRepository.findByYearAndMonthAndWeekSeq(
+                    request.getYear(), request.getMonth(), request.getWeekSeq());
+            
+            List<String> currentAreas = currentRecords.stream()
+                    .filter(record -> request.getCigCode().equals(record.getCigCode()) && 
+                                    request.getCigName().equals(record.getCigName()))
+                    .map(DemoTestData::getDeliveryArea)
+                    .distinct()
+                    .collect(java.util.stream.Collectors.toList());
+            
+            if (currentAreas.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "未找到要删除的卷烟记录");
+                response.put("error", "RECORD_NOT_FOUND");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // 3. 安全检查：确保删除后至少还有一个区域
+            List<String> remainingAreas = currentAreas.stream()
+                    .filter(area -> !request.getAreasToDelete().contains(area))
+                    .collect(java.util.stream.Collectors.toList());
+            
+            if (remainingAreas.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "删除失败：不能删除所有投放区域，至少需要保留一个");
+                response.put("error", "CANNOT_DELETE_ALL_AREAS");
+                response.put("currentAreas", currentAreas);
+                response.put("areasToDelete", request.getAreasToDelete());
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // 4. 执行删除操作
+            Map<String, Object> deleteResult = distributionService.deleteDeliveryAreas(request);
+            
+            if ((Boolean) deleteResult.get("success")) {
+                // 5. 记录操作日志
+                log.info("成功删除投放区域，卷烟: {} - {}, 删除区域: {}, 删除记录数: {}", 
+                        request.getCigName(), request.getCigCode(), 
+                        request.getAreasToDelete(), deleteResult.get("deletedCount"));
+                
+                // 6. 返回成功响应
+                response.put("success", true);
+                response.put("message", "删除成功");
+                response.put("deletedCount", deleteResult.get("deletedCount"));
+                response.put("deletedAreas", request.getAreasToDelete());
+                response.put("remainingAreas", remainingAreas);
+                response.put("remainingCount", remainingAreas.size());
+                
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("success", false);
+                response.put("message", "删除失败: " + deleteResult.get("message"));
+                response.put("error", "DELETE_FAILED");
+                return ResponseEntity.internalServerError().body(response);
+            }
+            
+        } catch (Exception e) {
+            log.error("删除投放区域失败", e);
+            response.put("success", false);
+            response.put("message", "删除失败: " + e.getMessage());
+            response.put("error", "INTERNAL_ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
+    /**
+     * 导入卷烟投放基础信息Excel
+     */
+    @PostMapping("/import-cigarette-info")
+    public ResponseEntity<Map<String, Object>> importCigaretteDistributionInfo(@Valid CigaretteImportRequestDto request) {
+        log.info("接收卷烟投放基础信息导入请求，年份: {}, 月份: {}, 周序号: {}", 
+                request.getYear(), request.getMonth(), request.getWeekSeq());
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // 1. 验证文件
+            if (request.getFile() == null || request.getFile().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "请选择要上传的Excel文件");
+                response.put("error", "FILE_EMPTY");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // 2. 检查文件大小（限制10MB）
+            if (request.getFile().getSize() > 10 * 1024 * 1024) {
+                response.put("success", false);
+                response.put("message", "文件大小超过限制（最大10MB）");
+                response.put("error", "FILE_TOO_LARGE");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // 3. 执行导入
+            Map<String, Object> importResult = excelImportService.importCigaretteDistributionInfo(request);
+            
+            if ((Boolean) importResult.get("success")) {
+                log.info("卷烟投放基础信息导入成功，表名: {}, 插入记录数: {}", 
+                        importResult.get("tableName"), importResult.get("insertedCount"));
+                return ResponseEntity.ok(importResult);
+            } else {
+                log.warn("卷烟投放基础信息导入失败: {}", importResult.get("message"));
+                return ResponseEntity.badRequest().body(importResult);
+            }
+            
+        } catch (Exception e) {
+            log.error("卷烟投放基础信息导入失败", e);
+            response.put("success", false);
+            response.put("message", "导入失败: " + e.getMessage());
+            response.put("error", "IMPORT_FAILED");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
+    /**
+     * 导入区域客户数表Excel
+     */
+    @PostMapping("/import-region-clientnum")
+    public ResponseEntity<Map<String, Object>> importRegionClientNumData(@Valid RegionClientNumImportRequestDto request) {
+        log.info("接收区域客户数表导入请求，年份: {}, 月份: {}, 投放类型: {}, 扩展投放类型: {}", 
+                request.getYear(), request.getMonth(), request.getDeliveryMethod(), request.getDeliveryEtype());
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // 1. 验证文件
+            if (request.getFile() == null || request.getFile().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "请选择要上传的Excel文件");
+                response.put("error", "FILE_EMPTY");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // 2. 检查文件大小（限制10MB）
+            if (request.getFile().getSize() > 10 * 1024 * 1024) {
+                response.put("success", false);
+                response.put("message", "文件大小超过限制（最大10MB）");
+                response.put("error", "FILE_TOO_LARGE");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // 3. 验证投放类型映射
+            Integer sequenceNumber = request.getSequenceNumber();
+            if (sequenceNumber < 0 || sequenceNumber > 4) {
+                response.put("success", false);
+                response.put("message", "投放类型和扩展投放类型组合无效");
+                response.put("error", "INVALID_DELIVERY_TYPE");
+                response.put("deliveryMethod", request.getDeliveryMethod());
+                response.put("deliveryEtype", request.getDeliveryEtype());
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // 4. 执行导入
+            Map<String, Object> importResult = excelImportService.importRegionClientNumData(request);
+            
+            if ((Boolean) importResult.get("success")) {
+                log.info("区域客户数表导入成功，表名: {}, 插入记录数: {}, 序号: {}", 
+                        importResult.get("tableName"), importResult.get("insertedCount"), sequenceNumber);
+                return ResponseEntity.ok(importResult);
+            } else {
+                log.warn("区域客户数表导入失败: {}", importResult.get("message"));
+                return ResponseEntity.badRequest().body(importResult);
+            }
+            
+        } catch (Exception e) {
+            log.error("区域客户数表导入失败", e);
+            response.put("success", false);
+            response.put("message", "导入失败: " + e.getMessage());
+            response.put("error", "IMPORT_FAILED");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

@@ -124,7 +124,7 @@ export class ExcelExporter {
         item.year || '',
         item.month || '',
         item.weekSeq || '',
-        item.deliveryAreas || '',
+        item.deliveryArea || '',
         item.advAmount || 0,
         item.actualDelivery || 0,
         item.remark || ''

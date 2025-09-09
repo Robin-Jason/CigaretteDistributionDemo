@@ -68,6 +68,34 @@ export const cigaretteDistributionAPI = {
   // 测试分配算法
   testAlgorithm() {
     return api.get('/test-algorithm')
+  },
+  
+  // 删除投放区域
+  deleteDeliveryAreas(data) {
+    return api.post('/delete-delivery-areas', data)
+  },
+  
+  // 导入卷烟投放基本信息
+  importBasicInfo(formData) {
+    return api.post('/import-basic-info', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+  
+  // 导入区域客户数
+  importCustomerData(formData) {
+    return api.post('/import-customer-data', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+  
+  // 生成分配方案
+  generateDistributionPlan(data) {
+    return api.post('/generate-distribution-plan', data)
   }
 }
 
