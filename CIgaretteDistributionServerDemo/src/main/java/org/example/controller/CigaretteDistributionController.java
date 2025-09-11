@@ -10,9 +10,11 @@ import org.example.dto.RegionClientNumImportRequestDto;
 import org.example.entity.DemoTestAdvData;
 import org.example.entity.DemoTestClientNumData;
 import org.example.entity.DemoTestData;
+import org.example.entity.DemoTestBusinessFormatClientNumData;
 import org.example.repository.DemoTestAdvDataRepository;
 import org.example.repository.DemoTestClientNumDataRepository;
 import org.example.repository.DemoTestDataRepository;
+import org.example.repository.DemoTestBusinessFormatClientNumDataRepository;
 import org.example.service.CigaretteDistributionService;
 import org.example.service.ExcelImportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +47,14 @@ public class CigaretteDistributionController {
     private DemoTestClientNumDataRepository clientNumDataRepository;
     
     @Autowired
+    private DemoTestBusinessFormatClientNumDataRepository businessFormatClientNumDataRepository;
+
+    @Autowired
     private DemoTestDataRepository testDataRepository;
     
     @Autowired
     private ExcelImportService excelImportService;
-    
+
     /**
      * 查询卷烟分配数据 - 返回原始数据并添加预投放量和实际投放量
      */
@@ -74,17 +79,17 @@ public class CigaretteDistributionController {
                 record.put("month", data.getMonth());
                 record.put("weekSeq", data.getWeekSeq());
                 record.put("remark", data.getBz());
-                
+
                 // 获取预投放量、投放类型和扩展投放类型（从demo_test_ADVdata表）
                 Map<String, Object> advInfo = getAdvDataInfo(data.getCigCode(), data.getCigName());
                 record.put("advAmount", advInfo.get("advAmount")); // 预投放量
                 record.put("deliveryMethod", advInfo.get("deliveryMethod")); // 投放类型
                 record.put("deliveryEtype", advInfo.get("deliveryEtype")); // 扩展投放类型
-                
+
                 // 从服务层获取实际投放量
                 BigDecimal actualDelivery = distributionService.calculateActualAmountForRecord(data);
                 record.put("actualDelivery", actualDelivery);
-                
+
                 // 添加所有档位数据
                 record.put("d30", data.getD30());
                 record.put("d29", data.getD29());
@@ -116,7 +121,7 @@ public class CigaretteDistributionController {
                 record.put("d3", data.getD3());
                 record.put("d2", data.getD2());
                 record.put("d1", data.getD1());
-                
+
                 result.add(record);
             }
             
@@ -777,7 +782,7 @@ public class CigaretteDistributionController {
         }
         return result;
     }
-    
+
     /**
      * 计算实际投放量
      */
@@ -933,17 +938,17 @@ public class CigaretteDistributionController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
-    
+
     /**
      * 删除指定卷烟的投放区域记录
      */
     @PostMapping("/delete-delivery-areas")
     public ResponseEntity<Map<String, Object>> deleteDeliveryAreas(@Valid @RequestBody DeleteAreasRequestDto request) {
-        log.info("接收删除投放区域请求，卷烟代码: {}, 卷烟名称: {}, 要删除的区域: {}", 
+        log.info("接收删除投放区域请求，卷烟代码: {}, 卷烟名称: {}, 要删除的区域: {}",
                 request.getCigCode(), request.getCigName(), request.getAreasToDelete());
-        
+
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             // 1. 验证请求参数
             if (request.getAreasToDelete() == null || request.getAreasToDelete().isEmpty()) {
@@ -952,30 +957,30 @@ public class CigaretteDistributionController {
                 response.put("error", "INVALID_PARAMETERS");
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             // 2. 查询当前该卷烟的所有投放区域
             List<DemoTestData> currentRecords = testDataRepository.findByYearAndMonthAndWeekSeq(
                     request.getYear(), request.getMonth(), request.getWeekSeq());
-            
+
             List<String> currentAreas = currentRecords.stream()
-                    .filter(record -> request.getCigCode().equals(record.getCigCode()) && 
+                    .filter(record -> request.getCigCode().equals(record.getCigCode()) &&
                                     request.getCigName().equals(record.getCigName()))
                     .map(DemoTestData::getDeliveryArea)
                     .distinct()
                     .collect(java.util.stream.Collectors.toList());
-            
+
             if (currentAreas.isEmpty()) {
                 response.put("success", false);
                 response.put("message", "未找到要删除的卷烟记录");
                 response.put("error", "RECORD_NOT_FOUND");
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             // 3. 安全检查：确保删除后至少还有一个区域
             List<String> remainingAreas = currentAreas.stream()
                     .filter(area -> !request.getAreasToDelete().contains(area))
                     .collect(java.util.stream.Collectors.toList());
-            
+
             if (remainingAreas.isEmpty()) {
                 response.put("success", false);
                 response.put("message", "删除失败：不能删除所有投放区域，至少需要保留一个");
@@ -984,16 +989,16 @@ public class CigaretteDistributionController {
                 response.put("areasToDelete", request.getAreasToDelete());
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             // 4. 执行删除操作
             Map<String, Object> deleteResult = distributionService.deleteDeliveryAreas(request);
-            
+
             if ((Boolean) deleteResult.get("success")) {
                 // 5. 记录操作日志
-                log.info("成功删除投放区域，卷烟: {} - {}, 删除区域: {}, 删除记录数: {}", 
-                        request.getCigName(), request.getCigCode(), 
+                log.info("成功删除投放区域，卷烟: {} - {}, 删除区域: {}, 删除记录数: {}",
+                        request.getCigName(), request.getCigCode(),
                         request.getAreasToDelete(), deleteResult.get("deletedCount"));
-                
+
                 // 6. 返回成功响应
                 response.put("success", true);
                 response.put("message", "删除成功");
@@ -1001,7 +1006,7 @@ public class CigaretteDistributionController {
                 response.put("deletedAreas", request.getAreasToDelete());
                 response.put("remainingAreas", remainingAreas);
                 response.put("remainingCount", remainingAreas.size());
-                
+
                 return ResponseEntity.ok(response);
             } else {
                 response.put("success", false);
@@ -1009,7 +1014,7 @@ public class CigaretteDistributionController {
                 response.put("error", "DELETE_FAILED");
                 return ResponseEntity.internalServerError().body(response);
             }
-            
+
         } catch (Exception e) {
             log.error("删除投放区域失败", e);
             response.put("success", false);
@@ -1018,17 +1023,17 @@ public class CigaretteDistributionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-    
+
     /**
      * 导入卷烟投放基础信息Excel
      */
     @PostMapping("/import-cigarette-info")
     public ResponseEntity<Map<String, Object>> importCigaretteDistributionInfo(@Valid CigaretteImportRequestDto request) {
-        log.info("接收卷烟投放基础信息导入请求，年份: {}, 月份: {}, 周序号: {}", 
+        log.info("接收卷烟投放基础信息导入请求，年份: {}, 月份: {}, 周序号: {}",
                 request.getYear(), request.getMonth(), request.getWeekSeq());
-        
+
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             // 1. 验证文件
             if (request.getFile() == null || request.getFile().isEmpty()) {
@@ -1037,7 +1042,7 @@ public class CigaretteDistributionController {
                 response.put("error", "FILE_EMPTY");
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             // 2. 检查文件大小（限制10MB）
             if (request.getFile().getSize() > 10 * 1024 * 1024) {
                 response.put("success", false);
@@ -1045,19 +1050,19 @@ public class CigaretteDistributionController {
                 response.put("error", "FILE_TOO_LARGE");
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             // 3. 执行导入
             Map<String, Object> importResult = excelImportService.importCigaretteDistributionInfo(request);
-            
+
             if ((Boolean) importResult.get("success")) {
-                log.info("卷烟投放基础信息导入成功，表名: {}, 插入记录数: {}", 
+                log.info("卷烟投放基础信息导入成功，表名: {}, 插入记录数: {}",
                         importResult.get("tableName"), importResult.get("insertedCount"));
                 return ResponseEntity.ok(importResult);
             } else {
                 log.warn("卷烟投放基础信息导入失败: {}", importResult.get("message"));
                 return ResponseEntity.badRequest().body(importResult);
             }
-            
+
         } catch (Exception e) {
             log.error("卷烟投放基础信息导入失败", e);
             response.put("success", false);
@@ -1066,17 +1071,17 @@ public class CigaretteDistributionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-    
+
     /**
      * 导入区域客户数表Excel
      */
     @PostMapping("/import-region-clientnum")
     public ResponseEntity<Map<String, Object>> importRegionClientNumData(@Valid RegionClientNumImportRequestDto request) {
-        log.info("接收区域客户数表导入请求，年份: {}, 月份: {}, 投放类型: {}, 扩展投放类型: {}", 
+        log.info("接收区域客户数表导入请求，年份: {}, 月份: {}, 投放类型: {}, 扩展投放类型: {}",
                 request.getYear(), request.getMonth(), request.getDeliveryMethod(), request.getDeliveryEtype());
-        
+
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             // 1. 验证文件
             if (request.getFile() == null || request.getFile().isEmpty()) {
@@ -1085,7 +1090,7 @@ public class CigaretteDistributionController {
                 response.put("error", "FILE_EMPTY");
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             // 2. 检查文件大小（限制10MB）
             if (request.getFile().getSize() > 10 * 1024 * 1024) {
                 response.put("success", false);
@@ -1093,7 +1098,7 @@ public class CigaretteDistributionController {
                 response.put("error", "FILE_TOO_LARGE");
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             // 3. 验证投放类型映射
             Integer sequenceNumber = request.getSequenceNumber();
             if (sequenceNumber < 0 || sequenceNumber > 4) {
@@ -1104,19 +1109,19 @@ public class CigaretteDistributionController {
                 response.put("deliveryEtype", request.getDeliveryEtype());
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
             // 4. 执行导入
             Map<String, Object> importResult = excelImportService.importRegionClientNumData(request);
-            
+
             if ((Boolean) importResult.get("success")) {
-                log.info("区域客户数表导入成功，表名: {}, 插入记录数: {}, 序号: {}", 
+                log.info("区域客户数表导入成功，表名: {}, 插入记录数: {}, 序号: {}",
                         importResult.get("tableName"), importResult.get("insertedCount"), sequenceNumber);
                 return ResponseEntity.ok(importResult);
             } else {
                 log.warn("区域客户数表导入失败: {}", importResult.get("message"));
                 return ResponseEntity.badRequest().body(importResult);
             }
-            
+
         } catch (Exception e) {
             log.error("区域客户数表导入失败", e);
             response.put("success", false);
@@ -1125,4 +1130,224 @@ public class CigaretteDistributionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+    /**
+     * 测试业态类型客户数矩阵
+     */
+    @GetMapping("/test-business-format-matrix")
+    public ResponseEntity<Map<String, Object>> testBusinessFormatMatrix() {
+        log.info("测试业态类型客户数矩阵");
+
+        try {
+            // 获取业态类型客户数矩阵
+            BigDecimal[][] businessFormatCustomerMatrix = distributionService.getBusinessFormatCustomerMatrix();
+
+            // 获取所有业态类型列表
+            List<String> allBusinessFormats = distributionService.getAllBusinessFormatList();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "查询成功");
+            response.put("matrixSize", businessFormatCustomerMatrix.length + "x" + businessFormatCustomerMatrix[0].length);
+            response.put("businessFormatCount", allBusinessFormats.size());
+            response.put("businessFormats", allBusinessFormats);
+
+            // 构建矩阵数据
+            List<Map<String, Object>> matrixData = new ArrayList<>();
+            for (int i = 0; i < businessFormatCustomerMatrix.length; i++) {
+                Map<String, Object> businessFormatData = new HashMap<>();
+                businessFormatData.put("businessFormatIndex", i);
+                businessFormatData.put("businessFormatName", allBusinessFormats.get(i));
+
+                // 添加所有档位数据
+                Map<String, Object> gradeData = new HashMap<>();
+                for (int j = 0; j < 30; j++) {
+                    String columnName = "D" + (30 - j);
+                    gradeData.put(columnName, businessFormatCustomerMatrix[i][j]);
+                }
+                businessFormatData.put("gradeData", gradeData);
+
+                matrixData.add(businessFormatData);
+            }
+            response.put("matrixData", matrixData);
+
+            log.info("查询成功，矩阵大小: {}x30, 业态类型数量: {}", businessFormatCustomerMatrix.length, allBusinessFormats.size());
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("查询失败", e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "查询失败: " + e.getMessage());
+            response.put("error", e.toString());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    /**
+     * 测试业态类型KMP匹配功能
+     */
+    @GetMapping("/test-business-format-kmp-matching")
+    public ResponseEntity<Map<String, Object>> testBusinessFormatKmpMatching() {
+        log.info("测试业态类型KMP匹配功能");
+
+        try {
+            // 获取所有业态类型
+            String businessFormatSql = "SELECT BusinessFormat FROM demo_test_businessFormat_clientNumData ORDER BY id ASC";
+            List<Map<String, Object>> businessFormatData = distributionService.getJdbcTemplate().queryForList(businessFormatSql);
+            List<String> allBusinessFormats = businessFormatData.stream()
+                    .map(row -> (String) row.get("BusinessFormat"))
+                    .collect(java.util.stream.Collectors.toList());
+
+            // 获取投放区域
+            String advDataSql = "SELECT cig_code, cig_name, delivery_area, delivery_etype FROM demo_test_advdata WHERE delivery_etype = '档位+业态类型'";
+            List<Map<String, Object>> advDataList = distributionService.getJdbcTemplate().queryForList(advDataSql);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "业态类型KMP匹配测试完成");
+            response.put("allBusinessFormats", allBusinessFormats);
+
+            List<Map<String, Object>> testResults = new ArrayList<>();
+            for (Map<String, Object> advData : advDataList) {
+                String cigCode = (String) advData.get("cig_code");
+                String cigName = (String) advData.get("cig_name");
+                String deliveryArea = (String) advData.get("delivery_area");
+                String deliveryEtype = (String) advData.get("delivery_etype");
+
+                Map<String, Object> testResult = new HashMap<>();
+                testResult.put("cigCode", cigCode);
+                testResult.put("cigName", cigName);
+                testResult.put("deliveryArea", deliveryArea);
+                testResult.put("deliveryEtype", deliveryEtype);
+
+                if (deliveryArea != null && !deliveryArea.trim().isEmpty()) {
+                    // 使用KMP匹配业态类型
+                    List<String> matchedBusinessFormats = distributionService.getKmpMatcher().matchPatterns(deliveryArea, allBusinessFormats);
+                    testResult.put("matchedBusinessFormats", matchedBusinessFormats);
+                    testResult.put("matchCount", matchedBusinessFormats.size());
+                } else {
+                    testResult.put("matchedBusinessFormats", new ArrayList<>());
+                    testResult.put("matchCount", 0);
+                }
+
+                testResults.add(testResult);
+            }
+
+            response.put("testResults", testResults);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("业态类型KMP匹配测试失败", e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "业态类型KMP匹配测试失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    /**
+     * 测试业态类型分配算法
+     */
+    @GetMapping("/test-business-format-algorithm")
+    public ResponseEntity<Map<String, Object>> testBusinessFormatAlgorithm() {
+        log.info("开始测试业态类型分配算法");
+
+        try {
+            // 获取业态类型的预投放量数据
+            String advDataSql = "SELECT cig_code, cig_name, adv, delivery_area, delivery_etype FROM demo_test_advdata WHERE delivery_etype = '档位+业态类型'";
+            List<Map<String, Object>> advDataList = distributionService.getJdbcTemplate().queryForList(advDataSql);
+
+            List<Map<String, Object>> testResults = new ArrayList<>();
+
+            for (Map<String, Object> advData : advDataList) {
+                String cigCode = (String) advData.get("cig_code");
+                String cigName = (String) advData.get("cig_name");
+                BigDecimal adv = (BigDecimal) advData.get("adv");
+                String deliveryArea = (String) advData.get("delivery_area");
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("cigCode", cigCode);
+                result.put("cigName", cigName);
+                result.put("adv", adv);
+                result.put("deliveryArea", deliveryArea);
+
+                if (deliveryArea != null && !deliveryArea.trim().isEmpty()) {
+                    // 获取目标业态类型
+                    List<String> targetBusinessFormats = distributionService.getTargetBusinessFormatList(deliveryArea);
+                    result.put("targetBusinessFormats", targetBusinessFormats);
+
+                    if (!targetBusinessFormats.isEmpty()) {
+                        // 计算分配矩阵
+                        BigDecimal[][] allocationMatrix = distributionService.calculateBusinessFormatDistributionMatrix(
+                                targetBusinessFormats, adv);
+
+                        // 计算实际投放量
+                        BigDecimal actualAmount = calculateActualAmountForBusinessFormat(allocationMatrix, targetBusinessFormats);
+                        result.put("actualAmount", actualAmount);
+                        result.put("error", adv.subtract(actualAmount).abs());
+
+                        // 验证约束
+                        result.put("constraintValid", validateConstraints(allocationMatrix));
+
+                        // 输出完整的分配矩阵
+                        Map<String, Object> allocationResult = new HashMap<>();
+                        for (int i = 0; i < targetBusinessFormats.size(); i++) {
+                            Map<String, Object> businessFormatAllocation = new HashMap<>();
+                            businessFormatAllocation.put("businessFormat", targetBusinessFormats.get(i));
+
+                            // 添加所有30个档位的分配值
+                            for (int j = 0; j < 30; j++) {
+                                String columnName = "d" + (30 - j);
+                                businessFormatAllocation.put(columnName, allocationMatrix[i][j]);
+                            }
+
+                            allocationResult.put("businessFormat_" + i, businessFormatAllocation);
+                        }
+                        result.put("allocationMatrix", allocationResult);
+                    }
+                }
+
+                testResults.add(result);
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "业态类型算法测试完成");
+            response.put("results", testResults);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("业态类型算法测试失败", e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "业态类型算法测试失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    /**
+     * 计算业态类型实际投放量
+     */
+    private BigDecimal calculateActualAmountForBusinessFormat(BigDecimal[][] allocationMatrix, List<String> targetBusinessFormats) {
+        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal[][] businessFormatCustomerMatrix = distributionService.getBusinessFormatCustomerMatrix();
+        List<String> allBusinessFormats = distributionService.getAllBusinessFormatList();
+
+        for (int i = 0; i < allocationMatrix.length; i++) {
+            String targetBusinessFormat = targetBusinessFormats.get(i);
+            int businessFormatIndex = allBusinessFormats.indexOf(targetBusinessFormat);
+
+            if (businessFormatIndex >= 0) {
+                for (int j = 0; j < 30; j++) {
+                    if (allocationMatrix[i][j] != null && businessFormatCustomerMatrix[businessFormatIndex][j] != null) {
+                        total = total.add(allocationMatrix[i][j].multiply(businessFormatCustomerMatrix[businessFormatIndex][j]));
+                    }
+                }
+            }
+        }
+        return total;
+    }
+
 }
+
