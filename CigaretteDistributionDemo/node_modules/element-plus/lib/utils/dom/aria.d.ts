@@ -10,14 +10,6 @@ export declare const obtainAllFocusableElements: (element: HTMLElement) => HTMLE
  */
 export declare const isFocusable: (element: HTMLElement) => boolean;
 /**
- * @desc Set Attempt to set focus on the current node.
- * @param element
- *          The node to attempt to focus on.
- * @returns
- *  true if element is focused.
- */
-export declare const attemptFocus: (element: HTMLElement) => boolean;
-/**
  * Trigger an event
  * mouseenter, mouseleave, mouseover, keyup, change, click, etc.
  * @param  {HTMLElement} elm
@@ -27,4 +19,7 @@ export declare const attemptFocus: (element: HTMLElement) => boolean;
 export declare const triggerEvent: (elm: HTMLElement, name: string, ...opts: Array<boolean>) => HTMLElement;
 export declare const isLeaf: (el: HTMLElement) => boolean;
 export declare const getSibling: (el: HTMLElement, distance: number, elClass: string) => Element | null;
+export declare const focusElement: (el?: HTMLElement | {
+    focus: () => void;
+} | null, options?: FocusOptions) => void;
 export declare const focusNode: (el: HTMLElement) => void;

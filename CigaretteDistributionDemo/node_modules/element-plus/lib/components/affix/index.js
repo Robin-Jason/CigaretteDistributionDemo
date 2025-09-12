@@ -2,8 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var affix$1 = require('./src/affix2.js');
-var affix = require('./src/affix.js');
+var affix$1 = require('./src/affix.js');
+var affix = require('./src/affix2.js');
 var install = require('../../utils/vue/install.js');
 
 const ElAffix = install.withInstall(affix$1["default"]);

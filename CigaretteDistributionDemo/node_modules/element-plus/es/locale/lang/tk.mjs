@@ -6,7 +6,10 @@ var tk = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "Arassala"
+      clear: "Arassala",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "\u015Euwagt",
@@ -14,6 +17,10 @@ var tk = {
       cancel: "Bes et",
       clear: "Arassala",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "G\xFCni sa\xFDla\u0148",
       selectTime: "Wagty sa\xFDla\u0148",
       startDate: "Ba\u015Fla\xFDan g\xFCni",
@@ -46,6 +53,15 @@ var tk = {
         fri: "Ann",
         sat: "\u015Een"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "\xDDan",
         feb: "Few",
@@ -61,6 +77,10 @@ var tk = {
         dec: "Dek"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Indiril\xFD\xE4r",
       noMatch: "Hi\xE7zat tapylmady",
@@ -69,6 +89,9 @@ var tk = {
     },
     mention: {
       loading: "Indiril\xFD\xE4r"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Hi\xE7zat tapylmady",
@@ -86,13 +109,21 @@ var tk = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Hat",
       confirm: "OK",
       cancel: "Bes et",
-      error: "\xDDal\u0148y\u015F girizme"
+      error: "\xDDal\u0148y\u015F girizme",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: 'Pozmak \xFC\xE7in "poz" d\xFCwm\xE4 basy\u0148',
@@ -100,12 +131,23 @@ var tk = {
       preview: "G\xF6r",
       continue: "Dowam et"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Maglumat \xFDok",
       confirmFilter: "Tassykla",
       resetFilter: "Arassala",
       clearFilter: "Hemmesi",
       sumText: "Jemi"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Maglumat \xFDok"

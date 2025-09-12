@@ -1,6 +1,6 @@
 import type { ExtractPropTypes, __ExtractPublicPropTypes } from 'vue';
 import type checkboxGroup from './checkbox-group.vue';
-import type { CheckboxValueType } from './checkbox';
+import type { CheckboxPropsPublic, CheckboxValueType } from './checkbox';
 export type CheckboxGroupValueType = Exclude<CheckboxValueType, boolean>[];
 export declare const checkboxGroupProps: {
     readonly ariaLabel: StringConstructor;
@@ -18,6 +18,13 @@ export declare const checkboxGroupProps: {
     readonly textColor: StringConstructor;
     readonly tag: import("element-plus/es/utils").EpPropFinalized<StringConstructor, unknown, unknown, "div", boolean>;
     readonly validateEvent: import("element-plus/es/utils").EpPropFinalized<BooleanConstructor, unknown, unknown, true, boolean>;
+    readonly options: {
+        readonly type: import("vue").PropType<CheckboxOption[]>;
+        readonly required: false;
+        readonly validator: ((val: unknown) => boolean) | undefined;
+        __epPropKey: true;
+    };
+    readonly props: import("element-plus/es/utils").EpPropFinalized<(new (...args: any[]) => CheckboxOptionProps) | (() => CheckboxOptionProps) | ((new (...args: any[]) => CheckboxOptionProps) | (() => CheckboxOptionProps))[], unknown, unknown, () => Required<CheckboxOptionProps>, boolean>;
 };
 export declare const checkboxGroupEmits: {
     "update:modelValue": (val: CheckboxGroupValueType) => boolean;
@@ -27,3 +34,11 @@ export type CheckboxGroupProps = ExtractPropTypes<typeof checkboxGroupProps>;
 export type CheckboxGroupPropsPublic = __ExtractPublicPropTypes<typeof checkboxGroupProps>;
 export type CheckboxGroupEmits = typeof checkboxGroupEmits;
 export type CheckboxGroupInstance = InstanceType<typeof checkboxGroup> & unknown;
+export type CheckboxOption = CheckboxPropsPublic & Record<string, any>;
+type CheckboxOptionProps = {
+    value?: string;
+    label?: string;
+    disabled?: string;
+};
+export declare const checkboxDefaultProps: Required<CheckboxOptionProps>;
+export {};

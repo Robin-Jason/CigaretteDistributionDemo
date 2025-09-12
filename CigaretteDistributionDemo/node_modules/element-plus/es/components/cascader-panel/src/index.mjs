@@ -2,7 +2,7 @@ import { defineComponent, useSlots, ref, computed, provide, reactive, watch, onB
 import { isEqual, flattenDeep, cloneDeep } from 'lodash-unified';
 import ElCascaderMenu from './menu.mjs';
 import Store from './store.mjs';
-import Node from './node.mjs';
+import Node from './node2.mjs';
 import { cascaderPanelProps, cascaderPanelEmits, useCascaderConfig } from './config.mjs';
 import { sortByOriginalOrder, checkNode, getMenuIndex } from './utils.mjs';
 import { CASCADER_PANEL_INJECTION_KEY } from './types.mjs';

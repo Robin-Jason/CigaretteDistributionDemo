@@ -44,7 +44,6 @@ var my = {
       month10: "\u1021\u1031\u102C\u1000\u103A\u1010\u102D\u102F\u1018\u102C",
       month11: "\u1014\u102D\u102F\u101D\u1004\u103A\u1018\u102C",
       month12: "\u1012\u102E\u1007\u1004\u103A\u1018\u102C",
-      week: "\u101B\u1000\u103A\u101E\u1010\u1039\u1010\u1015\u1010\u103A",
       weeks: {
         sun: "\u1014\u103D\u1031",
         mon: "\u101C\u102C",
@@ -147,7 +146,8 @@ var my = {
     tour: {
       next: "\u1014\u1031\u102C\u1000\u103A\u101E\u102D\u102F\u1037",
       previous: "\u101B\u103E\u1031\u1037\u101E\u102D\u102F\u1037",
-      finish: "\u1015\u103C\u102E\u1038\u1015\u103C\u102E"
+      finish: "\u1015\u103C\u102E\u1038\u1015\u103C\u102E",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u1012\u1031\u1010\u102C\u1019\u101B\u103E\u102D\u1015\u102B"

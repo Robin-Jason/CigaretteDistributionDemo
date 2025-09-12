@@ -6,7 +6,10 @@ var vi = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "X\xF3a"
+      clear: "X\xF3a",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Hi\u1EC7n t\u1EA1i",
@@ -14,6 +17,10 @@ var vi = {
       cancel: "H\u1EE7y",
       clear: "X\xF3a",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Ch\u1ECDn ng\xE0y",
       selectTime: "Ch\u1ECDn gi\u1EDD",
       startDate: "Ng\xE0y b\u1EAFt \u0111\u1EA7u",
@@ -46,6 +53,15 @@ var vi = {
         fri: "T6",
         sat: "T7"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Th.1",
         feb: "Th.2",
@@ -61,6 +77,10 @@ var vi = {
         dec: "Th.12"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "\u0110ang t\u1EA3i",
       noMatch: "D\u1EEF li\u1EC7u kh\xF4ng ph\xF9 h\u1EE3p",
@@ -69,6 +89,9 @@ var vi = {
     },
     mention: {
       loading: "\u0110ang t\u1EA3i"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "D\u1EEF li\u1EC7u kh\xF4ng ph\xF9 h\u1EE3p",
@@ -86,19 +109,32 @@ var vi = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Th\xF4ng b\xE1o",
       confirm: "OK",
       cancel: "H\u1EE7y",
-      error: "D\u1EEF li\u1EC7u kh\xF4ng h\u1EE3p l\u1EC7"
+      error: "D\u1EEF li\u1EC7u kh\xF4ng h\u1EE3p l\u1EC7",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "Nh\u1EA5n xo\xE1 \u0111\u1EC3 xo\xE1",
       delete: "X\xF3a",
       preview: "Xem tr\u01B0\u1EDBc",
       continue: "Ti\u1EBFp t\u1EE5c"
+    },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
     },
     table: {
       emptyText: "Kh\xF4ng c\xF3 d\u1EEF li\u1EC7u",
@@ -110,7 +146,8 @@ var vi = {
     tour: {
       next: "Ti\u1EBFp",
       previous: "Tr\u01B0\u1EDBc",
-      finish: "Ho\xE0n th\xE0nh"
+      finish: "Ho\xE0n th\xE0nh",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Kh\xF4ng c\xF3 d\u1EEF li\u1EC7u"

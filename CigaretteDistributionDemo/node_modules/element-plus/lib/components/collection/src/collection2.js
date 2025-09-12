@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var vue = require('vue');
 var pluginVue_exportHelper = require('../../../_virtual/plugin-vue_export-helper.js');
 
-const _sfc_main = /* @__PURE__ */ vue.defineComponent({
+const _sfc_main = vue.defineComponent({
   inheritAttrs: false
 });
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {

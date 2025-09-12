@@ -1,11 +1,11 @@
 import Menu from './src/menu.mjs';
 export { menuEmits, menuProps } from './src/menu.mjs';
 import MenuItem from './src/menu-item2.mjs';
-import MenuItemGroup from './src/menu-item-group2.mjs';
+import MenuItemGroup from './src/menu-item-group.mjs';
 import SubMenu from './src/sub-menu.mjs';
 export { subMenuProps } from './src/sub-menu.mjs';
 export { menuItemEmits, menuItemProps } from './src/menu-item.mjs';
-export { menuItemGroupProps } from './src/menu-item-group.mjs';
+export { menuItemGroupProps } from './src/menu-item-group2.mjs';
 export { MENU_INJECTION_KEY, SUB_MENU_INJECTION_KEY } from './src/tokens.mjs';
 import { withInstall, withNoopInstall } from '../../utils/vue/install.mjs';
 

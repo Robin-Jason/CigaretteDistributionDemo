@@ -138,6 +138,11 @@ function useTree(props, emit) {
   function setExpandedKeys(keys) {
     const expandedKeys = /* @__PURE__ */ new Set();
     const nodeMap = tree.value.treeNodeMap;
+    expandedKeySet.value.forEach((key) => {
+      const node = nodeMap.get(key);
+      expandedKeySet.value.delete(node.key);
+      node.expanded = false;
+    });
     keys.forEach((k) => {
       let node = nodeMap.get(k);
       while (node && !expandedKeys.has(node.key)) {

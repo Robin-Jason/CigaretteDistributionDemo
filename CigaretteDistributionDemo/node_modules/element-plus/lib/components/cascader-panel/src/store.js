@@ -3,7 +3,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var lodashUnified = require('lodash-unified');
-var node = require('./node.js');
+var node = require('./node2.js');
 var types = require('../../../utils/types.js');
 
 const flatNodes = (nodes, leafOnly) => {

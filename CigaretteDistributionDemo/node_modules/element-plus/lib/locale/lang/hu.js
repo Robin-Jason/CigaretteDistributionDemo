@@ -10,7 +10,10 @@ var hu = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "T\xF6rl\xE9s"
+      clear: "T\xF6rl\xE9s",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Most",
@@ -18,6 +21,10 @@ var hu = {
       cancel: "M\xE9gse",
       clear: "T\xF6rl\xE9s",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "D\xE1tum",
       selectTime: "Id\u0151pont",
       startDate: "D\xE1tum-t\xF3l",
@@ -50,6 +57,15 @@ var hu = {
         fri: "P\xE9n",
         sat: "Szo"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Jan",
         feb: "Feb",
@@ -65,6 +81,10 @@ var hu = {
         dec: "Dec"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Bet\xF6lt\xE9s",
       noMatch: "Nincs tal\xE1lat",
@@ -73,6 +93,9 @@ var hu = {
     },
     mention: {
       loading: "Bet\xF6lt\xE9s"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Nincs tal\xE1lat",
@@ -90,13 +113,21 @@ var hu = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "\xDCzenet",
       confirm: "OK",
       cancel: "M\xE9gse",
-      error: "Hib\xE1s adat"
+      error: "Hib\xE1s adat",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "kattints a t\xF6rl\xE9shez",
@@ -104,12 +135,23 @@ var hu = {
       preview: "El\u0151n\xE9zet",
       continue: "Tov\xE1bb"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Nincs adat",
       confirmFilter: "Meger\u0151s\xEDt",
       resetFilter: "Alaphelyet",
       clearFilter: "Mind",
       sumText: "\xD6sszeg"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Nincs adat"

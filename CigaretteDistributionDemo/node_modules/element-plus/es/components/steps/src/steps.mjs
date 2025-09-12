@@ -1,47 +1,41 @@
-import { defineComponent, getCurrentInstance, watch, provide, openBlock, createElementBlock, normalizeClass, unref, renderSlot, createVNode } from 'vue';
-import { stepsProps, stepsEmits } from './steps2.mjs';
-import { STEPS_INJECTION_KEY } from './tokens.mjs';
-import _export_sfc from '../../../_virtual/plugin-vue_export-helper.mjs';
-import { useNamespace } from '../../../hooks/use-namespace/index.mjs';
-import { useOrderedChildren } from '../../../hooks/use-ordered-children/index.mjs';
+import { buildProps } from '../../../utils/vue/props/runtime.mjs';
 import { CHANGE_EVENT } from '../../../constants/event.mjs';
+import { isNumber } from '../../../utils/types.mjs';
 
-const __default__ = defineComponent({
-  name: "ElSteps"
-});
-const _sfc_main = /* @__PURE__ */ defineComponent({
-  ...__default__,
-  props: stepsProps,
-  emits: stepsEmits,
-  setup(__props, { emit }) {
-    const props = __props;
-    const ns = useNamespace("steps");
-    const {
-      children: steps,
-      addChild: addStep,
-      removeChild: removeStep,
-      ChildrenSorter: StepsSorter
-    } = useOrderedChildren(getCurrentInstance(), "ElStep");
-    watch(steps, () => {
-      steps.value.forEach((instance, index) => {
-        instance.setIndex(index);
-      });
-    });
-    provide(STEPS_INJECTION_KEY, { props, steps, addStep, removeStep });
-    watch(() => props.active, (newVal, oldVal) => {
-      emit(CHANGE_EVENT, newVal, oldVal);
-    });
-    return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", {
-        class: normalizeClass([unref(ns).b(), unref(ns).m(_ctx.simple ? "simple" : _ctx.direction)])
-      }, [
-        renderSlot(_ctx.$slots, "default"),
-        createVNode(unref(StepsSorter))
-      ], 2);
-    };
+const stepsProps = buildProps({
+  space: {
+    type: [Number, String],
+    default: ""
+  },
+  active: {
+    type: Number,
+    default: 0
+  },
+  direction: {
+    type: String,
+    default: "horizontal",
+    values: ["horizontal", "vertical"]
+  },
+  alignCenter: {
+    type: Boolean
+  },
+  simple: {
+    type: Boolean
+  },
+  finishStatus: {
+    type: String,
+    values: ["wait", "process", "finish", "error", "success"],
+    default: "finish"
+  },
+  processStatus: {
+    type: String,
+    values: ["wait", "process", "finish", "error", "success"],
+    default: "process"
   }
 });
-var Steps = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "steps.vue"]]);
+const stepsEmits = {
+  [CHANGE_EVENT]: (newVal, oldVal) => [newVal, oldVal].every(isNumber)
+};
 
-export { Steps as default };
+export { stepsEmits, stepsProps };
 //# sourceMappingURL=steps.mjs.map

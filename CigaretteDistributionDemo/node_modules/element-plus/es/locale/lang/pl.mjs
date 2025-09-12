@@ -6,7 +6,10 @@ var pl = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "Wyczy\u015B\u0107"
+      clear: "Wyczy\u015B\u0107",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Teraz",
@@ -14,6 +17,10 @@ var pl = {
       cancel: "Anuluj",
       clear: "Wyczy\u015B\u0107",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Wybierz dat\u0119",
       selectTime: "Wybierz godzin\u0119",
       startDate: "Data pocz\u0105tkowa",
@@ -37,7 +44,6 @@ var pl = {
       month10: "pa\u017Adziernik",
       month11: "listopad",
       month12: "grudzie\u0144",
-      week: "tydzie\u0144",
       weeks: {
         sun: "niedz.",
         mon: "pon.",
@@ -46,6 +52,15 @@ var pl = {
         thu: "czw.",
         fri: "pt.",
         sat: "sob."
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "STY",
@@ -62,6 +77,10 @@ var pl = {
         dec: "GRU"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "\u0141adowanie",
       noMatch: "Brak dopasowa\u0144",
@@ -70,6 +89,9 @@ var pl = {
     },
     mention: {
       loading: "\u0141adowanie"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Brak dopasowa\u0144",
@@ -87,19 +109,32 @@ var pl = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Wiadomo\u015B\u0107",
       confirm: "OK",
       cancel: "Anuluj",
-      error: "Wiadomo\u015B\u0107 zawiera niedozwolone znaki"
+      error: "Wiadomo\u015B\u0107 zawiera niedozwolone znaki",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "kliknij kasuj aby usun\u0105\u0107",
       delete: "Kasuj",
       preview: "Podgl\u0105d",
       continue: "Kontynuuj"
+    },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
     },
     table: {
       emptyText: "Brak danych",
@@ -111,7 +146,8 @@ var pl = {
     tour: {
       next: "Dalej",
       previous: "Wr\xF3\u0107",
-      finish: "Zako\u0144cz"
+      finish: "Zako\u0144cz",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Brak danych"

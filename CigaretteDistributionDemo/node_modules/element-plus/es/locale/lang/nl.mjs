@@ -6,7 +6,10 @@ var nl = {
     },
     colorpicker: {
       confirm: "Bevestig",
-      clear: "Wissen"
+      clear: "Wissen",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Nu",
@@ -14,6 +17,10 @@ var nl = {
       cancel: "Annuleren",
       clear: "Legen",
       confirm: "Bevestig",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Selecteer datum",
       selectTime: "Selecteer tijd",
       startDate: "Startdatum",
@@ -46,6 +53,15 @@ var nl = {
         fri: "Vr",
         sat: "Za"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "jan",
         feb: "feb",
@@ -61,6 +77,10 @@ var nl = {
         dec: "dec"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Laden",
       noMatch: "Geen overeenkomende resultaten",
@@ -69,6 +89,9 @@ var nl = {
     },
     mention: {
       loading: "Laden"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Geen overeenkomende resultaten",
@@ -86,13 +109,21 @@ var nl = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Bericht",
       confirm: "Bevestig",
       cancel: "Annuleren",
-      error: "Ongeldige invoer"
+      error: "Ongeldige invoer",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "Kies verwijder om te wissen",
@@ -100,12 +131,23 @@ var nl = {
       preview: "Voorbeeld",
       continue: "Doorgaan"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Geen data",
       confirmFilter: "Bevestigen",
       resetFilter: "Reset",
       clearFilter: "Alles",
       sumText: "Som"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Geen data"

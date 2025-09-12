@@ -3,8 +3,9 @@ import type { ExtractPropTypes, __ExtractPublicPropTypes } from 'vue';
 export type TooltipTriggerType = 'hover' | 'focus' | 'click' | 'contextmenu';
 export declare const useTooltipTriggerProps: {
     readonly disabled: BooleanConstructor;
-    readonly trigger: import("element-plus/es/utils").EpPropFinalized<(new (...args: any[]) => "click" | "contextmenu" | "focus" | "hover" | TooltipTriggerType[]) | (() => Arrayable<TooltipTriggerType>) | ((new (...args: any[]) => "click" | "contextmenu" | "focus" | "hover" | TooltipTriggerType[]) | (() => Arrayable<TooltipTriggerType>))[], unknown, unknown, "hover", boolean>;
+    readonly trigger: import("element-plus/es/utils").EpPropFinalized<(new (...args: any[]) => "click" | "focus" | "contextmenu" | "hover" | TooltipTriggerType[]) | (() => Arrayable<TooltipTriggerType>) | ((new (...args: any[]) => "click" | "focus" | "contextmenu" | "hover" | TooltipTriggerType[]) | (() => Arrayable<TooltipTriggerType>))[], unknown, unknown, "hover", boolean>;
     readonly triggerKeys: import("element-plus/es/utils").EpPropFinalized<(new (...args: any[]) => string[]) | (() => string[]) | ((new (...args: any[]) => string[]) | (() => string[]))[], unknown, unknown, () => string[], boolean>;
+    readonly focusOnTarget: BooleanConstructor;
     readonly virtualRef: {
         readonly type: import("vue").PropType<import("element-plus/es/components/popper").Measurable>;
         readonly required: false;

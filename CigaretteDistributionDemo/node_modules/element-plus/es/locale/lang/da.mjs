@@ -6,7 +6,10 @@ var da = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "Ryd"
+      clear: "Ryd",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Nu",
@@ -14,6 +17,10 @@ var da = {
       cancel: "Annuller",
       clear: "Ryd",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "V\xE6lg dato",
       selectTime: "V\xE6lg tidspunkt",
       startDate: "Startdato",
@@ -37,7 +44,6 @@ var da = {
       month10: "Oktober",
       month11: "November",
       month12: "December",
-      week: "uge",
       weeks: {
         sun: "S\xF8n",
         mon: "Man",
@@ -46,6 +52,15 @@ var da = {
         thu: "Tor",
         fri: "Fre",
         sat: "L\xF8r"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "Jan",
@@ -62,6 +77,10 @@ var da = {
         dec: "Dec"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Henter",
       noMatch: "Ingen matchende data",
@@ -70,6 +89,9 @@ var da = {
     },
     mention: {
       loading: "Henter"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Ingen matchende data",
@@ -87,12 +109,21 @@ var da = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
+      title: "Message",
       confirm: "OK",
       cancel: "Annuller",
-      error: "Ugyldig input"
+      error: "Ugyldig input",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "tryk slet for at fjerne",
@@ -100,12 +131,23 @@ var da = {
       preview: "Forh\xE5ndsvisning",
       continue: "Forts\xE6t"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Ingen data",
       confirmFilter: "Bekr\xE6ft",
       resetFilter: "Nulstil",
       clearFilter: "Alle",
       sumText: "Sum"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Ingen data"

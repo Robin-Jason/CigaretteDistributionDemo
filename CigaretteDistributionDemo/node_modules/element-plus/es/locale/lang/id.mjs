@@ -6,7 +6,10 @@ var id = {
     },
     colorpicker: {
       confirm: "Pilih",
-      clear: "Kosongkan"
+      clear: "Kosongkan",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Sekarang",
@@ -14,6 +17,10 @@ var id = {
       cancel: "Batal",
       clear: "Kosongkan",
       confirm: "Ya",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Pilih tanggal",
       selectTime: "Pilih waktu",
       startDate: "Tanggal Mulai",
@@ -37,7 +44,6 @@ var id = {
       month10: "Oktober",
       month11: "November",
       month12: "Desember",
-      week: "Minggu",
       weeks: {
         sun: "Min",
         mon: "Sen",
@@ -46,6 +52,15 @@ var id = {
         thu: "Kam",
         fri: "Jum",
         sat: "Sab"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "Jan",
@@ -62,6 +77,10 @@ var id = {
         dec: "Des"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Memuat",
       noMatch: "Tidak ada data yg cocok",
@@ -70,6 +89,9 @@ var id = {
     },
     mention: {
       loading: "Memuat"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Tidak ada data yg cocok",
@@ -90,11 +112,18 @@ var id = {
       nextPages: "Next {pager} pages",
       deprecationWarning: "Penggunaan yang tidak akan digunakan lagi terdeteksi, silakan lihat dokumentasi el-pagination untuk lebih jelasnya"
     },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
+    },
     messagebox: {
       title: "Pesan",
       confirm: "Ya",
       cancel: "Batal",
-      error: "Masukan ilegal"
+      error: "Masukan ilegal",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "Tekan hapus untuk melanjutkan",
@@ -102,12 +131,23 @@ var id = {
       preview: "Pratinjau",
       continue: "Lanjutkan"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Tidak ada data",
       confirmFilter: "Konfirmasi",
       resetFilter: "Atur ulang",
       clearFilter: "Semua",
       sumText: "Jumlah"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Tidak ada data"

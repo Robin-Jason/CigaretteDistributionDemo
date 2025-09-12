@@ -150,7 +150,8 @@ var zhCn = {
     tour: {
       next: "\u4E0B\u4E00\u6B65",
       previous: "\u4E0A\u4E00\u6B65",
-      finish: "\u7ED3\u675F\u5BFC\u89C8"
+      finish: "\u7ED3\u675F\u5BFC\u89C8",
+      close: "\u5173\u95ED\u6B64\u5BF9\u8BDD\u6846"
     },
     tree: {
       emptyText: "\u6682\u65E0\u6570\u636E"

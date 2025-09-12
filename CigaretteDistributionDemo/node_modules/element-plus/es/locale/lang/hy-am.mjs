@@ -6,7 +6,10 @@ var hyAm = {
     },
     colorpicker: {
       confirm: "\u053C\u0561\u0582",
-      clear: "\u0544\u0561\u0584\u0580\u0565\u056C"
+      clear: "\u0544\u0561\u0584\u0580\u0565\u056C",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "\u0540\u056B\u0574\u0561",
@@ -14,6 +17,10 @@ var hyAm = {
       cancel: "\u0549\u0565\u0572\u0561\u0580\u056F\u0565\u056C",
       clear: "\u0544\u0561\u0584\u0580\u0565\u056C",
       confirm: "\u053C\u0561\u0582",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "\u0538\u0576\u057F\u0580\u0565\u0584 \u0561\u0574\u057D\u0561\u0569\u056B\u0582\u0568",
       selectTime: "\u0538\u0576\u057F\u0580\u0565\u0584 \u056A\u0561\u0574\u0561\u0576\u0561\u056F\u0568",
       startDate: "\u054D\u056F\u0566\u0562. \u0561\u0574\u057D\u0561\u0569\u056B\u0582\u0568",
@@ -37,7 +44,6 @@ var hyAm = {
       month10: "\u0545\u0578\u056F\u057F\u0565\u0574\u0562\u0565\u0580",
       month11: "\u0546\u0578\u0575\u0565\u0574\u0562\u0565\u0580",
       month12: "\u0534\u0565\u056F\u057F\u0565\u0574\u0562\u0565\u0580",
-      week: "\u0547\u0561\u0562\u0561\u0569",
       weeks: {
         sun: "\u053F\u056B\u0580",
         mon: "\u0535\u0580\u056F",
@@ -46,6 +52,15 @@ var hyAm = {
         thu: "\u0540\u056B\u0576\u0563",
         fri: "\u0548\u0582\u0580\u0562",
         sat: "\u0547\u0561\u0562"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "\u0545\u0578\u0582\u0576\u057E",
@@ -62,6 +77,10 @@ var hyAm = {
         dec: "\u0534\u0565\u056F"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "\u0532\u0565\u057C\u0576\u0578\u0582\u0574",
       noMatch: "\u0540\u0561\u0574\u0561\u057A\u0561\u057F\u0561\u057D\u056D\u0561\u0576 \u057F\u0578\u0582\u0565\u0561\u056C\u0576\u0565\u0580 \u0579\u056F\u0561\u0576",
@@ -70,6 +89,9 @@ var hyAm = {
     },
     mention: {
       loading: "\u0532\u0565\u057C\u0576\u0578\u0582\u0574"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "\u0540\u0561\u0574\u0561\u057A\u0561\u057F\u0561\u057D\u056D\u0561\u0576 \u057F\u0578\u0582\u0565\u0561\u056C\u0576\u0565\u0580 \u0579\u056F\u0561\u0576",
@@ -87,13 +109,21 @@ var hyAm = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "\u0540\u0561\u0572\u0578\u0580\u0564\u0561\u0563\u0580\u0578\u0582\u0569\u056B\u0582\u0576",
       confirm: "\u053C\u0561\u0582",
       cancel: "\u0549\u0565\u0572\u0561\u0580\u056F\u0565\u056C",
-      error: "\u0531\u0576\u057E\u0561\u0582\u0565\u0580 \u057F\u0578\u0582\u0565\u0561\u056C\u0576\u0565\u0580\u056B \u0574\u0578\u0582\u057F\u0584"
+      error: "\u0531\u0576\u057E\u0561\u0582\u0565\u0580 \u057F\u0578\u0582\u0565\u0561\u056C\u0576\u0565\u0580\u056B \u0574\u0578\u0582\u057F\u0584",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "\u054D\u0565\u0572\u0574\u0565\u0584 [\u054B\u0576\u057B\u0565\u056C] \u057B\u0576\u057B\u0565\u056C\u0578\u0582 \u0570\u0561\u0574\u0561\u0580",
@@ -101,12 +131,23 @@ var hyAm = {
       preview: "\u0546\u0561\u056D\u0561\u0564\u056B\u057F\u0578\u0582\u0574",
       continue: "\u0547\u0561\u0580\u0578\u0582\u0576\u0561\u056F\u0565\u056C"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "\u054F\u0578\u0582\u0565\u0561\u056C\u0576\u0565\u0580 \u0579\u056F\u0561\u0576",
       confirmFilter: "\u0545\u0561\u057D\u057F\u0561\u057F\u0565\u056C",
       resetFilter: "\u054E\u0565\u0580\u0561\u0563\u0578\u0580\u056E\u0561\u0580\u056F\u0565\u056C",
       clearFilter: "\u0532\u0578\u056C\u0578\u0580\u0568",
       sumText: "\u0533\u0578\u0582\u0574\u0561\u0580\u0568"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u054F\u0578\u0582\u0565\u0561\u056C\u0576\u0565\u0580 \u0579\u056F\u0561\u0576"

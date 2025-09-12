@@ -3,6 +3,11 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 const FOCUSABLE_ELEMENT_SELECTORS = `a[href],button:not([disabled]),button:not([hidden]),:not([tabindex="-1"]),input:not([disabled]),input:not([type="hidden"]),select:not([disabled]),textarea:not([disabled])`;
+const isHTMLElement = (e) => {
+  if (typeof Element === "undefined")
+    return false;
+  return e instanceof Element;
+};
 const isVisible = (element) => {
   const computed = getComputedStyle(element);
   return computed.position === "fixed" ? false : element.offsetParent !== null;
@@ -34,14 +39,6 @@ const isFocusable = (element) => {
     }
   }
 };
-const attemptFocus = (element) => {
-  var _a;
-  if (!isFocusable(element)) {
-    return false;
-  }
-  (_a = element.focus) == null ? void 0 : _a.call(element);
-  return document.activeElement === element;
-};
 const triggerEvent = function(elm, name, ...opts) {
   let eventName;
   if (name.includes("mouse") || name.includes("click")) {
@@ -65,14 +62,27 @@ const getSibling = (el, distance, elClass) => {
   const index = Array.prototype.indexOf.call(siblings, el);
   return siblings[index + distance] || null;
 };
+const focusElement = (el, options) => {
+  if (!el || !el.focus)
+    return;
+  let cleanup = false;
+  if (isHTMLElement(el) && !isFocusable(el) && !el.getAttribute("tabindex")) {
+    el.setAttribute("tabindex", "-1");
+    cleanup = true;
+  }
+  el.focus(options);
+  if (isHTMLElement(el) && cleanup) {
+    el.removeAttribute("tabindex");
+  }
+};
 const focusNode = (el) => {
   if (!el)
     return;
-  el.focus();
+  focusElement(el);
   !isLeaf(el) && el.click();
 };
 
-exports.attemptFocus = attemptFocus;
+exports.focusElement = focusElement;
 exports.focusNode = focusNode;
 exports.getSibling = getSibling;
 exports.isFocusable = isFocusable;

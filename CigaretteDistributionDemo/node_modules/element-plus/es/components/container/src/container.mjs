@@ -1,5 +1,6 @@
 import { defineComponent, useSlots, computed, openBlock, createElementBlock, normalizeClass, unref, renderSlot } from 'vue';
 import _export_sfc from '../../../_virtual/plugin-vue_export-helper.mjs';
+import { buildProps } from '../../../utils/vue/props/runtime.mjs';
 import { useNamespace } from '../../../hooks/use-namespace/index.mjs';
 
 const __default__ = defineComponent({
@@ -7,11 +8,12 @@ const __default__ = defineComponent({
 });
 const _sfc_main = /* @__PURE__ */ defineComponent({
   ...__default__,
-  props: {
+  props: buildProps({
     direction: {
-      type: String
+      type: String,
+      values: ["horizontal", "vertical"]
     }
-  },
+  }),
   setup(__props) {
     const props = __props;
     const slots = useSlots();

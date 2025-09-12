@@ -48,7 +48,6 @@ var fa = {
       month10: "\u0627\u06A9\u062A\u0628\u0631",
       month11: "\u0646\u0648\u0627\u0645\u0628\u0631",
       month12: "\u062F\u0633\u0627\u0645\u0628\u0631",
-      week: "\u0647\u0641\u062A\u0647",
       weeks: {
         sun: "\u06CC\u06A9\u200C\u0634\u0646\u0628\u0647",
         mon: "\u062F\u0648\u0634\u0646\u0628\u0647",
@@ -151,7 +150,8 @@ var fa = {
     tour: {
       next: "\u0628\u0639\u062F\u06CC",
       previous: "\u0642\u0628\u0644\u06CC",
-      finish: "\u067E\u0627\u06CC\u0627\u0646"
+      finish: "\u067E\u0627\u06CC\u0627\u0646",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u062F\u0627\u062F\u0647\u200C\u0627\u06CC \u0645\u0648\u062C\u0648\u062F \u0646\u06CC\u0633\u062A"

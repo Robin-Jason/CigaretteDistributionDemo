@@ -16,7 +16,8 @@ const useTooltipTriggerProps = runtime.buildProps({
   triggerKeys: {
     type: runtime.definePropType(Array),
     default: () => [aria.EVENT_CODE.enter, aria.EVENT_CODE.numpadEnter, aria.EVENT_CODE.space]
-  }
+  },
+  focusOnTarget: Boolean
 });
 
 exports.useTooltipTriggerProps = useTooltipTriggerProps;

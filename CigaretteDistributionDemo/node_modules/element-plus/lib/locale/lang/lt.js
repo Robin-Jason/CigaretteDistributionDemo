@@ -10,7 +10,10 @@ var lt = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "Valyti"
+      clear: "Valyti",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Dabar",
@@ -18,6 +21,10 @@ var lt = {
       cancel: "At\u0161aukti",
       clear: "Valyti",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Pasirink dat\u0105",
       selectTime: "Pasirink laik\u0105",
       startDate: "Data nuo",
@@ -50,6 +57,15 @@ var lt = {
         fri: "Pn.",
         sat: "\u0160."
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Sau",
         feb: "Vas",
@@ -65,6 +81,10 @@ var lt = {
         dec: "Gruo"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Kraunasi",
       noMatch: "Duomen\u0173 nerasta",
@@ -73,6 +93,9 @@ var lt = {
     },
     mention: {
       loading: "Kraunasi"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Duomen\u0173 nerasta",
@@ -90,19 +113,32 @@ var lt = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "\u017Dinut\u0117",
       confirm: "OK",
       cancel: "At\u0161aukti",
-      error: "Klaida \u012Fvestuose duomenyse"
+      error: "Klaida \u012Fvestuose duomenyse",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: 'spauskite "Trinti" nor\u0117dami pa\u0161alinti',
       delete: "Trinti",
       preview: "Per\u017Ei\u016Br\u0117ti",
       continue: "Toliau"
+    },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
     },
     table: {
       emptyText: "Duomen\u0173 nerasta",
@@ -114,7 +150,8 @@ var lt = {
     tour: {
       next: "Kitas",
       previous: "Ankstesnis",
-      finish: "Baigti"
+      finish: "Baigti",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "N\u0117ra duomen\u0173"

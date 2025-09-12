@@ -10,7 +10,10 @@ var es = {
     },
     colorpicker: {
       confirm: "Confirmar",
-      clear: "Despejar"
+      clear: "Despejar",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Ahora",
@@ -18,6 +21,10 @@ var es = {
       cancel: "Cancelar",
       clear: "Despejar",
       confirm: "Confirmar",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Seleccionar fecha",
       selectTime: "Seleccionar hora",
       startDate: "Fecha Incial",
@@ -50,6 +57,15 @@ var es = {
         fri: "vie",
         sat: "s\xE1b"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "ene",
         feb: "feb",
@@ -65,6 +81,10 @@ var es = {
         dec: "dic"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Cargando",
       noMatch: "No hay datos que coincidan",
@@ -73,6 +93,9 @@ var es = {
     },
     mention: {
       loading: "Cargando"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "No hay datos que coincidan",
@@ -90,12 +113,21 @@ var es = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
+      title: "Message",
       confirm: "Aceptar",
       cancel: "Cancelar",
-      error: "Entrada inv\xE1lida"
+      error: "Entrada inv\xE1lida",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "Pulse Eliminar para retirar",
@@ -103,12 +135,23 @@ var es = {
       preview: "Vista Previa",
       continue: "Continuar"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Sin Datos",
       confirmFilter: "Confirmar",
       resetFilter: "Reiniciar",
       clearFilter: "Despejar",
       sumText: "Suma"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Sin Datos"

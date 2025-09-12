@@ -4,7 +4,7 @@ import Table from '../table-grid.mjs';
 function _isSlot(s) {
   return typeof s === "function" || Object.prototype.toString.call(s) === "[object Object]" && !isVNode(s);
 }
-const LeftTable = (props, {
+const RightTable = (props, {
   slots
 }) => {
   if (!props.columns.length)
@@ -19,7 +19,7 @@ const LeftTable = (props, {
     default: () => [slots]
   });
 };
-var RightTable = LeftTable;
+var RightTable$1 = RightTable;
 
-export { RightTable as default };
+export { RightTable$1 as default };
 //# sourceMappingURL=right-table.mjs.map

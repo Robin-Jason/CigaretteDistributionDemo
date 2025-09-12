@@ -8,7 +8,7 @@ import { ElTooltip } from '../../tooltip/index.mjs';
 import { ElIcon } from '../../icon/index.mjs';
 import { autocompleteProps, autocompleteEmits } from './autocomplete.mjs';
 import _export_sfc from '../../../_virtual/plugin-vue_export-helper.mjs';
-import { inputProps } from '../../input/src/input2.mjs';
+import { inputProps } from '../../input/src/input.mjs';
 import { useFormDisabled } from '../../form/src/hooks/use-form-common-props.mjs';
 import { useNamespace } from '../../../hooks/use-namespace/index.mjs';
 import { useId } from '../../../hooks/use-id/index.mjs';

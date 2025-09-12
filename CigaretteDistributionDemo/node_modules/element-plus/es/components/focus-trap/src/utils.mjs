@@ -1,7 +1,6 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { FOCUSOUT_PREVENTED, FOCUSOUT_PREVENTED_OPTS } from './tokens.mjs';
-import { isElement } from '../../../utils/types.mjs';
-import { isFocusable } from '../../../utils/dom/aria.mjs';
+import { focusElement } from '../../../utils/dom/aria.mjs';
 
 const focusReason = ref();
 const lastUserFocusTimestamp = ref(0);
@@ -49,20 +48,12 @@ const isSelectable = (element) => {
   return element instanceof HTMLInputElement && "select" in element;
 };
 const tryFocus = (element, shouldSelect) => {
-  if (element && element.focus) {
+  if (element) {
     const prevFocusedElement = document.activeElement;
-    let cleanup = false;
-    if (isElement(element) && !isFocusable(element) && !element.getAttribute("tabindex")) {
-      element.setAttribute("tabindex", "-1");
-      cleanup = true;
-    }
-    element.focus({ preventScroll: true });
+    focusElement(element, { preventScroll: true });
     lastAutomatedFocusTimestamp.value = window.performance.now();
     if (element !== prevFocusedElement && isSelectable(element) && shouldSelect) {
       element.select();
-    }
-    if (isElement(element) && cleanup) {
-      element.removeAttribute("tabindex");
     }
   }
 };

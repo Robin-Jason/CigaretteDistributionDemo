@@ -2,8 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var input$1 = require('./src/input.js');
-var input = require('./src/input2.js');
+var input$1 = require('./src/input2.js');
+var input = require('./src/input.js');
 var install = require('../../utils/vue/install.js');
 
 const ElInput = install.withInstall(input$1["default"]);

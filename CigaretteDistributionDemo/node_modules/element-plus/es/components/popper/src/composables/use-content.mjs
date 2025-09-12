@@ -46,8 +46,8 @@ const usePopperContent = (props) => {
   });
   onMounted(() => {
     watch(() => {
-      var _a;
-      return (_a = unref(computedReference)) == null ? void 0 : _a.getBoundingClientRect();
+      var _a, _b;
+      return (_b = (_a = unref(computedReference)) == null ? void 0 : _a.getBoundingClientRect) == null ? void 0 : _b.call(_a);
     }, () => {
       update();
     });

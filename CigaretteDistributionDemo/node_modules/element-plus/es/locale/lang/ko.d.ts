@@ -9,6 +9,7 @@ declare const _default: {
             clear: string;
             defaultLabel: string;
             description: string;
+            alphaLabel: string;
         };
         datepicker: {
             now: string;
@@ -19,6 +20,7 @@ declare const _default: {
             dateTablePrompt: string;
             monthTablePrompt: string;
             yearTablePrompt: string;
+            selectedDate: string;
             selectDate: string;
             selectTime: string;
             startDate: string;
@@ -43,6 +45,15 @@ declare const _default: {
             month11: string;
             month12: string;
             weeks: {
+                sun: string;
+                mon: string;
+                tue: string;
+                wed: string;
+                thu: string;
+                fri: string;
+                sat: string;
+            };
+            weeksFull: {
                 sun: string;
                 mon: string;
                 tue: string;
@@ -136,6 +147,7 @@ declare const _default: {
             next: string;
             previous: string;
             finish: string;
+            close: string;
         };
         tree: {
             emptyText: string;

@@ -2,6 +2,7 @@ import { defineComponent, inject, computed, ref, onMounted, openBlock, createEle
 import { useResizeObserver } from '@vueuse/core';
 import { selectKey } from './token.mjs';
 import _export_sfc from '../../../_virtual/plugin-vue_export-helper.mjs';
+import { BORDER_HORIZONTAL_WIDTH } from '../../../constants/form.mjs';
 import { useNamespace } from '../../../hooks/use-namespace/index.mjs';
 
 const _sfc_main = defineComponent({
@@ -16,7 +17,12 @@ const _sfc_main = defineComponent({
     const minWidth = ref("");
     function updateMinWidth() {
       var _a;
-      minWidth.value = `${(_a = select.selectRef) == null ? void 0 : _a.offsetWidth}px`;
+      const offsetWidth = (_a = select.selectRef) == null ? void 0 : _a.offsetWidth;
+      if (offsetWidth) {
+        minWidth.value = `${offsetWidth - BORDER_HORIZONTAL_WIDTH}px`;
+      } else {
+        minWidth.value = "";
+      }
     }
     onMounted(() => {
       updateMinWidth();

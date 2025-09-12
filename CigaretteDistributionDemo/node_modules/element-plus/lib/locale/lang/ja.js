@@ -10,7 +10,10 @@ var ja = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "\u30AF\u30EA\u30A2"
+      clear: "\u30AF\u30EA\u30A2",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "\u73FE\u5728",
@@ -18,6 +21,10 @@ var ja = {
       cancel: "\u30AD\u30E3\u30F3\u30BB\u30EB",
       clear: "\u30AF\u30EA\u30A2",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "\u65E5\u4ED8\u3092\u9078\u629E",
       selectTime: "\u6642\u9593\u3092\u9078\u629E",
       startDate: "\u958B\u59CB\u65E5",
@@ -50,6 +57,15 @@ var ja = {
         fri: "\u91D1",
         sat: "\u571F"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "1\u6708",
         feb: "2\u6708",
@@ -65,6 +81,10 @@ var ja = {
         dec: "12\u6708"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "\u30ED\u30FC\u30C9\u4E2D",
       noMatch: "\u30C7\u30FC\u30BF\u306A\u3057",
@@ -73,6 +93,9 @@ var ja = {
     },
     mention: {
       loading: "\u30ED\u30FC\u30C9\u4E2D"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "\u30C7\u30FC\u30BF\u306A\u3057",
@@ -90,19 +113,32 @@ var ja = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "\u30E1\u30C3\u30BB\u30FC\u30B8",
       confirm: "OK",
       cancel: "\u30AD\u30E3\u30F3\u30BB\u30EB",
-      error: "\u6B63\u3057\u304F\u306A\u3044\u5165\u529B"
+      error: "\u6B63\u3057\u304F\u306A\u3044\u5165\u529B",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "Del\u30AD\u30FC\u3092\u62BC\u3057\u3066\u524A\u9664\u3059\u308B",
       delete: "\u524A\u9664\u3059\u308B",
       preview: "\u30D7\u30EC\u30D3\u30E5\u30FC",
       continue: "\u7D9A\u884C\u3059\u308B"
+    },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
     },
     table: {
       emptyText: "\u30C7\u30FC\u30BF\u306A\u3057",
@@ -114,7 +150,8 @@ var ja = {
     tour: {
       next: "\u6B21\u3078",
       previous: "\u524D\u3078",
-      finish: "\u30C4\u30A2\u30FC\u7D42\u4E86"
+      finish: "\u30C4\u30A2\u30FC\u7D42\u4E86",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u30C7\u30FC\u30BF\u306A\u3057"

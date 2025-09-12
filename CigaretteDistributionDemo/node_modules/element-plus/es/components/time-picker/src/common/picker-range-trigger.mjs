@@ -1,6 +1,7 @@
-import { defineComponent, ref, computed, openBlock, createElementBlock, normalizeClass, unref, normalizeStyle, renderSlot, createElementVNode, mergeProps } from 'vue';
+import { defineComponent, reactive, computed, ref, openBlock, createElementBlock, normalizeClass, unref, normalizeStyle, renderSlot, createElementVNode, mergeProps } from 'vue';
 import { timePickerRangeTriggerProps } from './props.mjs';
 import _export_sfc from '../../../../_virtual/plugin-vue_export-helper.mjs';
+import { useFormItem, useFormItemInputId } from '../../../form/src/hooks/use-form-item.mjs';
 import { useAttrs } from '../../../../hooks/use-attrs/index.mjs';
 import { useNamespace } from '../../../../hooks/use-namespace/index.mjs';
 import { useFocusController } from '../../../../hooks/use-focus-controller/index.mjs';
@@ -26,6 +27,13 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
   ],
   setup(__props, { expose, emit }) {
     const props = __props;
+    const { formItem } = useFormItem();
+    const { inputId } = useFormItemInputId(reactive({ id: computed(() => {
+      var _a;
+      return (_a = props.id) == null ? void 0 : _a[0];
+    }) }), {
+      formItemContext: formItem
+    });
     const attrs = useAttrs();
     const nsDate = useNamespace("date");
     const nsRange = useNamespace("range");
@@ -84,7 +92,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       }, [
         renderSlot(_ctx.$slots, "prefix"),
         createElementVNode("input", mergeProps(unref(attrs), {
-          id: _ctx.id && _ctx.id[0],
+          id: unref(inputId),
           ref_key: "inputRef",
           ref: inputRef,
           name: _ctx.name && _ctx.name[0],

@@ -1,6 +1,6 @@
 import { filterOption } from './helper.mjs';
 import { buildProps, definePropType } from '../../../utils/vue/props/runtime.mjs';
-import { inputProps } from '../../input/src/input2.mjs';
+import { inputProps } from '../../input/src/input.mjs';
 import { isString, isFunction } from '@vue/shared';
 import { UPDATE_MODEL_EVENT } from '../../../constants/event.mjs';
 

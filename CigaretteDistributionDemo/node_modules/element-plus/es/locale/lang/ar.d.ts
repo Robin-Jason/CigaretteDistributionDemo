@@ -9,6 +9,7 @@ declare const _default: {
             clear: string;
             defaultLabel: string;
             description: string;
+            alphaLabel: string;
         };
         datepicker: {
             now: string;
@@ -19,6 +20,7 @@ declare const _default: {
             dateTablePrompt: string;
             monthTablePrompt: string;
             yearTablePrompt: string;
+            selectedDate: string;
             selectDate: string;
             selectTime: string;
             startDate: string;
@@ -42,8 +44,16 @@ declare const _default: {
             month10: string;
             month11: string;
             month12: string;
-            week: string;
             weeks: {
+                sun: string;
+                mon: string;
+                tue: string;
+                wed: string;
+                thu: string;
+                fri: string;
+                sat: string;
+            };
+            weeksFull: {
                 sun: string;
                 mon: string;
                 tue: string;
@@ -100,6 +110,7 @@ declare const _default: {
             currentPage: string;
             prevPages: string;
             nextPages: string;
+            deprecationWarning: string;
         };
         dialog: {
             close: string;
@@ -120,12 +131,23 @@ declare const _default: {
             preview: string;
             continue: string;
         };
+        slider: {
+            defaultLabel: string;
+            defaultRangeStartLabel: string;
+            defaultRangeEndLabel: string;
+        };
         table: {
             emptyText: string;
             confirmFilter: string;
             resetFilter: string;
             clearFilter: string;
             sumText: string;
+        };
+        tour: {
+            next: string;
+            previous: string;
+            finish: string;
+            close: string;
         };
         tree: {
             emptyText: string;

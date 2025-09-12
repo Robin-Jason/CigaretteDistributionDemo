@@ -12,7 +12,8 @@ var ko = {
       confirm: "\uD655\uC778",
       clear: "\uCD08\uAE30\uD654",
       defaultLabel: "\uC0C9\uC0C1 \uC120\uD0DD\uAE30",
-      description: "\uD604\uC7AC \uC0C9\uC0C1\uC740 {color}\uC785\uB2C8\uB2E4. Enter \uD0A4\uB97C \uB20C\uB7EC \uC0C8 \uC0C9\uC0C1\uC744 \uC120\uD0DD\uD569\uB2C8\uB2E4."
+      description: "\uD604\uC7AC \uC0C9\uC0C1\uC740 {color}\uC785\uB2C8\uB2E4. Enter \uD0A4\uB97C \uB20C\uB7EC \uC0C8 \uC0C9\uC0C1\uC744 \uC120\uD0DD\uD569\uB2C8\uB2E4.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "\uC9C0\uAE08",
@@ -23,6 +24,7 @@ var ko = {
       dateTablePrompt: "\uD654\uC0B4\uD45C \uD0A4\uB97C \uC0AC\uC6A9\uD558\uACE0 Enter\uB97C \uB20C\uB7EC \uB0A0\uC9DC\uB97C \uC120\uD0DD\uD558\uC2ED\uC2DC\uC624.",
       monthTablePrompt: "\uD654\uC0B4\uD45C \uD0A4\uB97C \uC0AC\uC6A9\uD558\uACE0 Enter\uB97C \uB20C\uB7EC \uC6D4\uC744 \uC120\uD0DD\uD569\uB2C8\uB2E4.",
       yearTablePrompt: "\uD654\uC0B4\uD45C \uD0A4\uB97C \uC0AC\uC6A9\uD558\uACE0 Enter \uD0A4\uB97C \uB20C\uB7EC \uC5F0\uB3C4\uB97C \uC120\uD0DD\uD569\uB2C8\uB2E4.",
+      selectedDate: "Selected date",
       selectDate: "\uB0A0\uC9DC \uC120\uD0DD",
       selectTime: "\uC2DC\uAC04 \uC120\uD0DD",
       startDate: "\uC2DC\uC791 \uB0A0\uC9DC",
@@ -54,6 +56,15 @@ var ko = {
         thu: "\uBAA9",
         fri: "\uAE08",
         sat: "\uD1A0"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "1\uC6D4",
@@ -139,7 +150,8 @@ var ko = {
     tour: {
       next: "\uB2E4\uC74C",
       previous: "\uC774\uC804",
-      finish: "\uC885\uB8CC"
+      finish: "\uC885\uB8CC",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\uB370\uC774\uD130 \uC5C6\uC74C"

@@ -8,7 +8,7 @@ var tableGrid = require('../table-grid.js');
 function _isSlot(s) {
   return typeof s === "function" || Object.prototype.toString.call(s) === "[object Object]" && !vue.isVNode(s);
 }
-const LeftTable = (props, {
+const RightTable = (props, {
   slots
 }) => {
   if (!props.columns.length)
@@ -23,7 +23,7 @@ const LeftTable = (props, {
     default: () => [slots]
   });
 };
-var RightTable = LeftTable;
+var RightTable$1 = RightTable;
 
-exports["default"] = RightTable;
+exports["default"] = RightTable$1;
 //# sourceMappingURL=right-table.js.map

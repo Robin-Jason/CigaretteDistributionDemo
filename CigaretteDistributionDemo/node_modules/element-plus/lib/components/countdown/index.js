@@ -2,8 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var countdown$1 = require('./src/countdown2.js');
-var countdown = require('./src/countdown.js');
+var countdown$1 = require('./src/countdown.js');
+var countdown = require('./src/countdown2.js');
 var install = require('../../utils/vue/install.js');
 
 const ElCountdown = install.withInstall(countdown$1["default"]);

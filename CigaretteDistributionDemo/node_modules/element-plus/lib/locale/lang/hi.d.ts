@@ -44,7 +44,6 @@ declare const _default: {
             month10: string;
             month11: string;
             month12: string;
-            week: string;
             weeks: {
                 sun: string;
                 mon: string;
@@ -148,6 +147,7 @@ declare const _default: {
             next: string;
             previous: string;
             finish: string;
+            close: string;
         };
         tree: {
             emptyText: string;

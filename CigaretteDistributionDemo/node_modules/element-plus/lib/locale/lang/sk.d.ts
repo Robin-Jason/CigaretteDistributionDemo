@@ -7,6 +7,9 @@ declare const _default: {
         colorpicker: {
             confirm: string;
             clear: string;
+            defaultLabel: string;
+            description: string;
+            alphaLabel: string;
         };
         datepicker: {
             now: string;
@@ -14,6 +17,10 @@ declare const _default: {
             cancel: string;
             clear: string;
             confirm: string;
+            dateTablePrompt: string;
+            monthTablePrompt: string;
+            yearTablePrompt: string;
+            selectedDate: string;
             selectDate: string;
             selectTime: string;
             startDate: string;
@@ -24,9 +31,6 @@ declare const _default: {
             nextYear: string;
             prevMonth: string;
             nextMonth: string;
-            day: string;
-            week: string;
-            month: string;
             year: string;
             month1: string;
             month2: string;
@@ -49,6 +53,15 @@ declare const _default: {
                 fri: string;
                 sat: string;
             };
+            weeksFull: {
+                sun: string;
+                mon: string;
+                tue: string;
+                wed: string;
+                thu: string;
+                fri: string;
+                sat: string;
+            };
             months: {
                 jan: string;
                 feb: string;
@@ -63,6 +76,12 @@ declare const _default: {
                 nov: string;
                 dec: string;
             };
+            day: string;
+            month: string;
+        };
+        inputNumber: {
+            decrease: string;
+            increase: string;
         };
         select: {
             loading: string;
@@ -72,6 +91,9 @@ declare const _default: {
         };
         mention: {
             loading: string;
+        };
+        dropdown: {
+            toggleDropdown: string;
         };
         cascader: {
             noMatch: string;
@@ -90,12 +112,20 @@ declare const _default: {
             currentPage: string;
             prevPages: string;
             nextPages: string;
+            deprecationWarning: string;
+        };
+        dialog: {
+            close: string;
+        };
+        drawer: {
+            close: string;
         };
         messagebox: {
             title: string;
             confirm: string;
             cancel: string;
             error: string;
+            close: string;
         };
         upload: {
             deleteTip: string;
@@ -103,12 +133,23 @@ declare const _default: {
             preview: string;
             continue: string;
         };
+        slider: {
+            defaultLabel: string;
+            defaultRangeStartLabel: string;
+            defaultRangeEndLabel: string;
+        };
         table: {
             emptyText: string;
             confirmFilter: string;
             resetFilter: string;
             clearFilter: string;
             sumText: string;
+        };
+        tour: {
+            next: string;
+            previous: string;
+            finish: string;
+            close: string;
         };
         tree: {
             emptyText: string;

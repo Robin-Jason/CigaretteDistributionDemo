@@ -5,9 +5,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var vue = require('vue');
 var index = require('../use-namespace/index.js');
 var error = require('../../utils/error.js');
+var core = require('@vueuse/core');
 var style = require('../../utils/dom/style.js');
 var scroll = require('../../utils/dom/scroll.js');
-var core = require('@vueuse/core');
 
 const useLockscreen = (trigger, options = {}) => {
   if (!vue.isRef(trigger)) {

@@ -6,7 +6,10 @@ var ca = {
     },
     colorpicker: {
       confirm: "Confirmar",
-      clear: "Netejar"
+      clear: "Netejar",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Ara",
@@ -14,6 +17,10 @@ var ca = {
       cancel: "Cancel\xB7lar",
       clear: "Netejar",
       confirm: "Confirmar",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Seleccionar data",
       selectTime: "Seleccionar hora",
       startDate: "Data Inici",
@@ -46,6 +53,15 @@ var ca = {
         fri: "Dv",
         sat: "Ds"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Gen",
         feb: "Febr",
@@ -61,6 +77,10 @@ var ca = {
         dec: "Des"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Carregant",
       noMatch: "No hi ha dades que coincideixin",
@@ -69,6 +89,9 @@ var ca = {
     },
     mention: {
       loading: "Carregant"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "No hi ha dades que coincideixin",
@@ -86,12 +109,21 @@ var ca = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
+      title: "Message",
       confirm: "Acceptar",
       cancel: "Cancel\xB7lar",
-      error: "Entrada inv\xE0lida"
+      error: "Entrada inv\xE0lida",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "premi eliminar per descartar",
@@ -99,12 +131,23 @@ var ca = {
       preview: "Vista Pr\xE8via",
       continue: "Continuar"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Sense Dades",
       confirmFilter: "Confirmar",
       resetFilter: "Netejar",
       clearFilter: "Tot",
       sumText: "Tot"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Sense Dades"

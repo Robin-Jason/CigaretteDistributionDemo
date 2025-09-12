@@ -12,7 +12,8 @@ var sw = {
       confirm: "sawa",
       clear: "futa",
       defaultLabel: "kichagua rangi",
-      description: "rangi ya sasa ni {color}. bonyeza kitufe cha kuingia ili kuchagua rangi mpya."
+      description: "rangi ya sasa ni {color}. bonyeza kitufe cha kuingia ili kuchagua rangi mpya.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "sasa",
@@ -47,7 +48,6 @@ var sw = {
       month10: "mwezi wa kumi",
       month11: "mwezi wa kumi na moja",
       month12: "mwezi wa kumi na mbili",
-      week: "siku saba",
       weeks: {
         sun: "jpili",
         mon: "jtatu",
@@ -146,6 +146,12 @@ var sw = {
       resetFilter: "weka upya",
       clearFilter: "zote",
       sumText: "jumla"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "hakuna data"

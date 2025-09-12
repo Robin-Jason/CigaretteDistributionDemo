@@ -10,7 +10,10 @@ var eo = {
     },
     colorpicker: {
       confirm: "Bone",
-      clear: "Malplenigi"
+      clear: "Malplenigi",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Nun",
@@ -18,6 +21,10 @@ var eo = {
       cancel: "Nuligi",
       clear: "Malplenigi",
       confirm: "Bone",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Elektu daton",
       selectTime: "Elektu horon",
       startDate: "Komenca Dato",
@@ -41,7 +48,6 @@ var eo = {
       month10: "Oktobro",
       month11: "Novembro",
       month12: "Decembro",
-      week: "Semajno",
       weeks: {
         sun: "Dim",
         mon: "Lun",
@@ -50,6 +56,15 @@ var eo = {
         thu: "\u0134a\u016D",
         fri: "Ven",
         sat: "Sab"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "Jan",
@@ -66,6 +81,10 @@ var eo = {
         dec: "Dec"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "\u015Car\u011Dante",
       noMatch: "Neniuj kongruaj datumoj",
@@ -74,6 +93,9 @@ var eo = {
     },
     mention: {
       loading: "\u015Car\u011Dante"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Neniuj kongruaj datumoj",
@@ -91,13 +113,21 @@ var eo = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Mesa\u011Do",
       confirm: "Bone",
       cancel: "Nuligi",
-      error: "Nevalida Enigo!"
+      error: "Nevalida Enigo!",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: 'Premu "Delete" por forigi',
@@ -105,12 +135,23 @@ var eo = {
       preview: "Anta\u016Drigardi",
       continue: "Da\u016Drigi"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Neniuj datumoj",
       confirmFilter: "Konfirmi",
       resetFilter: "Restarigi",
       clearFilter: "\u0108iuj",
       sumText: "Sumo"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Neniuj datumoj"

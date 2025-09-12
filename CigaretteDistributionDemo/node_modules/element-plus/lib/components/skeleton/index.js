@@ -2,9 +2,9 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var skeleton$1 = require('./src/skeleton2.js');
+var skeleton$1 = require('./src/skeleton.js');
 var skeletonItem$1 = require('./src/skeleton-item2.js');
-var skeleton = require('./src/skeleton.js');
+var skeleton = require('./src/skeleton2.js');
 var skeletonItem = require('./src/skeleton-item.js');
 var install = require('../../utils/vue/install.js');
 

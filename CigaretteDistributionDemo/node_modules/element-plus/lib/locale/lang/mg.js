@@ -10,7 +10,10 @@ var mg = {
     },
     colorpicker: {
       confirm: "ENY",
-      clear: "Fafana"
+      clear: "Fafana",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Zao",
@@ -18,6 +21,10 @@ var mg = {
       cancel: "Hanafoana",
       clear: "Fafana",
       confirm: "ENY",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Misafidy daty",
       selectTime: "Misafidy ora",
       startDate: "Daty fanombohana",
@@ -41,7 +48,6 @@ var mg = {
       month10: "Oktobra",
       month11: "Novambra",
       month12: "Desambra",
-      week: "herinandro",
       weeks: {
         sun: "Lad",
         mon: "Ala",
@@ -50,6 +56,15 @@ var mg = {
         thu: "Lak",
         fri: "Zom",
         sat: "Sab"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "Jan",
@@ -66,6 +81,10 @@ var mg = {
         dec: "Des"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Eo ampiandrasana",
       noMatch: "Tsy misy angona mifanentana",
@@ -74,6 +93,9 @@ var mg = {
     },
     mention: {
       loading: "Eo ampiandrasana"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Tsy misy angona mifanentana",
@@ -94,11 +116,18 @@ var mg = {
       nextPages: "Next {pager} pages",
       deprecationWarning: "Fampiasana tsy ampiasaina intsony no hita, azafady mba jereo ny tahirin-kevitra el-pagination raha mila fanazavana fanampiny"
     },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
+    },
     messagebox: {
       title: "Hafatra",
       confirm: "ENY",
       cancel: "Hanafoana",
-      error: "Fampidirana tsy ara-dal\xE0na"
+      error: "Fampidirana tsy ara-dal\xE0na",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "tsindrio fafana raha hanala",
@@ -106,12 +135,23 @@ var mg = {
       preview: "Topi-maso",
       continue: "Hanoy"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Tsy misy angona",
       confirmFilter: "Manamarina",
       resetFilter: "Averina",
       clearFilter: "Rehetra",
       sumText: "Atambatra"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Tsy misy angona"

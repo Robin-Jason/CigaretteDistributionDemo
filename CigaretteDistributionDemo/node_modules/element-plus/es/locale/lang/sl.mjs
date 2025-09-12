@@ -6,7 +6,10 @@ var sl = {
     },
     colorpicker: {
       confirm: "V redu",
-      clear: "Po\u010Disti"
+      clear: "Po\u010Disti",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Zdaj",
@@ -14,6 +17,10 @@ var sl = {
       cancel: "Prekli\u010Di",
       clear: "Po\u010Disti",
       confirm: "Potrdi",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Izberi datum",
       selectTime: "Izberi \u010Das",
       startDate: "Za\u010Detni datum",
@@ -37,7 +44,6 @@ var sl = {
       month10: "Okt",
       month11: "Nov",
       month12: "Dec",
-      week: "teden",
       weeks: {
         sun: "Ned",
         mon: "Pon",
@@ -46,6 +52,15 @@ var sl = {
         thu: "\u010Cet",
         fri: "Pet",
         sat: "Sob"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "Jan",
@@ -62,6 +77,10 @@ var sl = {
         dec: "Dec"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Nalaganje",
       noMatch: "Ni ustreznih podatkov",
@@ -70,6 +89,9 @@ var sl = {
     },
     mention: {
       loading: "Nalaganje"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Ni ustreznih podatkov",
@@ -87,13 +109,21 @@ var sl = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Sporo\u010Dilo",
       confirm: "V redu",
       cancel: "Prekli\u010Di",
-      error: "Nedovoljen vnos"
+      error: "Nedovoljen vnos",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "press delete to remove",
@@ -101,12 +131,23 @@ var sl = {
       preview: "Predogled",
       continue: "Nadaljuj"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Ni podatkov",
       confirmFilter: "Potrdi",
       resetFilter: "Ponastavi",
       clearFilter: "Vse",
       sumText: "Skupno"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Ni podatkov"

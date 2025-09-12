@@ -10,7 +10,10 @@ var it = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "Pulisci"
+      clear: "Pulisci",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Ora",
@@ -18,6 +21,10 @@ var it = {
       cancel: "Cancella",
       clear: "Pulisci",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Seleziona data",
       selectTime: "Seleziona ora",
       startDate: "Data inizio",
@@ -50,6 +57,15 @@ var it = {
         fri: "Ven",
         sat: "Sab"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Gen",
         feb: "Feb",
@@ -65,6 +81,10 @@ var it = {
         dec: "Dic"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Caricamento",
       noMatch: "Nessuna corrispondenza",
@@ -73,6 +93,9 @@ var it = {
     },
     mention: {
       loading: "Caricamento"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Nessuna corrispondenza",
@@ -90,12 +113,21 @@ var it = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
+      title: "Message",
       confirm: "OK",
       cancel: "Cancella",
-      error: "Input non valido"
+      error: "Input non valido",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "Premi cancella per rimuovere",
@@ -103,12 +135,23 @@ var it = {
       preview: "Anteprima",
       continue: "Continua"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Nessun dato",
       confirmFilter: "Conferma",
       resetFilter: "Reset",
       clearFilter: "Tutti",
       sumText: "Somma"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Nessun dato"

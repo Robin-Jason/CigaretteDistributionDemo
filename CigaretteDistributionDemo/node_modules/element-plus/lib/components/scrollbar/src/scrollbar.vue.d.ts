@@ -77,10 +77,10 @@ declare const __VLS_component: import("vue").DefineComponent<{
     }) => any) | undefined;
     "onEnd-reached"?: ((direction: ScrollbarDirection) => any) | undefined;
 }, {
+    readonly tabindex: import("element-plus/es/utils").EpPropMergeType<readonly [StringConstructor, NumberConstructor], unknown, unknown>;
     readonly height: import("element-plus/es/utils").EpPropMergeType<readonly [StringConstructor, NumberConstructor], unknown, unknown>;
     readonly maxHeight: import("element-plus/es/utils").EpPropMergeType<readonly [StringConstructor, NumberConstructor], unknown, unknown>;
     readonly always: boolean;
-    readonly tabindex: import("element-plus/es/utils").EpPropMergeType<readonly [StringConstructor, NumberConstructor], unknown, unknown>;
     readonly minSize: number;
     readonly distance: number;
     readonly wrapStyle: StyleValue;

@@ -2,8 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var slider$1 = require('./src/slider.js');
-var slider = require('./src/slider2.js');
+var slider$1 = require('./src/slider2.js');
+var slider = require('./src/slider.js');
 var constants = require('./src/constants.js');
 var install = require('../../utils/vue/install.js');
 

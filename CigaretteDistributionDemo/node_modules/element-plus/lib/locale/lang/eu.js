@@ -10,7 +10,10 @@ var eu = {
     },
     colorpicker: {
       confirm: "Ados",
-      clear: "Garbitu"
+      clear: "Garbitu",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Orain",
@@ -18,6 +21,10 @@ var eu = {
       cancel: "Utzi",
       clear: "Garbitu",
       confirm: "Ados",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Hautatu data",
       selectTime: "Hautatu ordua",
       startDate: "Hasierako data",
@@ -50,6 +57,15 @@ var eu = {
         fri: "ol.",
         sat: "lr."
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "urt",
         feb: "ots",
@@ -65,6 +81,10 @@ var eu = {
         dec: "abe"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Kargatzen",
       noMatch: "Bat datorren daturik ez",
@@ -73,6 +93,9 @@ var eu = {
     },
     mention: {
       loading: "Kargatzen"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Bat datorren daturik ez",
@@ -90,19 +113,32 @@ var eu = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Mezua",
       confirm: "Ados",
       cancel: "Utzi",
-      error: "Sarrera baliogabea"
+      error: "Sarrera baliogabea",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "sakatu Ezabatu kentzeko",
       delete: "Ezabatu",
       preview: "Aurrebista",
       continue: "Jarraitu"
+    },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
     },
     table: {
       emptyText: "Daturik ez",
@@ -114,7 +150,8 @@ var eu = {
     tour: {
       next: "Hurrengoa",
       previous: "Aurrekoa",
-      finish: "Bukatu"
+      finish: "Bukatu",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Daturik ez"

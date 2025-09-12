@@ -50,8 +50,8 @@ const usePopperContent = (props) => {
   });
   vue.onMounted(() => {
     vue.watch(() => {
-      var _a;
-      return (_a = vue.unref(computedReference)) == null ? void 0 : _a.getBoundingClientRect();
+      var _a, _b;
+      return (_b = (_a = vue.unref(computedReference)) == null ? void 0 : _a.getBoundingClientRect) == null ? void 0 : _b.call(_a);
     }, () => {
       update();
     });

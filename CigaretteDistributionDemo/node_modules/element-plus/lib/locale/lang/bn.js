@@ -10,7 +10,10 @@ var bn = {
     },
     colorpicker: {
       confirm: "\u09A0\u09BF\u0995 \u0986\u099B\u09C7",
-      clear: "\u0995\u09CD\u09B2\u09BF\u09DF\u09BE\u09B0"
+      clear: "\u0995\u09CD\u09B2\u09BF\u09DF\u09BE\u09B0",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "\u098F\u0996\u09A8",
@@ -18,6 +21,10 @@ var bn = {
       cancel: "\u09AC\u09BE\u09A4\u09BF\u09B2",
       clear: "\u0995\u09CD\u09B2\u09BF\u09DF\u09BE\u09B0",
       confirm: "\u09A0\u09BF\u0995 \u0986\u099B\u09C7",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "\u09A4\u09BE\u09B0\u09BF\u0996 \u09A8\u09BF\u09B0\u09CD\u09AC\u09BE\u099A\u09A8 \u0995\u09B0\u09C1\u09A8",
       selectTime: "\u09B8\u09AE\u09DF \u09A8\u09BF\u09B0\u09CD\u09AC\u09BE\u099A\u09A8 \u0995\u09B0\u09C1\u09A8",
       startDate: "\u09AF\u09C7 \u09A4\u09BE\u09B0\u09BF\u0996 \u09A5\u09C7\u0995\u09C7",
@@ -41,7 +48,6 @@ var bn = {
       month10: "\u0985\u0995\u09CD\u099F\u09CB\u09AC\u09B0",
       month11: "\u09A8\u09AD\u09C7\u09AE\u09CD\u09AC\u09B0",
       month12: "\u09A1\u09BF\u09B8\u09C7\u09AE\u09CD\u09AC\u09B0",
-      week: "\u09B8\u09BE\u09AA\u09CD\u09A4\u09BE\u09B9",
       weeks: {
         sun: "\u09B0\u09AC\u09BF",
         mon: "\u09B8\u09CB\u09AE",
@@ -50,6 +56,15 @@ var bn = {
         thu: "\u09AC\u09C3\u09B9\u0983",
         fri: "\u09B6\u09C1\u0995\u09CD\u09B0",
         sat: "\u09B6\u09A8\u09BF"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "\u099C\u09BE\u09A8\u09C1",
@@ -66,6 +81,10 @@ var bn = {
         dec: "\u09A1\u09BF\u09B8\u09C7"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "\u09B2\u09CB\u09A1 \u09B9\u099A\u09CD\u099B\u09C7",
       noMatch: "\u0995\u09CB\u09A8 \u09AE\u09BF\u09B2 \u09AA\u0993\u09DF\u09BE \u09AF\u09BE\u09DF\u09A8\u09BF",
@@ -74,6 +93,9 @@ var bn = {
     },
     mention: {
       loading: "\u09B2\u09CB\u09A1 \u09B9\u099A\u09CD\u099B\u09C7"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "\u0995\u09CB\u09A8 \u09AE\u09BF\u09B2 \u09AA\u0993\u09DF\u09BE \u09AF\u09BE\u09DF\u09A8\u09BF",
@@ -94,11 +116,18 @@ var bn = {
       nextPages: "Next {pager} pages",
       deprecationWarning: "\u0985\u09AA\u09CD\u09B0\u099A\u09B2\u09BF\u09A4 (Deprecated) \u09AC\u09CD\u09AF\u09BE\u09AC\u09B9\u09BE\u09B0 \u09AA\u0993\u09DF\u09BE \u0997\u09C7\u099B\u09C7, \u0986\u09B0\u0993 \u099C\u09BE\u09A8\u09A4\u09C7 \u099A\u09BE\u0987\u09B2\u09C7, \u09A6\u09DF\u09BE \u0995\u09B0\u09C7 el-pagination \u098F\u09B0 \u09A1\u0995\u09C1\u09AE\u09C7\u09A8\u09CD\u099F\u09C7\u09B6\u09A8 \u09A6\u09C7\u0996\u09C1\u09A8"
     },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
+    },
     messagebox: {
       title: "\u09AC\u09BE\u09B0\u09CD\u09A4\u09BE",
       confirm: "\u09A0\u09BF\u0995 \u0986\u099B\u09C7",
       cancel: "\u09AC\u09BE\u09A4\u09BF\u09B2",
-      error: "\u0987\u09A8\u09AA\u09C1\u099F \u09A1\u09BE\u099F\u09BE \u0997\u09CD\u09B0\u09B9\u09A8\u09AF\u09CB\u0997\u09CD\u09AF \u09A8\u09DF"
+      error: "\u0987\u09A8\u09AA\u09C1\u099F \u09A1\u09BE\u099F\u09BE \u0997\u09CD\u09B0\u09B9\u09A8\u09AF\u09CB\u0997\u09CD\u09AF \u09A8\u09DF",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: '\u0985\u09AA\u09B8\u09BE\u09B0\u09A3 \u0995\u09B0\u09A4\u09C7 "\u09A1\u09BF\u09B2\u09BF\u099F" \u098F \u0995\u09CD\u09B2\u09BF\u0995 \u0995\u09B0\u09C1\u09A8',
@@ -106,12 +135,23 @@ var bn = {
       preview: "\u09AA\u09CD\u09B0\u09BF\u09AD\u09BF\u0989",
       continue: "\u099A\u09BE\u09B2\u09BF\u09DF\u09C7 \u09AF\u09BE\u09A8"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "\u0995\u09CB\u09A8 \u09A1\u09BE\u099F\u09BE \u09A8\u09C7\u0987",
       confirmFilter: "\u09A8\u09BF\u09B6\u09CD\u099A\u09BF\u09A4 \u0995\u09B0\u09C1\u09A8",
       resetFilter: "\u09B0\u09BF\u09B8\u09C7\u099F",
       clearFilter: "\u09B8\u09AC",
       sumText: "\u09B8\u09BE\u09B0\u09BE\u0982\u09B6"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u0995\u09CB\u09A8 \u09A1\u09BE\u099F\u09BE \u09A8\u09C7\u0987"

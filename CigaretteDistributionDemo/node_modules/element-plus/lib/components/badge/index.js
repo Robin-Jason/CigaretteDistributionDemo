@@ -2,8 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var badge$1 = require('./src/badge2.js');
-var badge = require('./src/badge.js');
+var badge$1 = require('./src/badge.js');
+var badge = require('./src/badge2.js');
 var install = require('../../utils/vue/install.js');
 
 const ElBadge = install.withInstall(badge$1["default"]);

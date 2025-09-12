@@ -48,7 +48,6 @@ var lo = {
       month10: "\u0E95\u0EB8\u0EA5\u0EB2",
       month11: "\u0E9E\u0EB0\u0E88\u0EB4\u0E81",
       month12: "\u0E97\u0EB1\u0E99\u0EA7\u0EB2",
-      week: "\u0EAD\u0EB2\u0E97\u0EB4\u0E94",
       weeks: {
         sun: "\u0EAD\u0EB2",
         mon: "\u0E88",
@@ -151,7 +150,8 @@ var lo = {
     tour: {
       next: "\u0E96\u0EB1\u0E94\u0EC4\u0E9B",
       previous: "\u0E8D\u0EC9\u0EAD\u0E99\u0E81\u0EB1\u0E9A",
-      finish: "\u0EAA\u0EB3\u0EC0\u0EA5\u0EB1\u0E94"
+      finish: "\u0EAA\u0EB3\u0EC0\u0EA5\u0EB1\u0E94",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u0E9A\u0ECD\u0EC8\u0EA1\u0EB5\u0E82\u0ECD\u0EC9\u0EA1\u0EB9\u0E99"

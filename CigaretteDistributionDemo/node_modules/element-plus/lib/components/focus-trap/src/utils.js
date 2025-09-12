@@ -4,7 +4,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var vue = require('vue');
 var tokens = require('./tokens.js');
-var types = require('../../../utils/types.js');
 var aria = require('../../../utils/dom/aria.js');
 
 const focusReason = vue.ref();
@@ -53,20 +52,12 @@ const isSelectable = (element) => {
   return element instanceof HTMLInputElement && "select" in element;
 };
 const tryFocus = (element, shouldSelect) => {
-  if (element && element.focus) {
+  if (element) {
     const prevFocusedElement = document.activeElement;
-    let cleanup = false;
-    if (types.isElement(element) && !aria.isFocusable(element) && !element.getAttribute("tabindex")) {
-      element.setAttribute("tabindex", "-1");
-      cleanup = true;
-    }
-    element.focus({ preventScroll: true });
+    aria.focusElement(element, { preventScroll: true });
     lastAutomatedFocusTimestamp.value = window.performance.now();
     if (element !== prevFocusedElement && isSelectable(element) && shouldSelect) {
       element.select();
-    }
-    if (types.isElement(element) && cleanup) {
-      element.removeAttribute("tabindex");
     }
   }
 };

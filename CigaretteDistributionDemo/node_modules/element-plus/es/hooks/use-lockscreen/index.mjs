@@ -1,9 +1,9 @@
 import { isRef, computed, watch, onScopeDispose } from 'vue';
 import { useNamespace } from '../use-namespace/index.mjs';
 import { throwError } from '../../utils/error.mjs';
+import { isClient } from '@vueuse/core';
 import { hasClass, addClass, getStyle, removeClass } from '../../utils/dom/style.mjs';
 import { getScrollBarWidth } from '../../utils/dom/scroll.mjs';
-import { isClient } from '@vueuse/core';
 
 const useLockscreen = (trigger, options = {}) => {
   if (!isRef(trigger)) {

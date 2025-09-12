@@ -6,7 +6,10 @@ var az = {
     },
     colorpicker: {
       confirm: "T\u0259sdiql\u0259",
-      clear: "T\u0259mizl\u0259"
+      clear: "T\u0259mizl\u0259",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "\u0130ndi",
@@ -14,6 +17,10 @@ var az = {
       cancel: "\u0130mtina",
       clear: "T\u0259mizl\u0259",
       confirm: "T\u0259sdiql\u0259",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Tarix se\xE7",
       selectTime: "Saat se\xE7",
       startDate: "Ba\u015Flan\u011F\u0131c Tarixi",
@@ -37,7 +44,6 @@ var az = {
       month10: "Oktyabr",
       month11: "Noyabr",
       month12: "Dekabr",
-      week: "h\u0259ft\u0259",
       weeks: {
         sun: "Baz",
         mon: "B.e",
@@ -46,6 +52,15 @@ var az = {
         thu: "C.a",
         fri: "C\xFCm",
         sat: "\u015E\u0259n"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "Yan",
@@ -62,6 +77,10 @@ var az = {
         dec: "Dek"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Y\xFCkl\u0259nir",
       noMatch: "N\u0259tic\u0259 tap\u0131lmad\u0131",
@@ -70,6 +89,9 @@ var az = {
     },
     mention: {
       loading: "Y\xFCkl\u0259nir"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "N\u0259tic\u0259 tap\u0131lmad\u0131",
@@ -87,13 +109,21 @@ var az = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Mesaj",
       confirm: "T\u0259sdiql\u0259",
       cancel: "\u0130mtina",
-      error: "S\u0259hv"
+      error: "S\u0259hv",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "S\xFCr\xFC\u015Fd\xFCrm\u0259d\u0259n sonra sil",
@@ -101,12 +131,23 @@ var az = {
       preview: "\xD6n izl\u0259",
       continue: "Davam et"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "M\u0259lumat yoxdur",
       confirmFilter: "T\u0259sdiql\u0259",
       resetFilter: "S\u0131f\u0131rla",
       clearFilter: "B\xFCt\xFCn",
       sumText: "C\u0259mi"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "M\u0259lumat yoxdur"
@@ -129,13 +170,13 @@ var az = {
       confirmButtonText: "B\u0259li",
       cancelButtonText: "Xeyr"
     },
-    empty: {
-      description: "M\u0259lumat yoxdur"
-    },
     carousel: {
       leftArrow: "Carousel arrow left",
       rightArrow: "Carousel arrow right",
       indicator: "Carousel switch to index {index}"
+    },
+    empty: {
+      description: "M\u0259lumat yoxdur"
     }
   }
 };

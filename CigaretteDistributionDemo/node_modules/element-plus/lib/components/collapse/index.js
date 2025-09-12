@@ -3,9 +3,9 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var collapse$1 = require('./src/collapse2.js');
-var collapseItem$1 = require('./src/collapse-item2.js');
+var collapseItem$1 = require('./src/collapse-item.js');
 var collapse = require('./src/collapse.js');
-var collapseItem = require('./src/collapse-item.js');
+var collapseItem = require('./src/collapse-item2.js');
 var constants = require('./src/constants.js');
 var install = require('../../utils/vue/install.js');
 

@@ -147,6 +147,7 @@ declare const _default: {
             next: string;
             previous: string;
             finish: string;
+            close: string;
         };
         tree: {
             emptyText: string;

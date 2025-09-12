@@ -48,7 +48,6 @@ var te = {
       month10: "\u0C05\u0C15\u0C4D\u0C1F\u0C4B\u0C2C\u0C30\u0C4D",
       month11: "\u0C28\u0C35\u0C02\u0C2C\u0C30\u0C4D",
       month12: "\u0C21\u0C3F\u0C38\u0C46\u0C02\u0C2C\u0C30\u0C4D",
-      week: "\u0C35\u0C3E\u0C30\u0C02",
       weeks: {
         sun: "\u0C06\u0C26\u0C3F",
         mon: "\u0C38\u0C4B\u0C2E",
@@ -151,7 +150,8 @@ var te = {
     tour: {
       next: "\u0C24\u0C26\u0C41\u0C2A\u0C30\u0C3F",
       previous: "\u0C17\u0C24",
-      finish: "\u0C2E\u0C41\u0C17\u0C3F\u0C02\u0C1A\u0C41"
+      finish: "\u0C2E\u0C41\u0C17\u0C3F\u0C02\u0C1A\u0C41",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u0C21\u0C47\u0C1F\u0C3E \u0C32\u0C47\u0C26\u0C41"

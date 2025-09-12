@@ -10,7 +10,10 @@ var fi = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "Tyhjenn\xE4"
+      clear: "Tyhjenn\xE4",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Nyt",
@@ -18,6 +21,10 @@ var fi = {
       cancel: "Peruuta",
       clear: "Tyhjenn\xE4",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Valitse p\xE4iv\xE4",
       selectTime: "Valitse aika",
       startDate: "Aloitusp\xE4iv\xE4",
@@ -50,6 +57,15 @@ var fi = {
         fri: "pe",
         sat: "la"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "tammi",
         feb: "helmi",
@@ -65,6 +81,10 @@ var fi = {
         dec: "joulu"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Lataa",
       noMatch: "Ei vastaavia tietoja",
@@ -73,6 +93,9 @@ var fi = {
     },
     mention: {
       loading: "Lataa"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Ei vastaavia tietoja",
@@ -90,13 +113,21 @@ var fi = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Viesti",
       confirm: "OK",
       cancel: "Peruuta",
-      error: "Virheellinen sy\xF6te"
+      error: "Virheellinen sy\xF6te",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "Poista Delete-n\xE4pp\xE4imell\xE4",
@@ -104,12 +135,23 @@ var fi = {
       preview: "Esikatsele",
       continue: "Jatka"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Ei tietoja",
       confirmFilter: "Vahvista",
       resetFilter: "Tyhjenn\xE4",
       clearFilter: "Kaikki",
       sumText: "Summa"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Ei tietoja"

@@ -44,7 +44,6 @@ var ms = {
       month10: "Oktober",
       month11: "November",
       month12: "Disember",
-      week: "minggu",
       weeks: {
         sun: "Ahd",
         mon: "Isn",
@@ -122,9 +121,10 @@ var ms = {
     messagebox: {
       title: "Mesej",
       confirm: "OK",
-      Batal: "Dibatalkan",
+      cancel: "Cancel",
       error: "Input haram",
-      close: "Tutup dialog ini"
+      close: "Tutup dialog ini",
+      Batal: "Dibatalkan"
     },
     upload: {
       deleteTip: "tekan padam untuk mengalih keluar",
@@ -147,7 +147,8 @@ var ms = {
     tour: {
       next: "Seterusnya",
       previous: "Sebelumnya",
-      finish: "Selesai"
+      finish: "Selesai",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Tiada Data"
@@ -168,6 +169,7 @@ var ms = {
     },
     popconfirm: {
       confirmButtonText: "Ya",
+      cancelButtonText: "No",
       BatalButtonText: "Tidak"
     },
     carousel: {

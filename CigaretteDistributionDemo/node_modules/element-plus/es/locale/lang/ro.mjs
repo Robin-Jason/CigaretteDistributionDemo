@@ -6,7 +6,10 @@ var ro = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "\u0218terge"
+      clear: "\u0218terge",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Acum",
@@ -14,6 +17,10 @@ var ro = {
       cancel: "Anuleaz\u0103",
       clear: "\u0218terge",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Selecteaz\u0103 data",
       selectTime: "Selecteaz\u0103 ora",
       startDate: "Data de \xEEnceput",
@@ -46,6 +53,15 @@ var ro = {
         fri: "Vi",
         sat: "S\xE2"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Ian",
         feb: "Feb",
@@ -61,6 +77,10 @@ var ro = {
         dec: "Dec"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Se \xEEncarc\u0103",
       noMatch: "Nu exist\u0103 date potrivite",
@@ -69,6 +89,9 @@ var ro = {
     },
     mention: {
       loading: "Se \xEEncarc\u0103"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Nu exist\u0103 date potrivite",
@@ -86,13 +109,21 @@ var ro = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Mesaj",
       confirm: "OK",
       cancel: "Anuleaz\u0103",
-      error: "Date introduse eronate"
+      error: "Date introduse eronate",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "ap\u0103sa\u021Bi pe \u0219terge\u021Bi pentru a elimina",
@@ -100,12 +131,23 @@ var ro = {
       preview: "previzualizare",
       continue: "continu\u0103"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Nu exist\u0103 date",
       confirmFilter: "Confirm\u0103",
       resetFilter: "Reseteaz\u0103",
       clearFilter: "Tot",
       sumText: "Suma"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Nu exist\u0103 date"

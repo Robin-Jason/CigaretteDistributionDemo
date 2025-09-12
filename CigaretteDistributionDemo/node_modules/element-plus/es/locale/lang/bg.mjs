@@ -6,7 +6,10 @@ var bg = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "\u0418\u0437\u0447\u0438\u0441\u0442\u0438"
+      clear: "\u0418\u0437\u0447\u0438\u0441\u0442\u0438",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "\u0421\u0435\u0433\u0430",
@@ -14,6 +17,10 @@ var bg = {
       cancel: "\u041E\u0442\u043A\u0430\u0436\u0438",
       clear: "\u0418\u0437\u0447\u0438\u0441\u0442\u0438",
       confirm: "\u041E\u041A",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "\u0418\u0437\u0431\u0435\u0440\u0438 \u0434\u0430\u0442\u0430",
       selectTime: "\u0418\u0437\u0431\u0435\u0440\u0438 \u0447\u0430\u0441",
       startDate: "\u041D\u0430\u0447\u0430\u043B\u043D\u0430 \u0434\u0430\u0442\u0430",
@@ -46,6 +53,15 @@ var bg = {
         fri: "\u041F\u0435\u0442",
         sat: "\u0421\u044A\u0431"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "\u042F\u043D\u0443",
         feb: "\u0424\u0435\u0432",
@@ -61,6 +77,10 @@ var bg = {
         dec: "\u0414\u0435\u043A"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "\u0417\u0430\u0440\u0435\u0436\u0434\u0430\u043D\u0435",
       noMatch: "\u041D\u044F\u043C\u0430 \u043D\u0430\u043C\u0435\u0440\u0435\u043D\u0438",
@@ -69,6 +89,9 @@ var bg = {
     },
     mention: {
       loading: "\u0417\u0430\u0440\u0435\u0436\u0434\u0430\u043D\u0435"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "\u041D\u044F\u043C\u0430 \u043D\u0430\u043C\u0435\u0440\u0435\u043D\u0438",
@@ -86,13 +109,21 @@ var bg = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "\u0421\u044A\u043E\u0431\u0449\u0435\u043D\u0438\u0435",
       confirm: "\u041E\u041A",
       cancel: "\u041E\u0442\u043A\u0430\u0436\u0438",
-      error: "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u043D\u0438 \u0434\u0430\u043D\u043D\u0438"
+      error: "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u043D\u0438 \u0434\u0430\u043D\u043D\u0438",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "press delete to remove",
@@ -100,12 +131,23 @@ var bg = {
       preview: "\u041F\u0440\u0435\u0433\u043B\u0435\u0434\u0430\u0439",
       continue: "\u041F\u0440\u043E\u0434\u044A\u043B\u0436\u0438"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "\u041D\u044F\u043C\u0430 \u0434\u0430\u043D\u043D\u0438",
       confirmFilter: "\u041F\u043E\u0442\u0432\u044A\u0440\u0434\u0438",
       resetFilter: "\u0418\u0437\u0447\u0438\u0441\u0442\u0438",
       clearFilter: "\u0412\u0441\u0438\u0447\u043A\u0438",
       sumText: "Sum"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u041D\u044F\u043C\u0430 \u0434\u0430\u043D\u043D\u0438"

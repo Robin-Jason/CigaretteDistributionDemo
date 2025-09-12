@@ -1,8 +1,16 @@
-### 测试分配算法
-GET http://localhost:28080/api/cigarette/test-algorithm
-
-### 测试优化算法
+### 城乡分类代码以及业态分配算法测试
 GET http://localhost:28080/api/optimized-algorithm/test-optimized-algorithm
 
 ### 写回分配矩阵
 POST http://localhost:28080/api/cigarette/write-back?year=2024&month=1&weekSeq=1
+
+
+### 区县分配算法测试 - 执行预测并写回数据库
+POST http://localhost:28080/api/county-cigarette/predict
+Content-Type: application/json
+
+{
+  "year": 2024,
+  "month": 1,
+  "weekSeq": 1
+}

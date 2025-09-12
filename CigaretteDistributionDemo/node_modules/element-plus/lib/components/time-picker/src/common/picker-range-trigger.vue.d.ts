@@ -30,8 +30,8 @@ declare const __VLS_component: import("vue").DefineComponent<{
     blur: () => void;
 }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {
     click: (...args: any[]) => void;
-    blur: (...args: any[]) => void;
     focus: (...args: any[]) => void;
+    blur: (...args: any[]) => void;
     mouseenter: (...args: any[]) => void;
     mouseleave: (...args: any[]) => void;
     touchstart: (...args: any[]) => void;

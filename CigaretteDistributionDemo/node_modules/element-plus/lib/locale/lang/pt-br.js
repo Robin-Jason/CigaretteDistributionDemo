@@ -10,7 +10,10 @@ var ptBr = {
     },
     colorpicker: {
       confirm: "Confirmar",
-      clear: "Limpar"
+      clear: "Limpar",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Agora",
@@ -18,6 +21,10 @@ var ptBr = {
       cancel: "Cancelar",
       clear: "Limpar",
       confirm: "Confirmar",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Selecione a data",
       selectTime: "Selecione a hora",
       startDate: "Data inicial",
@@ -50,6 +57,15 @@ var ptBr = {
         fri: "Sex",
         sat: "Sab"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Jan",
         feb: "Fev",
@@ -65,6 +81,10 @@ var ptBr = {
         dec: "Dez"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Carregando",
       noMatch: "Sem resultados",
@@ -73,6 +93,9 @@ var ptBr = {
     },
     mention: {
       loading: "Carregando"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Sem resultados",
@@ -90,19 +113,32 @@ var ptBr = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Mensagem",
       confirm: "Confirmar",
       cancel: "Cancelar",
-      error: "Erro!"
+      error: "Erro!",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "aperte delete para apagar",
       delete: "Apagar",
       preview: "Pr\xE9-visualizar",
       continue: "Continuar"
+    },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
     },
     table: {
       emptyText: "Sem dados",
@@ -114,7 +150,8 @@ var ptBr = {
     tour: {
       next: "Pr\xF3ximo",
       previous: "Anterior",
-      finish: "Finalizar"
+      finish: "Finalizar",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Sem dados"

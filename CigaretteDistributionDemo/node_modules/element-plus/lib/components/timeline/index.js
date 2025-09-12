@@ -3,8 +3,8 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var timeline = require('./src/timeline.js');
-var timelineItem$1 = require('./src/timeline-item2.js');
-var timelineItem = require('./src/timeline-item.js');
+var timelineItem$1 = require('./src/timeline-item.js');
+var timelineItem = require('./src/timeline-item2.js');
 var tokens = require('./src/tokens.js');
 var install = require('../../utils/vue/install.js');
 

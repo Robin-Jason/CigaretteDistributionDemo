@@ -4,10 +4,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var menu = require('./src/menu.js');
 var menuItem$1 = require('./src/menu-item2.js');
-var menuItemGroup$1 = require('./src/menu-item-group2.js');
+var menuItemGroup$1 = require('./src/menu-item-group.js');
 var subMenu = require('./src/sub-menu.js');
 var menuItem = require('./src/menu-item.js');
-var menuItemGroup = require('./src/menu-item-group.js');
+var menuItemGroup = require('./src/menu-item-group2.js');
 var tokens = require('./src/tokens.js');
 var install = require('../../utils/vue/install.js');
 

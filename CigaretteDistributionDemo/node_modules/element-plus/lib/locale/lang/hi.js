@@ -48,7 +48,6 @@ var hi = {
       month10: "\u0905\u0915\u094D\u091F\u0942\u092C\u0930",
       month11: "\u0928\u0935\u0902\u092C\u0930",
       month12: "\u0926\u093F\u0938\u0902\u092C\u0930",
-      week: "\u0938\u092A\u094D\u0924\u093E\u0939",
       weeks: {
         sun: "\u0930\u0935\u093F",
         mon: "\u0938\u094B\u092E",
@@ -151,7 +150,8 @@ var hi = {
     tour: {
       next: "\u0905\u0917\u0932\u093E",
       previous: "\u092A\u093F\u091B\u0932\u093E",
-      finish: "\u092A\u0942\u0930\u093E \u0915\u0930\u0947\u0902"
+      finish: "\u092A\u0942\u0930\u093E \u0915\u0930\u0947\u0902",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u0915\u094B\u0908 \u0921\u0947\u091F\u093E \u0928\u0939\u0940\u0902 \u0939\u0948"

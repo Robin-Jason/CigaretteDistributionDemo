@@ -2,10 +2,10 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var steps$1 = require('./src/steps.js');
+var steps$1 = require('./src/steps2.js');
 var item$1 = require('./src/item2.js');
 var item = require('./src/item.js');
-var steps = require('./src/steps2.js');
+var steps = require('./src/steps.js');
 var tokens = require('./src/tokens.js');
 var install = require('../../utils/vue/install.js');
 

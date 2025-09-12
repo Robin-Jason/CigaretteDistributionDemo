@@ -12,7 +12,8 @@ const useTooltipTriggerProps = buildProps({
   triggerKeys: {
     type: definePropType(Array),
     default: () => [EVENT_CODE.enter, EVENT_CODE.numpadEnter, EVENT_CODE.space]
-  }
+  },
+  focusOnTarget: Boolean
 });
 
 export { useTooltipTriggerProps };

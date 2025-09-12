@@ -1,4 +1,4 @@
-import type { default as CascaderNode } from './node';
+import type { CascaderNode } from './types';
 import type { PropType } from 'vue';
 declare const _default: import("vue").DefineComponent<{
     node: {

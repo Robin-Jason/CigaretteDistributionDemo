@@ -10,7 +10,10 @@ var lv = {
     },
     colorpicker: {
       confirm: "Labi",
-      clear: "Not\u012Br\u012Bt"
+      clear: "Not\u012Br\u012Bt",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Tagad",
@@ -18,6 +21,10 @@ var lv = {
       cancel: "Atcelt",
       clear: "Not\u012Br\u012Bt",
       confirm: "Labi",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Izv\u0113l\u0113ties datumu",
       selectTime: "Izv\u0113l\u0113ties laiku",
       startDate: "S\u0101kuma datums",
@@ -50,6 +57,15 @@ var lv = {
         fri: "Pk",
         sat: "Se"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Jan",
         feb: "Feb",
@@ -65,6 +81,10 @@ var lv = {
         dec: "Dec"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Iel\u0101d\u0113",
       noMatch: "Nav atbilsto\u0161u datu",
@@ -73,6 +93,9 @@ var lv = {
     },
     mention: {
       loading: "Iel\u0101d\u0113"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Nav atbilsto\u0161u datu",
@@ -90,13 +113,21 @@ var lv = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Pazi\u0146ojums",
       confirm: "Labi",
       cancel: "Atcelt",
-      error: "Neder\u012Bga ievade"
+      error: "Neder\u012Bga ievade",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "Nospiediet dz\u0113st lai iz\u0146emtu",
@@ -104,12 +135,23 @@ var lv = {
       preview: "Priek\u0161skat\u012Bt",
       continue: "Turpin\u0101t"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Nav datu",
       confirmFilter: "Apstiprin\u0101t",
       resetFilter: "Atiestat\u012Bt",
       clearFilter: "Visi",
       sumText: "Summa"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Nav datu"

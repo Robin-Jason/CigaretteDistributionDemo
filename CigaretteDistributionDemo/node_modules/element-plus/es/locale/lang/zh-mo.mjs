@@ -146,7 +146,8 @@ var zhMo = {
     tour: {
       next: "\u4E0B\u4E00\u6B65",
       previous: "\u4E0A\u4E00\u6B65",
-      finish: "\u7D50\u675F\u5C0E\u89BD"
+      finish: "\u7D50\u675F\u5C0E\u89BD",
+      close: "\u95DC\u9589\u6B64\u5C0D\u8A71\u6846"
     },
     tree: {
       emptyText: "\u66AB\u7121\u8CC7\u6599"

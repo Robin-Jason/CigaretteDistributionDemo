@@ -10,7 +10,10 @@ var af = {
     },
     colorpicker: {
       confirm: "Bevestig",
-      clear: "Maak skoon"
+      clear: "Maak skoon",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Nou",
@@ -18,6 +21,10 @@ var af = {
       cancel: "Kanselleer",
       clear: "Maak skoon",
       confirm: "Bevestig",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Kies datum",
       selectTime: "Kies tyd",
       startDate: "Begindatum",
@@ -50,6 +57,15 @@ var af = {
         fri: "Vr",
         sat: "Sa"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Jan",
         feb: "Feb",
@@ -65,6 +81,10 @@ var af = {
         dec: "Des"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Laai",
       noMatch: "Geen toepaslike data",
@@ -73,6 +93,9 @@ var af = {
     },
     mention: {
       loading: "Laai"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Geen toepaslike data",
@@ -90,13 +113,21 @@ var af = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Boodskap",
       confirm: "Bevestig",
       cancel: "Kanselleer",
-      error: "Ongeldige invoer"
+      error: "Ongeldige invoer",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "press delete to remove",
@@ -104,12 +135,23 @@ var af = {
       preview: "Voorskou",
       continue: "Gaan voort"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Geen Data",
       confirmFilter: "Bevestig",
       resetFilter: "Herstel",
       clearFilter: "Alles",
       sumText: "Som"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Geen Data"

@@ -1,7 +1,7 @@
 import { defineComponent, renderSlot } from 'vue';
 import _export_sfc from '../../../_virtual/plugin-vue_export-helper.mjs';
 
-const _sfc_main = /* @__PURE__ */ defineComponent({
+const _sfc_main = defineComponent({
   name: "ElCollectionItem",
   inheritAttrs: false
 });

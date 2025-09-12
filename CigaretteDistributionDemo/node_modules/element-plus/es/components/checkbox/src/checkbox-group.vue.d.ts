@@ -18,6 +18,33 @@ declare const __VLS_component: import("vue").DefineComponent<{
     readonly textColor: StringConstructor;
     readonly tag: import("element-plus/es/utils").EpPropFinalized<StringConstructor, unknown, unknown, "div", boolean>;
     readonly validateEvent: import("element-plus/es/utils").EpPropFinalized<BooleanConstructor, unknown, unknown, true, boolean>;
+    readonly options: {
+        readonly type: import("vue").PropType<import("./checkbox-group").CheckboxOption[]>;
+        readonly required: false;
+        readonly validator: ((val: unknown) => boolean) | undefined;
+        __epPropKey: true;
+    };
+    readonly props: import("element-plus/es/utils").EpPropFinalized<(new (...args: any[]) => {
+        value?: string;
+        label?: string;
+        disabled?: string;
+    }) | (() => {
+        value?: string;
+        label?: string;
+        disabled?: string;
+    }) | ((new (...args: any[]) => {
+        value?: string;
+        label?: string;
+        disabled?: string;
+    }) | (() => {
+        value?: string;
+        label?: string;
+        disabled?: string;
+    }))[], unknown, unknown, () => Required<{
+        value?: string;
+        label?: string;
+        disabled?: string;
+    }>, boolean>;
 }, {}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {
     "update:modelValue": (val: CheckboxGroupValueType) => void;
     change: (val: import("element-plus").CheckboxValueType[]) => void;
@@ -37,11 +64,43 @@ declare const __VLS_component: import("vue").DefineComponent<{
     readonly textColor: StringConstructor;
     readonly tag: import("element-plus/es/utils").EpPropFinalized<StringConstructor, unknown, unknown, "div", boolean>;
     readonly validateEvent: import("element-plus/es/utils").EpPropFinalized<BooleanConstructor, unknown, unknown, true, boolean>;
+    readonly options: {
+        readonly type: import("vue").PropType<import("./checkbox-group").CheckboxOption[]>;
+        readonly required: false;
+        readonly validator: ((val: unknown) => boolean) | undefined;
+        __epPropKey: true;
+    };
+    readonly props: import("element-plus/es/utils").EpPropFinalized<(new (...args: any[]) => {
+        value?: string;
+        label?: string;
+        disabled?: string;
+    }) | (() => {
+        value?: string;
+        label?: string;
+        disabled?: string;
+    }) | ((new (...args: any[]) => {
+        value?: string;
+        label?: string;
+        disabled?: string;
+    }) | (() => {
+        value?: string;
+        label?: string;
+        disabled?: string;
+    }))[], unknown, unknown, () => Required<{
+        value?: string;
+        label?: string;
+        disabled?: string;
+    }>, boolean>;
 }>> & {
     "onUpdate:modelValue"?: ((val: CheckboxGroupValueType) => any) | undefined;
     onChange?: ((val: import("element-plus").CheckboxValueType[]) => any) | undefined;
 }, {
     readonly disabled: boolean;
+    readonly props: {
+        value?: string;
+        label?: string;
+        disabled?: string;
+    };
     readonly modelValue: CheckboxGroupValueType;
     readonly validateEvent: import("element-plus/es/utils").EpPropMergeType<BooleanConstructor, unknown, unknown>;
     readonly tag: string;

@@ -10,7 +10,10 @@ var kk = {
     },
     colorpicker: {
       confirm: "\u049A\u0430\u0431\u044B\u043B\u0434\u0430\u0443",
-      clear: "\u0422\u0430\u0437\u0430\u043B\u0430\u0443"
+      clear: "\u0422\u0430\u0437\u0430\u043B\u0430\u0443",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "\u049A\u0430\u0437\u0456\u0440",
@@ -18,6 +21,10 @@ var kk = {
       cancel: "\u0411\u043E\u043B\u0434\u044B\u0440\u043C\u0430\u0443",
       clear: "\u0422\u0430\u0437\u0430\u043B\u0430\u0443",
       confirm: "\u049A\u0430\u0431\u044B\u043B\u0434\u0430\u0443",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "\u041A\u04AF\u043D\u0434\u0456 \u0442\u0430\u04A3\u0434\u0430\u04A3\u044B\u0437",
       selectTime: "\u0421\u0430\u0493\u0430\u0442\u0442\u044B \u0442\u0430\u04A3\u0434\u0430\u04A3\u044B\u0437",
       startDate: "\u0411\u0430\u0441\u0442\u0430\u043B\u0443 \u043A\u04AF\u043D\u0456",
@@ -41,7 +48,6 @@ var kk = {
       month10: "\u049A\u0430\u0437\u0430\u043D",
       month11: "\u049A\u0430\u0440\u0430\u0448\u0430",
       month12: "\u0416\u0435\u043B\u0442\u043E\u049B\u0441\u0430\u043D",
-      week: "\u0410\u043F\u0442\u0430",
       weeks: {
         sun: "\u0416\u0435\u043A",
         mon: "\u0414\u04AF\u0439",
@@ -50,6 +56,15 @@ var kk = {
         thu: "\u0411\u0435\u0439",
         fri: "\u0416\u04B1\u043C",
         sat: "\u0421\u0435\u043D"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "\u049A\u0430\u04A3",
@@ -66,6 +81,10 @@ var kk = {
         dec: "\u0416\u0435\u043B"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "\u0416\u04AF\u043A\u0442\u0435\u043B\u0443\u0434\u0435",
       noMatch: "\u0421\u04D9\u0439\u043A\u0435\u0441 \u0434\u0435\u0440\u0435\u043A\u0442\u0435\u0440 \u0436\u043E\u049B",
@@ -74,6 +93,9 @@ var kk = {
     },
     mention: {
       loading: "\u0416\u04AF\u043A\u0442\u0435\u043B\u0443\u0434\u0435"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "\u0421\u04D9\u0439\u043A\u0435\u0441 \u0434\u0435\u0440\u0435\u043A\u0442\u0435\u0440 \u0436\u043E\u049B",
@@ -91,13 +113,21 @@ var kk = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "\u0425\u0430\u0431\u0430\u0440",
       confirm: "\u049A\u0430\u0431\u044B\u043B\u0434\u0430\u0443",
       cancel: "\u0411\u043E\u043B\u0434\u044B\u0440\u043C\u0430\u0443",
-      error: "\u0416\u0430\u0440\u0430\u043C\u0441\u044B\u0437 \u0435\u043D\u0433\u0456\u0437\u0443\u043B\u0435\u0440"
+      error: "\u0416\u0430\u0440\u0430\u043C\u0441\u044B\u0437 \u0435\u043D\u0433\u0456\u0437\u0443\u043B\u0435\u0440",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "\u04E8\u0448\u0456\u0440\u0443\u0434\u0456 \u0431\u0430\u0441\u044B\u043F \u04E9\u0448\u0456\u0440\u0456\u04A3\u0456\u0437",
@@ -105,12 +135,23 @@ var kk = {
       preview: "\u0410\u043B\u0434\u044B\u043D \u0430\u043B\u0430 \u049B\u0430\u0440\u0430\u0443",
       continue: "\u0416\u0430\u043B\u0493\u0430\u0441\u0442\u044B\u0440\u0443"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "\u0414\u0435\u0440\u0435\u043A\u0442\u0435\u0440 \u0436\u043E\u049B",
       confirmFilter: "\u049A\u0430\u0431\u044B\u043B\u0434\u0430\u0443",
       resetFilter: "\u049A\u0430\u043B\u043F\u044B\u043D\u0430 \u043A\u0435\u043B\u0442\u0456\u0440\u0443",
       clearFilter: "\u0411\u0430\u0440\u043B\u044B\u0493\u044B",
       sumText: "\u0421\u043E\u043C\u0430\u0441\u044B"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u0414\u0435\u0440\u0435\u043A\u0442\u0435\u0440 \u0436\u043E\u049B"

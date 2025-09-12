@@ -3,6 +3,7 @@ export declare enum SortOrder {
     DESC = "desc"
 }
 export declare enum Alignment {
+    LEFT = "left",
     CENTER = "center",
     RIGHT = "right"
 }

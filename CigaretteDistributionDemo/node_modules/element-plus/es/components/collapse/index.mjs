@@ -1,7 +1,7 @@
 import Collapse from './src/collapse2.mjs';
-import CollapseItem from './src/collapse-item2.mjs';
+import CollapseItem from './src/collapse-item.mjs';
 export { collapseEmits, collapseProps, emitChangeFn } from './src/collapse.mjs';
-export { collapseItemProps } from './src/collapse-item.mjs';
+export { collapseItemProps } from './src/collapse-item2.mjs';
 export { collapseContextKey } from './src/constants.mjs';
 import { withInstall, withNoopInstall } from '../../utils/vue/install.mjs';
 

@@ -6,7 +6,10 @@ var tr = {
     },
     colorpicker: {
       confirm: "Onayla",
-      clear: "Temizle"
+      clear: "Temizle",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "\u015Eimdi",
@@ -14,6 +17,10 @@ var tr = {
       cancel: "\u0130ptal",
       clear: "Temizle",
       confirm: "Onayla",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Tarih se\xE7",
       selectTime: "Saat se\xE7",
       startDate: "Ba\u015Flang\u0131\xE7 Tarihi",
@@ -46,6 +53,15 @@ var tr = {
         fri: "Cum",
         sat: "Cmt"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Oca",
         feb: "\u015Eub",
@@ -61,6 +77,10 @@ var tr = {
         dec: "Ara"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Y\xFCkleniyor",
       noMatch: "E\u015Fle\u015Fen veri bulunamad\u0131",
@@ -69,6 +89,9 @@ var tr = {
     },
     mention: {
       loading: "Y\xFCkleniyor"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "E\u015Fle\u015Fen veri bulunamad\u0131",
@@ -86,13 +109,21 @@ var tr = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Mesaj",
       confirm: "Onayla",
       cancel: "\u0130ptal",
-      error: "\u0130llegal giri\u015F"
+      error: "\u0130llegal giri\u015F",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "kald\u0131rmak i\xE7in delete tu\u015Funa bas",
@@ -100,12 +131,23 @@ var tr = {
       preview: "G\xF6r\xFCnt\xFCle",
       continue: "Devam"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Veri yok",
       confirmFilter: "Onayla",
       resetFilter: "S\u0131f\u0131rla",
       clearFilter: "Hepsi",
       sumText: "Sum"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Veri yok"

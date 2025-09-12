@@ -12,6 +12,7 @@ declare const useSelect: (props: SelectV2Props, emit: SelectV2EmitFn) => {
     popupHeight: import("vue").ComputedRef<number>;
     debounce: import("vue").ComputedRef<0 | 300>;
     allOptions: import("vue").ComputedRef<OptionType[]>;
+    allOptionsValueMap: import("vue").ComputedRef<Map<any, any>>;
     filteredOptions: import("vue").Ref<({
         [x: string]: any;
     } | {
@@ -94,6 +95,7 @@ declare const useSelect: (props: SelectV2Props, emit: SelectV2EmitFn) => {
     getValue: (option: Option) => any;
     getDisabled: (option: Option) => any;
     getValueKey: (item: unknown) => any;
+    getIndex: (option: Option) => any;
     handleClear: () => void;
     handleClickOutside: (event: Event) => void;
     handleDel: (e: KeyboardEvent) => void;

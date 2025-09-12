@@ -10,7 +10,10 @@ var sk = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "Zmaza\u0165"
+      clear: "Zmaza\u0165",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Teraz",
@@ -18,6 +21,10 @@ var sk = {
       cancel: "Zru\u0161i\u0165",
       clear: "Zmaza\u0165",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Vybra\u0165 d\xE1tum",
       selectTime: "Vybra\u0165 \u010Das",
       startDate: "D\xE1tum za\u010Diatku",
@@ -28,9 +35,6 @@ var sk = {
       nextYear: "\u010Eal\u0161\xED rok",
       prevMonth: "Predo\u0161l\xFD mesiac",
       nextMonth: "\u010Eal\u0161\xED mesiac",
-      day: "De\u0148",
-      week: "T\xFD\u017Ede\u0148",
-      month: "Mesiac",
       year: "Rok",
       month1: "Janu\xE1r",
       month2: "Febru\xE1r",
@@ -53,6 +57,15 @@ var sk = {
         fri: "Pi",
         sat: "So"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Jan",
         feb: "Feb",
@@ -66,7 +79,13 @@ var sk = {
         oct: "Okt",
         nov: "Nov",
         dec: "Dec"
-      }
+      },
+      day: "De\u0148",
+      month: "Mesiac"
+    },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
     },
     select: {
       loading: "Na\u010D\xEDtavanie",
@@ -76,6 +95,9 @@ var sk = {
     },
     mention: {
       loading: "Na\u010D\xEDtavanie"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "\u017Diadna zhoda",
@@ -93,13 +115,21 @@ var sk = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Spr\xE1va",
       confirm: "OK",
       cancel: "Zru\u0161i\u0165",
-      error: "Neplatn\xFD vstup"
+      error: "Neplatn\xFD vstup",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "pre odstr\xE1nenie stisni kl\xE1vesu Delete",
@@ -107,12 +137,23 @@ var sk = {
       preview: "Prehliada\u0165",
       continue: "Pokra\u010Dova\u0165"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "\u017Diadne d\xE1ta",
       confirmFilter: "Potvrdi\u0165",
       resetFilter: "Zresetova\u0165",
       clearFilter: "V\u0161etko",
       sumText: "Spolu"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u017Diadne d\xE1ta"

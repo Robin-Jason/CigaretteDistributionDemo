@@ -50,8 +50,8 @@ declare const __VLS_component: import("vue").DefineComponent<{
 }>> & {
     "onUpdate:size"?: ((value: number) => any) | undefined;
 }, {
-    readonly collapsible: boolean;
     readonly resizable: import("element-plus/es/utils").EpPropMergeType<BooleanConstructor, unknown, unknown>;
+    readonly collapsible: boolean;
 }>;
 declare const _default: __VLS_WithTemplateSlots<typeof __VLS_component, ReturnType<typeof __VLS_template>>;
 export default _default;

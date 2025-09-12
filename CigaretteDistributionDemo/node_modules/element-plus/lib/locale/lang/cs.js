@@ -10,7 +10,10 @@ var cs = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "Vymazat"
+      clear: "Vymazat",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Te\u010F",
@@ -18,6 +21,10 @@ var cs = {
       cancel: "Zru\u0161it",
       clear: "Vymazat",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Vybrat datum",
       selectTime: "Vybrat \u010Das",
       startDate: "Datum za\u010D\xE1tku",
@@ -28,9 +35,6 @@ var cs = {
       nextYear: "P\u0159\xED\u0161t\xED rok",
       prevMonth: "P\u0159edchoz\xED m\u011Bs\xEDc",
       nextMonth: "P\u0159\xED\u0161t\xED m\u011Bs\xEDc",
-      day: "Den",
-      week: "T\xFDden",
-      month: "M\u011Bs\xEDc",
       year: "Rok",
       month1: "Leden",
       month2: "\xDAnor",
@@ -53,6 +57,15 @@ var cs = {
         fri: "P\xE1",
         sat: "So"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Led",
         feb: "\xDAno",
@@ -66,7 +79,13 @@ var cs = {
         oct: "\u0158\xEDj",
         nov: "Lis",
         dec: "Pro"
-      }
+      },
+      day: "Den",
+      month: "M\u011Bs\xEDc"
+    },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
     },
     select: {
       loading: "Na\u010D\xEDt\xE1n\xED",
@@ -76,6 +95,9 @@ var cs = {
     },
     mention: {
       loading: "Na\u010D\xEDt\xE1n\xED"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "\u017D\xE1dn\xE1 shoda",
@@ -93,13 +115,21 @@ var cs = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Zpr\xE1va",
       confirm: "OK",
       cancel: "Zru\u0161it",
-      error: "Neplatn\xFD vstup"
+      error: "Neplatn\xFD vstup",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "Stisknout pro smaz\xE1n\xED",
@@ -107,12 +137,23 @@ var cs = {
       preview: "N\xE1hled",
       continue: "Pokra\u010Dovat"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "\u017D\xE1dn\xE1 data",
       confirmFilter: "Potvrdit",
       resetFilter: "Resetovat",
       clearFilter: "V\u0161e",
       sumText: "Celkem"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u017D\xE1dn\xE1 data"

@@ -10,7 +10,10 @@ var he = {
     },
     colorpicker: {
       confirm: "\u05D0\u05D9\u05E9\u05D5\u05E8",
-      clear: "\u05E0\u05E7\u05D4"
+      clear: "\u05E0\u05E7\u05D4",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "\u05DB\u05E2\u05EA",
@@ -18,6 +21,10 @@ var he = {
       cancel: "\u05D1\u05D8\u05DC",
       clear: "\u05E0\u05E7\u05D4",
       confirm: "\u05D0\u05D9\u05E9\u05D5\u05E8",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "\u05D1\u05D7\u05E8 \u05EA\u05D0\u05E8\u05D9\u05DA",
       selectTime: "\u05D1\u05D7\u05E8 \u05D6\u05DE\u05DF",
       startDate: "\u05EA\u05D0\u05E8\u05D9\u05DA \u05D4\u05EA\u05D7\u05DC\u05D4",
@@ -41,7 +48,6 @@ var he = {
       month10: "\u05D0\u05D5\u05E7\u05D8\u05D5\u05D1\u05E8",
       month11: "\u05E0\u05D5\u05D1\u05DE\u05D1\u05E8",
       month12: "\u05D3\u05E6\u05DE\u05D1\u05E8",
-      week: "\u05E9\u05D1\u05D5\u05E2",
       weeks: {
         sun: "\u05D0\u05F3",
         mon: "\u05D1\u05F3",
@@ -50,6 +56,15 @@ var he = {
         thu: "\u05D4\u05F3",
         fri: "\u05D5\u05F3",
         sat: "\u05E9\u05D1\u05EA"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "\u05D9\u05E0\u05D5\u05D0\u05E8",
@@ -66,6 +81,10 @@ var he = {
         dec: "\u05D3\u05E6\u05DE\u05D1\u05E8"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "\u05D8\u05D5\u05E2\u05DF",
       noMatch: "\u05DC\u05D0 \u05E0\u05DE\u05E6\u05D0\u05D4 \u05D4\u05EA\u05D0\u05DE\u05D4",
@@ -74,6 +93,9 @@ var he = {
     },
     mention: {
       loading: "\u05D8\u05D5\u05E2\u05DF"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "\u05DC\u05D0 \u05E0\u05DE\u05E6\u05D0\u05D4 \u05D4\u05EA\u05D0\u05DE\u05D4",
@@ -91,13 +113,21 @@ var he = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "\u05D4\u05D5\u05D3\u05E2\u05D4",
       confirm: "\u05D0\u05D9\u05E9\u05D5\u05E8",
       cancel: "\u05D1\u05D8\u05DC",
-      error: "\u05E7\u05DC\u05D8 \u05DC\u05D0 \u05EA\u05E7\u05D9\u05DF"
+      error: "\u05E7\u05DC\u05D8 \u05DC\u05D0 \u05EA\u05E7\u05D9\u05DF",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "\u05DC\u05D7\u05E5 \u05DB\u05D3\u05D9 \u05DC\u05DE\u05D7\u05D5\u05E7",
@@ -105,12 +135,23 @@ var he = {
       preview: "\u05EA\u05E6\u05D5\u05D2\u05D4 \u05DE\u05E7\u05D3\u05D9\u05DE\u05D4",
       continue: "\u05D4\u05DE\u05E9\u05DA"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "\u05D0\u05D9\u05DF \u05E0\u05EA\u05D5\u05E0\u05D9\u05DD",
       confirmFilter: "\u05D0\u05D9\u05E9\u05D5\u05E8",
       resetFilter: "\u05E0\u05E7\u05D4",
       clearFilter: "\u05D4\u05DB\u05DC",
       sumText: "\u05E1\u05DA \u05D4\u05DB\u05DC"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u05D0\u05D9\u05DF \u05E0\u05EA\u05D5\u05E0\u05D9\u05DD"

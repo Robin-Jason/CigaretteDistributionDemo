@@ -10,7 +10,10 @@ var de = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "Leeren"
+      clear: "Leeren",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Jetzt",
@@ -18,6 +21,10 @@ var de = {
       cancel: "Abbrechen",
       clear: "Leeren",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Datum w\xE4hlen",
       selectTime: "Uhrzeit w\xE4hlen",
       startDate: "Startdatum",
@@ -28,9 +35,6 @@ var de = {
       nextYear: "N\xE4chtes Jahr",
       prevMonth: "Letzter Monat",
       nextMonth: "N\xE4chster Monat",
-      day: "Tag",
-      week: "Woche",
-      month: "Monat",
       year: "",
       month1: "Januar",
       month2: "Februar",
@@ -53,6 +57,15 @@ var de = {
         fri: "Fr",
         sat: "Sa"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "Jan",
         feb: "Feb",
@@ -66,7 +79,13 @@ var de = {
         oct: "Okt",
         nov: "Nov",
         dec: "Dez"
-      }
+      },
+      day: "Tag",
+      month: "Monat"
+    },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
     },
     select: {
       loading: "L\xE4dt.",
@@ -76,6 +95,9 @@ var de = {
     },
     mention: {
       loading: "L\xE4dt."
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Nichts gefunden.",
@@ -93,18 +115,32 @@ var de = {
       next: "Zur n\xE4chsten Seite gehen",
       currentPage: "Seite {pager}",
       prevPages: "Vorherige {pager} Seiten",
-      nextPages: "N\xE4chste {pager} Seiten"
+      nextPages: "N\xE4chste {pager} Seiten",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
+      title: "Message",
       confirm: "OK",
       cancel: "Abbrechen",
-      error: "Fehler"
+      error: "Fehler",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "Klicke l\xF6schen zum entfernen",
       delete: "L\xF6schen",
       preview: "Vorschau",
       continue: "Fortsetzen"
+    },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
     },
     table: {
       emptyText: "Keine Daten",
@@ -116,7 +152,8 @@ var de = {
     tour: {
       next: "Weiter",
       previous: "Zur\xFCck",
-      finish: "Fertig"
+      finish: "Fertig",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Keine Eintr\xE4ge"

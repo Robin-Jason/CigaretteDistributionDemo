@@ -1,5 +1,5 @@
-import Countdown from './src/countdown2.mjs';
-export { countdownEmits, countdownProps } from './src/countdown.mjs';
+import Countdown from './src/countdown.mjs';
+export { countdownEmits, countdownProps } from './src/countdown2.mjs';
 import { withInstall } from '../../utils/vue/install.mjs';
 
 const ElCountdown = withInstall(Countdown);

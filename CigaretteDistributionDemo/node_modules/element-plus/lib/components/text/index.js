@@ -2,8 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var text$1 = require('./src/text.js');
-var text = require('./src/text2.js');
+var text$1 = require('./src/text2.js');
+var text = require('./src/text.js');
 var install = require('../../utils/vue/install.js');
 
 const ElText = install.withInstall(text$1["default"]);

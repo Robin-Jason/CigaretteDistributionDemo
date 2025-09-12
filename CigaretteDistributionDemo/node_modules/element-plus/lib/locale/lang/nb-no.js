@@ -10,7 +10,10 @@ var nbNo = {
     },
     colorpicker: {
       confirm: "OK",
-      clear: "T\xF8m"
+      clear: "T\xF8m",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "N\xE5",
@@ -18,6 +21,10 @@ var nbNo = {
       cancel: "Avbryt",
       clear: "T\xF8m",
       confirm: "OK",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "Velg dato",
       selectTime: "Velg tidspunkt",
       startDate: "Startdato",
@@ -41,7 +48,6 @@ var nbNo = {
       month10: "Oktober",
       month11: "November",
       month12: "Desember",
-      week: "uke",
       weeks: {
         sun: "S\xF8n",
         mon: "Man",
@@ -50,6 +56,15 @@ var nbNo = {
         thu: "Tor",
         fri: "Fre",
         sat: "L\xF8r"
+      },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
       },
       months: {
         jan: "Jan",
@@ -66,6 +81,10 @@ var nbNo = {
         dec: "Des"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Laster",
       noMatch: "Ingen samsvarende resulater",
@@ -74,6 +93,9 @@ var nbNo = {
     },
     mention: {
       loading: "Laster"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Ingen samsvarende resultater",
@@ -91,12 +113,21 @@ var nbNo = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
+      title: "Message",
       confirm: "OK",
       cancel: "Avbryt",
-      error: "Ugyldig input"
+      error: "Ugyldig input",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "trykk p\xE5 x for \xE5 slette",
@@ -104,12 +135,23 @@ var nbNo = {
       preview: "Forh\xE5ndsvisning",
       continue: "Fortsett"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Ingen Data",
       confirmFilter: "Bekreft",
       resetFilter: "Tilbakestill",
       clearFilter: "Alle",
       sumText: "Sum"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Ingen Data"

@@ -3,8 +3,8 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var core = require('@vueuse/core');
-var types = require('../../utils/types.js');
 var shared = require('@vue/shared');
+var types = require('../../utils/types.js');
 
 const nodeList = /* @__PURE__ */ new Map();
 if (core.isClient) {

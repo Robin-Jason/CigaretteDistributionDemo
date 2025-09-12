@@ -6,6 +6,7 @@ var vue = require('vue');
 var core = require('@vueuse/core');
 var token = require('./token.js');
 var pluginVue_exportHelper = require('../../../_virtual/plugin-vue_export-helper.js');
+var form = require('../../../constants/form.js');
 var index = require('../../../hooks/use-namespace/index.js');
 
 const _sfc_main = vue.defineComponent({
@@ -20,7 +21,12 @@ const _sfc_main = vue.defineComponent({
     const minWidth = vue.ref("");
     function updateMinWidth() {
       var _a;
-      minWidth.value = `${(_a = select.selectRef) == null ? void 0 : _a.offsetWidth}px`;
+      const offsetWidth = (_a = select.selectRef) == null ? void 0 : _a.offsetWidth;
+      if (offsetWidth) {
+        minWidth.value = `${offsetWidth - form.BORDER_HORIZONTAL_WIDTH}px`;
+      } else {
+        minWidth.value = "";
+      }
     }
     vue.onMounted(() => {
       updateMinWidth();

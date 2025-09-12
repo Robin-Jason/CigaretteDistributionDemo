@@ -10,7 +10,10 @@ var ku = {
     },
     colorpicker: {
       confirm: "Temam",
-      clear: "Paqij bike"
+      clear: "Paqij bike",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "Niha",
@@ -18,6 +21,10 @@ var ku = {
       cancel: "Betal bike",
       clear: "Paqij bike",
       confirm: "Temam",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "D\xEErok\xEA bibij\xEAre",
       selectTime: "Dem\xEA bibij\xEAre",
       startDate: "D\xEEroka Destp\xEAk\xEA",
@@ -50,6 +57,15 @@ var ku = {
         fri: "\xCEn",
         sat: "\u015Eem"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "R\xEAb",
         feb: "Re\u015F",
@@ -65,6 +81,10 @@ var ku = {
         dec: "Ber"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "Bardibe",
       noMatch: "Li hembere ve agah\xEE tune",
@@ -73,6 +93,9 @@ var ku = {
     },
     mention: {
       loading: "Bardibe"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "Li hembere ve agah\xEE tune",
@@ -90,13 +113,21 @@ var ku = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "Peyam",
       confirm: "Temam",
       cancel: "Betal bike",
-      error: "Beyana \xE7ewt"
+      error: "Beyana \xE7ewt",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: 'ji bo rake p\xEAl "delete" bike',
@@ -104,12 +135,23 @@ var ku = {
       preview: "P\xEA\u015Fd\xEEtin",
       continue: "Berdewam"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "Agah\xEE tune",
       confirmFilter: "Pi\u015Ftrast bike",
       resetFilter: "J\xEA bibe",
       clearFilter: "Hem\xFB",
       sumText: "Kom"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "Agah\xEE tune"

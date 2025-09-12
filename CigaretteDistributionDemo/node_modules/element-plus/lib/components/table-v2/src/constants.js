@@ -8,6 +8,7 @@ var SortOrder = /* @__PURE__ */ ((SortOrder2) => {
   return SortOrder2;
 })(SortOrder || {});
 var Alignment = /* @__PURE__ */ ((Alignment2) => {
+  Alignment2["LEFT"] = "left";
   Alignment2["CENTER"] = "center";
   Alignment2["RIGHT"] = "right";
   return Alignment2;

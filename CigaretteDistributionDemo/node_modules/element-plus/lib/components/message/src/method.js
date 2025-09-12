@@ -3,8 +3,8 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var vue = require('vue');
-var message$2 = require('./message.js');
-var message$1 = require('./message2.js');
+var message$2 = require('./message2.js');
+var message$1 = require('./message.js');
 var instance = require('./instance.js');
 var configProvider = require('../../config-provider/src/config-provider.js');
 var core = require('@vueuse/core');

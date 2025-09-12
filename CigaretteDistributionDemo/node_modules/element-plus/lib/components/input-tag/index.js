@@ -2,8 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var inputTag$1 = require('./src/input-tag2.js');
-var inputTag = require('./src/input-tag.js');
+var inputTag$1 = require('./src/input-tag.js');
+var inputTag = require('./src/input-tag2.js');
 var install = require('../../utils/vue/install.js');
 
 const ElInputTag = install.withInstall(inputTag$1["default"]);

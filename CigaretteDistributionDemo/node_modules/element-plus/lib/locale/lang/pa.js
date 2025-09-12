@@ -10,7 +10,10 @@ var pa = {
     },
     colorpicker: {
       confirm: "\u062A\u0627\u06CC\u06CC\u062F",
-      clear: "\u067E\u0627\u06A9\u0648\u0644"
+      clear: "\u067E\u0627\u06A9\u0648\u0644",
+      defaultLabel: "color picker",
+      description: "current color is {color}. press enter to select a new color.",
+      alphaLabel: "pick alpha value"
     },
     datepicker: {
       now: "\u0627\u0648\u0633",
@@ -18,6 +21,10 @@ var pa = {
       cancel: "\u0631\u062F\u0648\u0644",
       clear: "\u067E\u0627\u06A9\u0648\u0644",
       confirm: "\u062A\u0627\u06CC\u06CC\u062F",
+      dateTablePrompt: "Use the arrow keys and enter to select the day of the month",
+      monthTablePrompt: "Use the arrow keys and enter to select the month",
+      yearTablePrompt: "Use the arrow keys and enter to select the year",
+      selectedDate: "Selected date",
       selectDate: "\u0646\u06CC\u067C\u0647 \u0648\u067C\u0627\u06A9\u0626",
       selectTime: "\u0648\u062E\u062A \u0648\u067C\u0627\u06A9\u0626",
       startDate: "\u067E\u06CC\u0644 \u0646\u06CC\u067C\u0647",
@@ -50,6 +57,15 @@ var pa = {
         fri: "\u062C\u0645\u0639\u0647",
         sat: "\u0634\u0646\u0628\u0647"
       },
+      weeksFull: {
+        sun: "Sunday",
+        mon: "Monday",
+        tue: "Tuesday",
+        wed: "Wednesday",
+        thu: "Thursday",
+        fri: "Friday",
+        sat: "Saturday"
+      },
       months: {
         jan: "\u062C\u0646\u0648\u0631\u064A",
         feb: "\u0641\u0628\u0631\u0648\u0631\u064A",
@@ -65,6 +81,10 @@ var pa = {
         dec: "\u062F\u0633\u0645\u0628\u0631"
       }
     },
+    inputNumber: {
+      decrease: "decrease number",
+      increase: "increase number"
+    },
     select: {
       loading: "\u0628\u0627\u0631 \u06A9\u0648\u0644",
       noMatch: "\u0647\u06CC\u0685\u0647 \u0648\u0646\u0647 \u0645\u0648\u0646\u062F\u0644 \u0634\u0648\u0644",
@@ -73,6 +93,9 @@ var pa = {
     },
     mention: {
       loading: "\u0628\u0627\u0631 \u06A9\u0648\u0644"
+    },
+    dropdown: {
+      toggleDropdown: "Toggle Dropdown"
     },
     cascader: {
       noMatch: "\u0647\u06CC\u0685\u0647 \u0648\u0646\u0647 \u0645\u0648\u0646\u062F\u0644 \u0634\u0648\u0644",
@@ -90,13 +113,21 @@ var pa = {
       next: "Go to next page",
       currentPage: "page {pager}",
       prevPages: "Previous {pager} pages",
-      nextPages: "Next {pager} pages"
+      nextPages: "Next {pager} pages",
+      deprecationWarning: "Deprecated usages detected, please refer to the el-pagination documentation for more details"
+    },
+    dialog: {
+      close: "Close this dialog"
+    },
+    drawer: {
+      close: "Close this dialog"
     },
     messagebox: {
       title: "\u0639\u0646\u0648\u0627\u0646",
       confirm: "\u062A\u0627\u06CC\u06CC\u062F",
       cancel: "\u0644\u063A\u0648\u0647 \u06A9\u0648\u0644",
-      error: "\u062A\u064A\u0631\u0648\u062A\u0646\u0647"
+      error: "\u062A\u064A\u0631\u0648\u062A\u0646\u0647",
+      close: "Close this dialog"
     },
     upload: {
       deleteTip: "\u062F \u062D\u0630\u0641 \u06A9\u0648\u0644\u0648 \u0644\u067E\u0627\u0631\u0647 \u067E\u0627\u06A9\u0647 \u062A\u06BC\u06CD \u0641\u0634\u0627\u0631 \u06A9\u0693\u0626",
@@ -104,12 +135,23 @@ var pa = {
       preview: "\u0645\u062E\u06A9\u062A\u0646\u0647",
       continue: "\u0627\u062F\u0627\u0645\u0647"
     },
+    slider: {
+      defaultLabel: "slider between {min} and {max}",
+      defaultRangeStartLabel: "pick start value",
+      defaultRangeEndLabel: "pick end value"
+    },
     table: {
       emptyText: "\u0647\u06CC\u0685 \u0645\u0639\u0644\u0648\u0645\u0627\u062A \u0648\u0646\u0647 \u0645\u0648\u0646\u062F\u0644 \u0634\u0648\u0644",
       confirmFilter: "\u062A\u0627\u06CC\u06CC\u062F",
       resetFilter: "\u067E\u0627\u06A9\u0648\u0644",
       clearFilter: "\u067C\u0648\u0644",
       sumText: "\u0645\u062C\u0645\u0648\u0639\u0647"
+    },
+    tour: {
+      next: "Next",
+      previous: "Previous",
+      finish: "Finish",
+      close: "Close this dialog"
     },
     tree: {
       emptyText: "\u0647\u06CC\u0685 \u0645\u0639\u0644\u0648\u0645\u0627\u062A \u0648\u0646\u0647 \u0645\u0648\u0646\u062F\u0644 \u0634\u0648\u0644"

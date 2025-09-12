@@ -2,8 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var empty$1 = require('./src/empty.js');
-var empty = require('./src/empty2.js');
+var empty$1 = require('./src/empty2.js');
+var empty = require('./src/empty.js');
 var install = require('../../utils/vue/install.js');
 
 const ElEmpty = install.withInstall(empty$1["default"]);

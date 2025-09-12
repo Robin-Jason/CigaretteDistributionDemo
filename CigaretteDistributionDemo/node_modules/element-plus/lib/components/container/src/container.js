@@ -4,6 +4,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var vue = require('vue');
 var pluginVue_exportHelper = require('../../../_virtual/plugin-vue_export-helper.js');
+var runtime = require('../../../utils/vue/props/runtime.js');
 var index = require('../../../hooks/use-namespace/index.js');
 
 const __default__ = vue.defineComponent({
@@ -11,11 +12,12 @@ const __default__ = vue.defineComponent({
 });
 const _sfc_main = /* @__PURE__ */ vue.defineComponent({
   ...__default__,
-  props: {
+  props: runtime.buildProps({
     direction: {
-      type: String
+      type: String,
+      values: ["horizontal", "vertical"]
     }
-  },
+  }),
   setup(__props) {
     const props = __props;
     const slots = vue.useSlots();
