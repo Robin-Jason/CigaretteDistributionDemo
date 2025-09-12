@@ -38,4 +38,17 @@ public interface DemoTestDataRepository extends JpaRepository<DemoTestData, Inte
                                                                                 @Param("year") Integer year, 
                                                                                 @Param("month") Integer month, 
                                                                                 @Param("weekSeq") Integer weekSeq);
+    
+    @Query("SELECT d FROM DemoTestData d WHERE d.year = :year AND d.month = :month AND d.weekSeq = :weekSeq AND d.cigCode IN :cigCodes")
+    List<DemoTestData> findByYearAndMonthAndWeekSeqAndCigCodeIn(@Param("year") Integer year, 
+                                                               @Param("month") Integer month, 
+                                                               @Param("weekSeq") Integer weekSeq, 
+                                                               @Param("cigCodes") List<String> cigCodes);
+    
+    @Query("SELECT d FROM DemoTestData d WHERE d.year = :year AND d.month = :month AND d.weekSeq = :weekSeq AND d.cigCode = :cigCode AND d.deliveryArea IN :deliveryAreas")
+    List<DemoTestData> findByYearAndMonthAndWeekSeqAndCigCodeAndDeliveryAreaIn(@Param("year") Integer year, 
+                                                                              @Param("month") Integer month, 
+                                                                              @Param("weekSeq") Integer weekSeq, 
+                                                                              @Param("cigCode") String cigCode, 
+                                                                              @Param("deliveryAreas") List<String> deliveryAreas);
 }

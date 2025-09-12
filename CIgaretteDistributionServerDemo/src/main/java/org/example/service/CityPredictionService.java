@@ -62,8 +62,13 @@ public class CityPredictionService {
 
         // 4. 遍历每个卷烟进行预测并写回数据库
         for (DemoTestAdvData advData : advDataList) {
-            log.info("正在处理卷烟: {} ({})", advData.getCigName(), advData.getCigCode());
+            log.info("正在处理卷烟: {} ({}), 投放方式: {}", advData.getCigName(), advData.getCigCode(), advData.getDeliveryMethod());
 
+            // 判断是否为按档位统一投放
+            if (!"按档位统一投放".equals(advData.getDeliveryMethod())) {
+                log.info("卷烟 {} 的投放方式为 {}，跳过全市统一分配", advData.getCigName(), advData.getDeliveryMethod());
+                continue;
+            }
             // 5. 执行分配算法
             BigDecimal[][] allocationMatrix = distributionAlgorithm.calculateDistribution(
                     Collections.singletonList("全市"),

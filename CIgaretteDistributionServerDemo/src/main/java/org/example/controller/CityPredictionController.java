@@ -2,7 +2,7 @@ package org.example.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.dto.CityPredictionRequestDto;
-import org.example.service.PredictionService;
+import org.example.service.CityPredictionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +20,9 @@ import java.util.Map;
 public class CityPredictionController {
 
     @Autowired
-    private PredictionService predictionService;
+
+    private CityPredictionService predictionService;
+
 
     @PostMapping("/predict")
     public ResponseEntity<Map<String, Object>> predict(@Valid @RequestBody CityPredictionRequestDto request) {

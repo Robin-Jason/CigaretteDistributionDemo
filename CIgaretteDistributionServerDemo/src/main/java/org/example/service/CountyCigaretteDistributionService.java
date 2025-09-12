@@ -64,11 +64,18 @@ public class CountyCigaretteDistributionService {
             return response;
         }
 
-        // 删除旧数据
-        List<DemoTestData> oldPredictions = testDataRepository.findByYearAndMonthAndWeekSeq(year, month, weekSeq);
-        if (!oldPredictions.isEmpty()) {
-            testDataRepository.deleteAll(oldPredictions);
-            log.info("已删除 {} 条旧的预测数据", oldPredictions.size());
+        // 精确删除：只删除当前要处理的卷烟在其目标区县的旧数据，保留其他投放区域的数据
+        for (DemoTestAdvData advData : countyAdvData) {
+            List<String> targetCounties = getTargetCountyList(advData.getDeliveryArea());
+            if (!targetCounties.isEmpty()) {
+                List<DemoTestData> oldCountyPredictions = testDataRepository.findByYearAndMonthAndWeekSeqAndCigCodeAndDeliveryAreaIn(
+                    year, month, weekSeq, advData.getCigCode(), targetCounties);
+                if (!oldCountyPredictions.isEmpty()) {
+                    testDataRepository.deleteAll(oldCountyPredictions);
+                    log.info("已删除卷烟 {} 在目标区县 {} 的 {} 条旧预测数据", 
+                        advData.getCigName(), targetCounties, oldCountyPredictions.size());
+                }
+            }
         }
 
 

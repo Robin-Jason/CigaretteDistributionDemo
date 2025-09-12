@@ -14,3 +14,14 @@ Content-Type: application/json
   "month": 1,
   "weekSeq": 1
 }
+
+### 按档位全市统一投放分配算法测试 - 执行预测并写回数据库
+POST http://localhost:28080/api/prediction/predict
+Content-Type: application/json
+
+{
+  "year": 2024,
+  "month": 1,
+  "weekSeq": 1
+}
+
