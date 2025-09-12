@@ -31,6 +31,15 @@ public class DemoTestAdvData {
     @Column(name = "ADV")
     private BigDecimal adv;
     
+    @Column(name = "YEAR")
+    private Integer year;
+    
+    @Column(name = "MONTH")
+    private Integer month;
+    
+    @Column(name = "WEEK_SEQ")
+    private Integer weekSeq;
+    
     // 手动实现所有getter和setter方法
     public Integer getId() {
         return id;
@@ -94,5 +103,29 @@ public class DemoTestAdvData {
     
     public void setAdv(BigDecimal adv) {
         this.adv = adv;
+    }
+    
+    public Integer getYear() {
+        return year;
+    }
+    
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+    
+    public Integer getMonth() {
+        return month;
+    }
+    
+    public void setMonth(Integer month) {
+        this.month = month;
+    }
+    
+    public Integer getWeekSeq() {
+        return weekSeq;
+    }
+    
+    public void setWeekSeq(Integer weekSeq) {
+        this.weekSeq = weekSeq;
     }
 }

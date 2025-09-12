@@ -25,3 +25,12 @@ Content-Type: application/json
   "weekSeq": 1
 }
 
+### 按市场类型分配算法测试 - 执行预测并写回数据库
+POST http://localhost:28080/api/predict/run-market-prediction-new
+Content-Type: application/json
+
+{
+  "year": 2024,
+  "month": 1,
+  "weekSeq": 1
+}
