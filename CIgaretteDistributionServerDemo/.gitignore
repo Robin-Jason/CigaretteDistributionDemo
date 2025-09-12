@@ -4,10 +4,7 @@ target/
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -36,3 +33,33 @@ build/
 
 ### Mac OS ###
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+
+### 日志文件 ###
+*.log
+logs/
+
+### 临时文件 ###
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+### 环境配置文件 ###
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
