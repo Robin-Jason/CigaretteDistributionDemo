@@ -818,7 +818,7 @@ public class CigaretteDistributionService {
                         String targetType = null;
                         
                         // 根据DELIVERY_ETYPE决定处理方式
-                        if ("档位+业态类型".equals(deliveryEtype)) {
+                        if ("档位+业态".equals(deliveryEtype)) {
                             // 使用业态类型处理
                             targetList = kmpMatcher.matchPatterns(deliveryArea, allBusinessFormats);
                             cigResult.put("targetBusinessFormats", targetList);

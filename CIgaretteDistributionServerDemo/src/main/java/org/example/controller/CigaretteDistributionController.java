@@ -1199,7 +1199,7 @@ public class CigaretteDistributionController {
                     .collect(java.util.stream.Collectors.toList());
 
             // 获取投放区域
-            String advDataSql = "SELECT cig_code, cig_name, delivery_area, delivery_etype FROM demo_test_advdata WHERE delivery_etype = '档位+业态类型'";
+            String advDataSql = "SELECT cig_code, cig_name, delivery_area, delivery_etype FROM demo_test_advdata WHERE delivery_etype = '档位+业态'";
             List<Map<String, Object>> advDataList = distributionService.getJdbcTemplate().queryForList(advDataSql);
 
             Map<String, Object> response = new HashMap<>();
@@ -1254,7 +1254,7 @@ public class CigaretteDistributionController {
 
         try {
             // 获取业态类型的预投放量数据
-            String advDataSql = "SELECT cig_code, cig_name, adv, delivery_area, delivery_etype FROM demo_test_advdata WHERE delivery_etype = '档位+业态类型'";
+            String advDataSql = "SELECT cig_code, cig_name, adv, delivery_area, delivery_etype FROM demo_test_advdata WHERE delivery_etype = '档位+业态'";
             List<Map<String, Object>> advDataList = distributionService.getJdbcTemplate().queryForList(advDataSql);
 
             List<Map<String, Object>> testResults = new ArrayList<>();

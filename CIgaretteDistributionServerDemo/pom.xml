@@ -13,7 +13,7 @@
     </parent>
 
     <groupId>org.example</groupId>
-    <artifactId>cigarette-distribution-server</artifactId>
+    <artifactId>CigaretteDistributionServe</artifactId>
     <version>1.0.0</version>
     <name>cigarette-distribution-server</name>
     <description>卷烟分配服务器</description>
