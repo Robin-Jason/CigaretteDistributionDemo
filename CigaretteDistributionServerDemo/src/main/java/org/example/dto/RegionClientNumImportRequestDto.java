@@ -31,7 +31,14 @@ public class RegionClientNumImportRequestDto {
     private String deliveryEtype;
     
     /**
-     * 获取序号映射
+     * 双周上浮标识
+     * false: 非双周上浮 (子序号为1)
+     * true: 双周上浮 (子序号为2)
+     */
+    private Boolean isBiWeeklyFloat = false;
+    
+    /**
+     * 获取主序号映射（仅用于向后兼容，推荐使用getTableName()方法）
      * 0表示投放类型为按档位统一投放
      * 1-4均为按档位扩展投放：
      * 1表示扩展类型为档位+区县
@@ -55,5 +62,43 @@ public class RegionClientNumImportRequestDto {
         }
         // 默认返回0
         return 0;
+    }
+    
+    /**
+     * 获取子序号（双周上浮区分）
+     * 1: 非双周上浮
+     * 2: 双周上浮
+     * 注意：只有按档位统一投放、档位+区县、档位+市场类型支持双周上浮区分
+     */
+    public Integer getSubSequenceNumber() {
+        // 检查当前投放类型是否支持双周上浮区分
+        boolean supportsBiWeeklyFloat = false;
+        
+        if ("按档位统一投放".equals(deliveryMethod)) {
+            supportsBiWeeklyFloat = true;
+        } else if ("按档位扩展投放".equals(deliveryMethod)) {
+            if ("档位+区县".equals(deliveryEtype) || "档位+市场类型".equals(deliveryEtype)) {
+                supportsBiWeeklyFloat = true;
+            }
+        }
+        
+        // 如果支持双周上浮区分，则根据标识返回子序号，否则返回1
+        if (supportsBiWeeklyFloat) {
+            return (isBiWeeklyFloat != null && isBiWeeklyFloat) ? 2 : 1;
+        } else {
+            return 1; // 档位+城乡分类代码和档位+业态不支持双周上浮，固定返回1
+        }
+    }
+    
+    /**
+     * 获取完整的表名
+     * 格式：region_clientNum_{主序号}_{子序号}
+     * 例如：region_clientNum_1_1 (档位+区县，非双周上浮)
+     *      region_clientNum_1_2 (档位+区县，双周上浮)
+     */
+    public String getTableName() {
+        Integer mainSeq = getSequenceNumber();
+        Integer subSeq = getSubSequenceNumber();
+        return String.format("region_clientNum_%d_%d", mainSeq, subSeq);
     }
 }

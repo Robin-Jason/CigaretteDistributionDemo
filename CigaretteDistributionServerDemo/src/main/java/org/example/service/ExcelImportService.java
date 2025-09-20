@@ -91,8 +91,8 @@ public class ExcelImportService {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            log.info("开始导入区域客户数表，年份: {}, 月份: {}, 投放类型: {}, 扩展投放类型: {}", 
-                    request.getYear(), request.getMonth(), request.getDeliveryMethod(), request.getDeliveryEtype());
+            log.info("开始导入区域客户数表，年份: {}, 月份: {}, 投放类型: {}, 扩展投放类型: {}, 双周上浮: {}", 
+                    request.getYear(), request.getMonth(), request.getDeliveryMethod(), request.getDeliveryEtype(), request.getIsBiWeeklyFloat());
             
             // 1. 验证文件
             if (!validateExcelFile(request.getFile())) {
@@ -101,9 +101,8 @@ public class ExcelImportService {
                 return result;
             }
             
-            // 2. 生成表名
-            Integer sequenceNumber = request.getSequenceNumber();
-            String tableName = String.format("region_clientNum_%d", sequenceNumber);
+            // 2. 生成表名（使用新的命名规则）
+            String tableName = request.getTableName();
             
             // 3. 读取Excel数据
             List<Map<String, Object>> excelData = readRegionClientNumFromExcel(request.getFile());
@@ -131,9 +130,11 @@ public class ExcelImportService {
             result.put("tableName", tableName);
             result.put("insertedCount", insertedCount);
             result.put("totalRows", excelData.size());
-            result.put("sequenceNumber", sequenceNumber);
+            result.put("mainSequenceNumber", request.getSequenceNumber());
+            result.put("subSequenceNumber", request.getSubSequenceNumber());
             result.put("deliveryMethod", request.getDeliveryMethod());
             result.put("deliveryEtype", request.getDeliveryEtype());
+            result.put("isBiWeeklyFloat", request.getIsBiWeeklyFloat());
             
             log.info("区域客户数表导入完成，表名: {}, 插入记录数: {}", tableName, insertedCount);
             

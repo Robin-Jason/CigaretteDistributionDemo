@@ -81,8 +81,8 @@ public class ExcelImportController {
      */
     @PostMapping("/region-clientnum")
     public ResponseEntity<Map<String, Object>> importRegionClientNumData(@Valid RegionClientNumImportRequestDto request) {
-        log.info("接收区域客户数表导入请求，年份: {}, 月份: {}, 投放类型: {}, 扩展投放类型: {}",
-                request.getYear(), request.getMonth(), request.getDeliveryMethod(), request.getDeliveryEtype());
+        log.info("接收区域客户数表导入请求，年份: {}, 月份: {}, 投放类型: {}, 扩展投放类型: {}, 双周上浮: {}",
+                request.getYear(), request.getMonth(), request.getDeliveryMethod(), request.getDeliveryEtype(), request.getIsBiWeeklyFloat());
 
         Map<String, Object> response = new HashMap<>();
 
@@ -118,8 +118,9 @@ public class ExcelImportController {
             Map<String, Object> importResult = excelImportService.importRegionClientNumData(request);
 
             if ((Boolean) importResult.get("success")) {
-                log.info("区域客户数表导入成功，表名: {}, 插入记录数: {}, 序号: {}",
-                        importResult.get("tableName"), importResult.get("insertedCount"), sequenceNumber);
+                log.info("区域客户数表导入成功，表名: {}, 插入记录数: {}, 主序号: {}, 子序号: {}",
+                        importResult.get("tableName"), importResult.get("insertedCount"), 
+                        importResult.get("mainSequenceNumber"), importResult.get("subSequenceNumber"));
                 return ResponseEntity.ok(importResult);
             } else {
                 log.warn("区域客户数表导入失败: {}", importResult.get("message"));
