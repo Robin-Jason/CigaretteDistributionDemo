@@ -1,4 +1,4 @@
-package org.example.entity;
+package org.example.entity.BusinessFormatDIstribution;
 
 import lombok.Data;
 import javax.persistence.*;
@@ -6,29 +6,14 @@ import java.math.BigDecimal;
 
 @Data
 @Entity
-@Table(name = "demo_test_data")
-public class DemoTestData {
+@Table(name = "demo_test_businessFormat_clientNumData")
+public class DemoTestBusinessFormatClientNumData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    @Column(name = "CIG_CODE")
-    private String cigCode;
-    
-    @Column(name = "CIG_NAME")
-    private String cigName;
-    
-    @Column(name = "YEAR")
-    private Integer year;
-    
-    @Column(name = "MONTH")
-    private Integer month;
-    
-    @Column(name = "WEEK_SEQ")
-    private Integer weekSeq;
-    
-    @Column(name = "DELIVERY_AREA")
-    private String deliveryArea;
+    @Column(name = "BusinessFormat")
+    private String businessFormatCode;
     
     @Column(name = "D30")
     private BigDecimal d30;
@@ -120,9 +105,6 @@ public class DemoTestData {
     @Column(name = "D1")
     private BigDecimal d1;
     
-    @Column(name = "bz")
-    private String bz;
-    
-    @Column(name = "ACTUAL_DELIVERY")
-    private BigDecimal actualDelivery;
+    @Column(name = "TOTAL")
+    private BigDecimal total;
 }

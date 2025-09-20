@@ -83,17 +83,16 @@ export class ExcelExporter {
    * @returns {Array} 表头数组
    */
   static generateHeaders() {
-          const baseHeaders = [
-        '卷烟代码',
-        '卷烟名称', 
-        '年份',
-        '月份',
-        '周序号',
-        '投放区域',
-        '预投放量',
-        '实际投放量',
-        '备注'
-      ]
+    const baseHeaders = [
+      '卷烟代码',
+      '卷烟名称', 
+      '年份',
+      '月份',
+      '周序号',
+      '投放区域',
+      '预投放量',
+      '实际投放量'
+    ]
     
     // 添加30个档位列（从30档到1档）
     const positionHeaders = []
@@ -101,7 +100,10 @@ export class ExcelExporter {
       positionHeaders.push(`${i}档`)
     }
     
-    return [...baseHeaders, ...positionHeaders]
+    // 备注列放在最后
+    const remarkHeader = ['备注']
+    
+    return [...baseHeaders, ...positionHeaders, ...remarkHeader]
   }
 
   /**
@@ -126,8 +128,7 @@ export class ExcelExporter {
         item.weekSeq || '',
         item.deliveryArea || '',
         item.advAmount || 0,
-        item.actualDelivery || 0,
-        item.remark || ''
+        item.actualDelivery || 0
       ]
       
       // 添加30个档位数据（从30档到1档）
@@ -135,6 +136,9 @@ export class ExcelExporter {
         const dKey = `d${i}`
         row.push(item[dKey] || 0)
       }
+      
+      // 备注列放在最后
+      row.push(item.remark || '')
       
       tableData.push(row)
     })
@@ -214,7 +218,7 @@ export class ExcelExporter {
         
         if (cell) {
           // 数值列居中对齐
-          if (col >= 9) { // 档位列
+          if (col >= 8 && col <= 37) { // 档位列（从第9列到第38列，0-based索引）
             cell.s = {
               alignment: { horizontal: 'center', vertical: 'center' },
               border: {

@@ -64,6 +64,7 @@
       <!-- 中间表单区域 -->
       <section class="form-section">
         <SearchForm 
+          ref="searchForm"
           :selected-record="selectedRecord"
           :table-data="tableData"
           @search="handleSearch"
@@ -826,10 +827,37 @@ export default {
       try {
         const formData = new FormData()
         formData.append('file', this.customerDataFileList[0])
-        formData.append('distributionType', this.customerImportForm.distributionType)
-        if (this.customerImportForm.extendedType) {
-          formData.append('extendedType', this.customerImportForm.extendedType)
+        
+        // 注意：后端接口格式已更新，需要提供年份月份和序列号
+        // 年份月份暂时使用当前年月，实际使用中应该让用户选择
+        const currentDate = new Date()
+        formData.append('year', currentDate.getFullYear())
+        formData.append('month', currentDate.getMonth() + 1)
+        
+        // 映射投放类型为后端期望的格式
+        formData.append('deliveryMethod', this.customerImportForm.distributionType)
+        formData.append('deliveryEtype', this.customerImportForm.extendedType || 'NULL')
+        
+        // 根据投放类型映射序列号
+        const sequenceMapping = {
+          '按档位统一投放': 0,
+          '档位+区县': 1,
+          '档位+市场类型': 2,
+          '档位+城乡分类代码': 3,
+          '档位+业态': 4
         }
+        
+        let sequenceNumber = 0
+        if (this.customerImportForm.distributionType === '按档位扩展投放' && this.customerImportForm.extendedType) {
+          sequenceNumber = sequenceMapping[this.customerImportForm.extendedType] || 0
+        }
+        formData.append('sequenceNumber', sequenceNumber)
+        
+        console.log('导入客户数据参数:', {
+          distributionType: this.customerImportForm.distributionType,
+          extendedType: this.customerImportForm.extendedType,
+          sequenceNumber: sequenceNumber
+        })
         
         // 调用后端导入接口
         const response = await cigaretteDistributionAPI.importCustomerData(formData)
@@ -886,20 +914,119 @@ export default {
         // 调用后端生成分配方案接口
         const response = await cigaretteDistributionAPI.generateDistributionPlan(requestData)
         
+        console.log('生成分配方案响应数据:', response.data)
+        
         if (response.data.success) {
+          // 构建详细的成功信息
+          const details = []
+          
+          if (response.data.totalCigarettes) {
+            details.push(`共处理 ${response.data.totalCigarettes} 种卷烟`)
+          }
+          
+          if (response.data.successfulAllocations) {
+            details.push(`成功分配 ${response.data.successfulAllocations} 种`)
+          }
+          
+          if (response.data.deletedRecords > 0) {
+            details.push(`删除 ${response.data.deletedRecords} 条旧记录`)
+          }
+          
+          if (response.data.processedCount) {
+            details.push(`生成 ${response.data.processedCount} 条新记录`)
+          }
+          
+          const message = details.length > 0 
+            ? `分配方案生成成功！${details.join('，')}`
+            : '分配方案生成成功！'
+          
+          // 显示简短的成功消息
           ElMessage.success({
-            message: `分配方案生成成功！共处理 ${response.data.processedCount || 0} 条卷烟记录`,
+            message: '分配方案生成成功！',
             duration: 3000
+          })
+          
+          // 显示详细统计信息的弹窗
+          const statisticsDetails = []
+          
+          if (response.data.totalCigarettes !== undefined && response.data.totalCigarettes !== null) {
+            statisticsDetails.push(`📊 共处理卷烟种类：${response.data.totalCigarettes} 种`)
+          }
+          
+          if (response.data.successfulAllocations !== undefined && response.data.successfulAllocations !== null) {
+            statisticsDetails.push(`✅ 成功分配卷烟：${response.data.successfulAllocations} 种`)
+          }
+          
+          if (response.data.deletedRecords !== undefined && response.data.deletedRecords !== null) {
+            statisticsDetails.push(`🗑️ 删除旧记录：${response.data.deletedRecords} 条`)
+          }
+          
+          if (response.data.processedCount !== undefined && response.data.processedCount !== null) {
+            statisticsDetails.push(`📝 生成新记录：${response.data.processedCount} 条`)
+          }
+          
+          if (response.data.processingTime) {
+            statisticsDetails.push(`⏱️ 处理耗时：${response.data.processingTime}`)
+          }
+          
+          const messageHtml = `
+            <div style="text-align: center; line-height: 1.6;">
+              <p style="margin: 10px 0; font-weight: bold; color: #409EFF; font-size: 16px;">✅ 操作执行成功</p>
+              <hr style="margin: 15px 0; border: none; border-top: 1px solid #EBEEF5;">
+              <div style="text-align: left; line-height: 1.8;">
+                ${statisticsDetails.map(detail => `<p style="margin: 8px 0;">${detail}</p>`).join('')}
+              </div>
+            </div>
+          `
+          
+          this.$msgbox({
+            title: '生成分配方案完成',
+            message: messageHtml,
+            confirmButtonText: '确定',
+            type: 'success',
+            customClass: 'generation-result-dialog',
+            dangerouslyUseHTMLString: true
           })
           
           // 关闭对话框并清理表单
           this.generatePlanDialogVisible = false
           this.generatePlanForm = { year: null, month: null, weekSeq: null }
           
-          // 刷新表格数据
-          if (this.$refs.dataTable) {
-            this.$refs.dataTable.handleRefresh()
-          }
+          // 自动刷新卷烟投放数据统计表
+          setTimeout(() => {
+            console.log('自动刷新卷烟投放数据统计表，使用生成方案的时间范围...')
+            
+            // 使用生成分配方案时的时间参数进行搜索
+            const searchParams = {
+              year: requestData.year,
+              month: requestData.month,
+              week: requestData.weekSeq
+            }
+            
+            console.log('搜索参数:', searchParams)
+            
+            // 更新SearchForm组件的搜索条件，确保界面显示正确的时间范围
+            if (this.$refs.searchForm && this.$refs.searchForm.updateSearchForm) {
+              this.$refs.searchForm.updateSearchForm(searchParams)
+            }
+            
+            this.handleSearch(searchParams)
+            
+            // 同时直接刷新DataTable组件作为备用方案
+            setTimeout(() => {
+              if (this.$refs.dataTable && this.$refs.dataTable.handleRefresh) {
+                console.log('直接刷新DataTable组件...')
+                this.$refs.dataTable.handleRefresh()
+                
+                // 显示数据刷新完成的提示
+                ElMessage.info({
+                  message: '数据已自动刷新，显示最新的分配方案',
+                  duration: 2000
+                })
+              }
+            }, 200) // 在搜索后再等200ms刷新表格
+            
+          }, 1000) // 增加到1秒，确保后端数据已保存
         } else {
           throw new Error(response.data.message || '生成分配方案失败')
         }
@@ -1043,5 +1170,49 @@ export default {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* 生成分配方案结果弹窗样式 */
+::v-deep .generation-result-dialog {
+  .el-message-box {
+    width: 480px;
+    border-radius: 12px;
+  }
+  
+  .el-message-box__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #303133;
+  }
+  
+  .el-message-box__content {
+    padding: 20px 20px 30px;
+  }
+  
+  .el-message-box__message {
+    font-size: 14px;
+    line-height: 1.6;
+    
+    p {
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      
+      &:first-child {
+        font-size: 16px;
+        justify-content: center;
+      }
+    }
+  }
+  
+  .el-message-box__btns {
+    padding: 10px 20px 20px;
+    
+    .el-button--primary {
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+  }
 }
 </style>

@@ -1,12 +1,12 @@
 package org.example.algorithm;
 
 import org.example.entity.DemoTestAdvData;
-import org.example.entity.DemoTestClientNumData;
 import org.example.entity.DemoTestData;
+import org.example.entity.UrbanRuralClassificationCodeDIstribution.DemoTestUrbanRuralClientNumData;
 import org.example.repository.DemoTestAdvDataRepository;
-import org.example.repository.DemoTestClientNumDataRepository;
 import org.example.repository.DemoTestDataRepository;
-import org.example.service.algorithm.CigaretteDistributionAlgorithm;
+import org.example.repository.UrbanRuralClassificationCodeDIstribution.DemoTestUrbanRuralClientNumDataRepository;
+import org.example.service.algorithm.BaseCigaretteDistributionAlgorithm;
 import org.example.util.KmpMatcher;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +24,13 @@ public class CigaretteDistributionAlgorithmTest {
     private DemoTestAdvDataRepository advDataRepository;
 
     @Autowired
-    private DemoTestClientNumDataRepository clientNumDataRepository;
+    private DemoTestUrbanRuralClientNumDataRepository clientNumDataRepository;
 
     @Autowired
     private DemoTestDataRepository testDataRepository;
 
     @Autowired
-    private CigaretteDistributionAlgorithm distributionAlgorithm;
+    private BaseCigaretteDistributionAlgorithm distributionAlgorithm;
 
     @Autowired
     private KmpMatcher kmpMatcher;
@@ -48,9 +48,9 @@ public class CigaretteDistributionAlgorithmTest {
         }
 
         // 2. 获取投放区域和客户数数据
-        List<DemoTestClientNumData> clientNumDataList = clientNumDataRepository.findAllByOrderByIdAsc();
+        List<DemoTestUrbanRuralClientNumData> clientNumDataList = clientNumDataRepository.findAllByOrderByIdAsc();
         System.out.println("\n2. 投放区域客户数数据:");
-        for (DemoTestClientNumData clientData : clientNumDataList) {
+        for (DemoTestUrbanRuralClientNumData clientData : clientNumDataList) {
             System.out.printf("投放区域: %s, 总客户数: %s%n", 
                 clientData.getUrbanRuralCode(), clientData.getTotal());
         }
@@ -67,7 +67,7 @@ public class CigaretteDistributionAlgorithmTest {
         System.out.println("\n4. KMP匹配测试:");
         List<String> allRegions = clientNumDataRepository.findAllByOrderByIdAsc()
                 .stream()
-                .map(DemoTestClientNumData::getUrbanRuralCode)
+                .map(DemoTestUrbanRuralClientNumData::getUrbanRuralCode)
                 .collect(java.util.stream.Collectors.toList());
         
         for (DemoTestData testData : testDataList) {
@@ -114,12 +114,12 @@ public class CigaretteDistributionAlgorithmTest {
      * 构建区域客户数矩阵
      */
     private BigDecimal[][] buildRegionCustomerMatrix(List<String> targetRegions, 
-                                                   List<DemoTestClientNumData> clientNumDataList) {
+                                                   List<DemoTestUrbanRuralClientNumData> clientNumDataList) {
         BigDecimal[][] matrix = new BigDecimal[targetRegions.size()][30];
         
         for (int i = 0; i < targetRegions.size(); i++) {
             String targetRegion = targetRegions.get(i);
-            DemoTestClientNumData clientData = clientNumDataList.stream()
+            DemoTestUrbanRuralClientNumData clientData = clientNumDataList.stream()
                     .filter(data -> targetRegion.equals(data.getUrbanRuralCode()))
                     .findFirst()
                     .orElse(null);

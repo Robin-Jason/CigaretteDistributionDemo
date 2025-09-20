@@ -1,9 +1,9 @@
 package org.example.algorithm;
 
 import org.example.entity.DemoTestAdvData;
-import org.example.entity.DemoTestCountyClientNumData;
+import org.example.entity.CountyDistribution.DemoTestCountyClientNumData;
 import org.example.repository.DemoTestAdvDataRepository;
-import org.example.repository.DemoTestCountyClientNumDataRepository;
+import org.example.repository.CountyDistribution.DemoTestCountyClientNumDataRepository;
 import org.example.service.algorithm.countyCigaretteDistributionAlgorithm;
 import org.example.util.KmpMatcher;
 import org.junit.jupiter.api.Test;

@@ -1,9 +1,9 @@
 package org.example.algorithm;
 
 import org.example.entity.DemoTestAdvData;
-import org.example.entity.DemoMarketTestClientNumData;
+import org.example.entity.MarketTypeDistribution.DemoMarketTestClientNumData;
 import org.example.repository.DemoTestAdvDataRepository;
-import org.example.repository.DemoMarketTestClientNumDataRepository;
+import org.example.repository.MarketTypeDistribution.DemoMarketTestClientNumDataRepository;
 import org.example.service.algorithm.MarketProportionalCigaretteDistributionAlgorithm;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

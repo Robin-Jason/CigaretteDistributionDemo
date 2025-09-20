@@ -134,11 +134,10 @@
             <el-input-number
               v-model="positionData[index]"
               :min="0"
-              :precision="2"
-              :step="0.01"
+              :precision="0"
+              :step="1"
               size="small"
               style="width: 90px"
-              @change="validatePositionConstraints"
             />
           </div>
         </div>
@@ -333,8 +332,6 @@ export default {
       positionData: new Array(30).fill(0),
       // 保存状态
       savingPositions: false,
-      // 档位数据验证
-      positionValidationErrors: [],
       // 要删除的投放区域
       areasToDelete: []
     }
@@ -381,20 +378,13 @@ export default {
       }
       return '请先选择投放类型'
     },
-    // 验证档位数据是否有效（非递增约束：D30 >= D29 >= ... >= D1）
+    // 验证档位数据是否有效
     isPositionDataValid() {
       if (!this.positionData || this.positionData.length !== 30) {
         return false
       }
       
-      // 检查非递增约束
-      for (let i = 0; i < this.positionData.length - 1; i++) {
-        if (this.positionData[i] < this.positionData[i + 1]) {
-          return false
-        }
-      }
-      
-      // 检查是否有数值
+      // 只检查是否有数值，不再检查约束条件
       return this.positionData.some(val => val > 0)
     },
     // 检查是否可以新增投放区域
@@ -591,31 +581,20 @@ export default {
       }
       
       this.positionData = positions.length === 30 ? positions : new Array(30).fill(0)
-      console.log('加载档位数据:', this.positionData)
+      
+      // 详细的调试信息
+      console.log('=== 档位数据加载调试 ===')
+      console.log('从后端接收的原始数据字段:', Object.keys(record).filter(key => key.startsWith('d')).sort())
+      console.log('转换后的positionData数组:', this.positionData)
+      console.log('界面将显示的顺序:', this.positionData.map((val, idx) => `D${30-idx}=${val}`).join(', '))
+      console.log('数组第一个值 (对应D30):', this.positionData[0])
+      console.log('数组最后一个值 (对应D1):', this.positionData[29])
     },
     
-    // 验证档位约束
+    // 档位数据验证（已移除约束检查）
     validatePositionConstraints() {
-      this.positionValidationErrors = []
-      
-      // 检查非递增约束
-      for (let i = 0; i < this.positionData.length - 1; i++) {
-        if (this.positionData[i] < this.positionData[i + 1]) {
-          const currentGrade = 30 - i
-          const nextGrade = 30 - (i + 1)
-          this.positionValidationErrors.push(
-            `D${currentGrade}(${this.positionData[i]}) 不能小于 D${nextGrade}(${this.positionData[i + 1]})`
-          )
-        }
-      }
-      
-      // 如果有验证错误，显示提示
-      if (this.positionValidationErrors.length > 0) {
-        ElMessage.warning({
-          message: `档位约束错误: ${this.positionValidationErrors[0]}`,
-          duration: 3000
-        })
-      }
+      // 不再进行约束条件检查，允许任意档位值
+      console.log('档位数据已更新，不再检查约束条件')
     },
     
     // 保存档位设置
@@ -626,7 +605,7 @@ export default {
       }
       
       if (!this.isPositionDataValid) {
-        ElMessage.error('档位数据无效，请检查数据约束')
+        ElMessage.error('请检查档位数据，至少设置一个档位值')
         return
       }
       
@@ -647,7 +626,14 @@ export default {
           remark: this.selectedRecord.remark || '档位设置更新'
         }
         
-        console.log('保存档位设置请求数据:', updateData)
+        // 详细的调试信息
+        console.log('=== 档位设置数据传输调试 ===')
+        console.log('界面显示顺序:', this.positionData.map((val, idx) => `D${30-idx}=${val}`).join(', '))
+        console.log('发送给后端的distribution数组:', updateData.distribution)
+        console.log('数组长度:', updateData.distribution.length)
+        console.log('数组第一个值 (应该是D30):', updateData.distribution[0])
+        console.log('数组最后一个值 (应该是D1):', updateData.distribution[29])
+        console.log('完整请求数据:', updateData)
         
         const response = await cigaretteDistributionAPI.updateCigaretteInfo(updateData)
         
@@ -727,6 +713,13 @@ export default {
               distribution: [...this.positionData], // 使用当前的档位设置
               remark: `新增投放区域: ${area}`
             }
+            
+            // 新增区域的调试信息
+            console.log(`=== 新增区域 ${area} 数据传输调试 ===`)
+            console.log('界面显示顺序:', this.positionData.map((val, idx) => `D${30-idx}=${val}`).join(', '))
+            console.log('发送给后端的distribution数组:', addData.distribution)
+            console.log('数组第一个值 (应该是D30):', addData.distribution[0])
+            console.log('数组最后一个值 (应该是D1):', addData.distribution[29])
             
             return cigaretteDistributionAPI.updateCigaretteInfo(addData)
           })

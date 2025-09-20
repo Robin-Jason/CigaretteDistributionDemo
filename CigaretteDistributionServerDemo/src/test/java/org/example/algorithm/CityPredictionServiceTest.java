@@ -1,12 +1,12 @@
 package org.example.algorithm;
 
-import org.example.entity.CityClientNumData;
 import org.example.entity.DemoTestAdvData;
 import org.example.entity.DemoTestData;
-import org.example.repository.CityClientNumDataRepository;
+import org.example.entity.CityUnifiedDistribution.CityClientNumData;
 import org.example.repository.DemoTestAdvDataRepository;
 import org.example.repository.DemoTestDataRepository;
-import org.example.service.CityPredictionService;
+import org.example.repository.CityUnifiedDistribution.CityClientNumDataRepository;
+import org.example.service.CityUnifiedDistribution.CityPredictionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

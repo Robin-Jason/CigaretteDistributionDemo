@@ -1,135 +1,176 @@
 import axios from 'axios'
 
-// 创建axios实例
-const api = axios.create({
-  baseURL: process.env.VUE_APP_API_BASE_URL || '/api/cigarette',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
+// 创建axios实例 - 基础配置
+const createApiInstance = (baseURL) => {
+  // 后端服务运行在28080端口
+  const backendBaseUrl = process.env.VUE_APP_API_BASE_URL || `http://localhost:28080${baseURL}`
+  const instance = axios.create({
+    baseURL: backendBaseUrl,
+    timeout: 10000,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  
+  // 请求拦截器
+  instance.interceptors.request.use(
+    config => {
+      console.log('发送请求:', config.method && config.method.toUpperCase(), config.url, config.data || config.params)
+      return config
+    },
+    error => {
+      console.error('请求错误:', error)
+      return Promise.reject(error)
+    }
+  )
 
-// 请求拦截器
-api.interceptors.request.use(
-  config => {
-    console.log('发送请求:', config.method && config.method.toUpperCase(), config.url, config.data || config.params)
-    return config
-  },
-  error => {
-    console.error('请求错误:', error)
-    return Promise.reject(error)
-  }
-)
+  // 响应拦截器
+  instance.interceptors.response.use(
+    response => {
+      console.log('响应数据:', response.data)
+      return response
+    },
+    error => {
+      console.error('响应错误:', error)
+      return Promise.reject(error)
+    }
+  )
+  
+  return instance
+}
 
-// 响应拦截器
-api.interceptors.response.use(
-  response => {
-    console.log('响应数据:', response.data)
-    return response
-  },
-  error => {
-    console.error('响应错误:', error)
-    return Promise.reject(error)
-  }
-)
+// 创建各模块的API实例
+const dataApi = createApiInstance('/api/data')        // 数据管理接口
+const commonApi = createApiInstance('/api/common')    // 通用功能接口  
+const calculateApi = createApiInstance('/api/calculate') // 分配计算接口
+const importApi = createApiInstance('/api/import')    // 数据导入接口
 
-// 卷烟分配服务相关API
+// 卷烟分配服务相关API（重构为多模块接口）
 export const cigaretteDistributionAPI = {
+  // =================== 通用功能接口 (/api/common) ===================
+  
   // 健康检查
   healthCheck() {
-    return api.get('/health')
+    return commonApi.get('/health')
   },
   
-  // 查询卷烟分配
+  // =================== 数据管理接口 (/api/data) ===================
+  
+  // 查询卷烟分配数据
   queryDistribution(params) {
-    return api.post('/query', params)
+    return dataApi.post('/query', params)
   },
   
-  // 查询原始数据
-  queryRawData(params) {
-    return api.post('/query-raw', params)
-  },
-  
-  // 更新卷烟分配
-  updateDistribution(data) {
-    return api.post('/update', data)
-  },
-  
-  // 卷烟信息更新（推荐使用）
+  // 更新卷烟信息（主要接口）
   updateCigaretteInfo(data) {
-    return api.post('/update-cigarette', data)
-  },
-  
-  // 写回分配矩阵
-  writeBackDistribution(data) {
-    return api.post('/write-back', data)
-  },
-  
-  // 测试分配算法
-  testAlgorithm() {
-    return api.get('/test-algorithm')
+    return dataApi.post('/update-cigarette', data)
   },
   
   // 删除投放区域
   deleteDeliveryAreas(data) {
-    return api.post('/delete-delivery-areas', data)
+    return dataApi.post('/delete-delivery-areas', data)
   },
   
-  // 导入卷烟投放基本信息
-  importBasicInfo(formData) {
-    return api.post('/import-basic-info', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-  },
+  // =================== 分配计算接口 (/api/calculate) ===================
   
-  // 导入区域客户数
-  importCustomerData(formData) {
-    return api.post('/import-customer-data', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
+  // 写回分配矩阵
+  writeBackDistribution(params) {
+    // 注意：后端接口使用URL参数
+    return calculateApi.post(`/write-back?year=${params.year}&month=${params.month}&weekSeq=${params.weekSeq}`)
   },
   
   // 生成分配方案
-  generateDistributionPlan(data) {
-    return api.post('/generate-distribution-plan', data)
+  generateDistributionPlan(params) {
+    // 注意：后端接口使用URL参数而非请求体
+    return calculateApi.post(`/generate-distribution-plan?year=${params.year}&month=${params.month}&weekSeq=${params.weekSeq}`)
+  },
+  
+  // 计算总实际投放量
+  calculateTotalActualDelivery(params) {
+    return calculateApi.post(`/total-actual-delivery?year=${params.year}&month=${params.month}&weekSeq=${params.weekSeq}`)
+  },
+  
+  // =================== 数据导入接口 (/api/import) ===================
+  
+  // 导入卷烟投放基础信息
+  importBasicInfo(formData) {
+    return importApi.post('/cigarette-info', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+  
+  // 导入区域客户数表
+  importCustomerData(formData) {
+    return importApi.post('/region-clientnum', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+  
+  // =================== 废弃的接口（向后兼容） ===================
+  
+  // 查询原始数据（如需要可联系后端添加）
+  queryRawData(params) {
+    console.warn('queryRawData 接口已废弃，请使用 queryDistribution')
+    return this.queryDistribution(params)
+  },
+  
+  // 更新卷烟分配（废弃，建议使用updateCigaretteInfo）
+  updateDistribution(data) {
+    console.warn('updateDistribution 接口已废弃，请使用 updateCigaretteInfo')
+    return this.updateCigaretteInfo(data)
+  },
+  
+  // 测试分配算法（如需要可联系后端添加）
+  testAlgorithm() {
+    console.warn('testAlgorithm 接口暂不可用，请联系后端开发')
+    return Promise.reject(new Error('接口暂不可用'))
   }
 }
 
-// 卷烟投放方案相关API（保留原有接口）
+// =================== 废弃的API模块（保留以兼容现有代码） ===================
+
+// 卷烟投放方案相关API（废弃，建议使用cigaretteDistributionAPI）
 export const distributionPlanAPI = {
   // 查询卷烟投放方案
   queryPlan(params) {
-    return api.get('/distribution-plan/query', { params })
+    console.warn('distributionPlanAPI.queryPlan 已废弃，请使用 cigaretteDistributionAPI.queryDistribution')
+    return cigaretteDistributionAPI.queryDistribution(params)
   },
   
   // 保存档位设置
   savePositions(data) {
-    return api.post('/distribution-plan/save-positions', data)
+    console.warn('distributionPlanAPI.savePositions 已废弃，请使用 cigaretteDistributionAPI.updateCigaretteInfo')
+    return cigaretteDistributionAPI.updateCigaretteInfo(data)
   },
   
   // 获取档位数据
   getPositionData(cigaretteName, year, month, week) {
-    return api.get('/distribution-plan/positions', {
-      params: { cigaretteName, year, month, week }
-    })
+    console.warn('distributionPlanAPI.getPositionData 已废弃，请使用 cigaretteDistributionAPI.queryDistribution 查询特定卷烟')
+    return cigaretteDistributionAPI.queryDistribution({ year, month, weekSeq: week })
   }
 }
 
-// 卷烟数据相关API
+// 卷烟数据相关API（暂未在后端接口文档中找到对应接口）
 export const cigaretteAPI = {
   // 获取卷烟列表
   getCigaretteList() {
-    return api.get('/cigarettes')
+    console.warn('cigaretteAPI.getCigaretteList 接口暂不可用，请联系后端开发')
+    return Promise.reject(new Error('接口暂不可用'))
   },
   
   // 搜索卷烟
   searchCigarettes(keyword) {
-    return api.get('/cigarettes/search', { params: { keyword } })
+    console.warn('cigaretteAPI.searchCigarettes 接口暂不可用，请联系后端开发')  
+    return Promise.reject(new Error('接口暂不可用'))
   }
 }
 
-export default api
+// =================== 导出配置 ===================
+
+// 导出主要的API实例和方法
+export { dataApi, commonApi, calculateApi, importApi }
+export default cigaretteDistributionAPI
