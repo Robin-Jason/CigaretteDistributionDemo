@@ -2,10 +2,8 @@ package org.example.service.BusinessFormatDIstribution;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.example.entity.DemoTestData;
-import org.example.repository.DemoTestDataRepository;
 import org.example.service.CommonService;
-//import org.example.service.DistributionCalculateService;
+
 import org.example.service.algorithm.BussinessFormatDistributionAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,13 +22,13 @@ import java.util.stream.Collectors;
 @Service
 public class BussinessFormatDistributionService {
     
-    @Autowired
-    private DemoTestDataRepository testDataRepository;
-    
+
+
     @Autowired
     private BussinessFormatDistributionAlgorithm distributionAlgorithm;
-    
-    
+
+
+
     @Autowired
     private org.example.util.KmpMatcher kmpMatcher;
     
@@ -42,9 +40,9 @@ public class BussinessFormatDistributionService {
     // 缓存业态类型列表
     private List<String> allBusinessFormatList;
     
-    // 缓存业态类型客户数矩阵
-    private BigDecimal[][] businessFormatCustomerMatrix;
-    
+//    // 缓存业态类型客户数矩阵
+//    private BigDecimal[][] businessFormatCustomerMatrix;
+//
     /**
      * 获取所有业态类型列表（按id从小到大排序去重）
      */
@@ -61,14 +59,34 @@ public class BussinessFormatDistributionService {
         }
         return allBusinessFormatList;
     }
-    
 
+    /**
+     * 获取业态类型客户数矩阵
+     */
+//
+//    @Cacheable("businessFormatCustomerMatrix")
+//    public BigDecimal[][] getBusinessFormatCustomerMatrix() {
+//        if (businessFormatCustomerMatrix == null) {
+//            log.info("初始化业态类型客户数矩阵(通用服务)");
+//            CommonService.RegionCustomerMatrix matrix = commonService.buildRegionCustomerMatrix("按档位扩展投放", "档位+业态");
+//            List<BigDecimal[]> rows = matrix.getCustomerMatrix();
+//            businessFormatCustomerMatrix = new BigDecimal[rows.size()][30];
+//            for (int i = 0; i < rows.size(); i++) {
+//                BigDecimal[] row = rows.get(i);
+//                System.arraycopy(row, 0, businessFormatCustomerMatrix[i], 0, 30);
+//            }
+//            // 同步缓存的名称列表
+//            this.allBusinessFormatList = matrix.getRegionNames();
+//            log.info("业态类型客户数矩阵初始化完成，矩阵大小: {}x30", rows.size());
+//        }
+//        return businessFormatCustomerMatrix;
+//    }
     /**
      * 获取卷烟的待投放业态类型列表
      * @param deliveryArea 投放区域字段值
      * @return 匹配成功的业态类型列表
      */
-    //这里应该修改一下调用getAdvDataByDeliveryType
+    //这里可以看下调用getAdvDataByDeliveryType
     public List<String> getTargetBusinessFormatList(String deliveryArea) {
         log.info("获取卷烟投放业态类型，投放区域字段值: {}", deliveryArea);
         List<String> allBusinessFormats = getAllBusinessFormatList();
