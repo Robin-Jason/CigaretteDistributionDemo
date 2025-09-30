@@ -38,6 +38,14 @@
         <el-table-column prop="cigCode" label="卷烟代码" width="100" align="center" />
         <el-table-column prop="cigName" label="卷烟名称" width="180" />
         <el-table-column prop="dateDisplay" label="日期" width="150" align="center" />
+        <el-table-column prop="encodedExpression" label="编码表达" width="200" align="center">
+          <template #default="scope">
+            <el-tooltip v-if="scope.row.encodedExpression" :content="scope.row.decodedExpression || '暂无解码信息'" placement="top">
+              <span class="encoded-expression">{{ scope.row.encodedExpression }}</span>
+            </el-tooltip>
+            <span v-else class="no-encoding">-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="deliveryArea" label="投放区域" width="200" />
         
         <!-- 30个档位列，从30档开始到1档 -->
@@ -528,5 +536,27 @@ export default {
 
 :deep(.el-table__body-wrapper .el-table__body .selected-group-row.current-selected td) {
   background-color: #cce7ff !important;
+}
+
+/* 编码表达列样式 */
+.encoded-expression {
+  font-family: 'Consolas', 'Monaco', 'Menlo', monospace;
+  font-size: 12px;
+  color: #409eff;
+  background: rgba(64, 158, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.encoded-expression:hover {
+  background: rgba(64, 158, 255, 0.2);
+  color: #1976d2;
+}
+
+.no-encoding {
+  color: #c0c4cc;
+  font-style: italic;
 }
 </style>

@@ -71,6 +71,11 @@ export const cigaretteDistributionAPI = {
     return dataApi.post('/delete-delivery-areas', data)
   },
   
+  // 基于编码表达式批量更新投放信息
+  batchUpdateFromExpressions(data) {
+    return dataApi.post('/batch-update-from-expressions', data)
+  },
+  
   // =================== 分配计算接口 (/api/calculate) ===================
   
   // 写回分配矩阵

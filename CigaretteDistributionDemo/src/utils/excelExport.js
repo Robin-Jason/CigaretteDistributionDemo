@@ -89,6 +89,8 @@ export class ExcelExporter {
       '年份',
       '月份',
       '周序号',
+      '编码表达',
+      '解码表达',
       '投放区域',
       '预投放量',
       '实际投放量'
@@ -126,6 +128,8 @@ export class ExcelExporter {
         item.year || '',
         item.month || '',
         item.weekSeq || '',
+        item.encodedExpression || '',
+        item.decodedExpression || '',
         item.deliveryArea || '',
         item.advAmount || 0,
         item.actualDelivery || 0
@@ -158,6 +162,8 @@ export class ExcelExporter {
       '年份': 8,
       '月份': 8,
       '周序号': 10,
+      '编码表达': 25,
+      '解码表达': 40,
       '投放区域': 30,
       '预投放量': 12,
       '实际投放量': 12,
@@ -218,7 +224,7 @@ export class ExcelExporter {
         
         if (cell) {
           // 数值列居中对齐
-          if (col >= 8 && col <= 37) { // 档位列（从第9列到第38列，0-based索引）
+          if (col >= 10 && col <= 39) { // 档位列（从第11列到第40列，0-based索引，因为新增了2列编码表达）
             cell.s = {
               alignment: { horizontal: 'center', vertical: 'center' },
               border: {

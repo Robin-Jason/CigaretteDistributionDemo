@@ -61,6 +61,7 @@
           placeholder="请选择投放类型"
           style="width: 180px"
           clearable
+          :disabled="isFormDisabled"
           @change="handleDistributionTypeChange"
         >
           <el-option label="按档位统一投放" value="按档位统一投放" />
@@ -74,6 +75,7 @@
           placeholder="请选择扩展类型"
           style="width: 160px"
           clearable
+          :disabled="isFormDisabled"
           @change="handleExtendedTypeChange"
         >
           <el-option label="档位+区县" value="档位+区县" />
@@ -92,6 +94,8 @@
           collapse-tags
           collapse-tags-tooltip
           clearable
+          :disabled="isFormDisabled"
+          @change="handleDistributionAreaChange"
         >
           <el-option
             v-for="option in deliveryAreaOptions"
@@ -123,12 +127,44 @@
       
       <!-- 档位设置区域（仅在选中卷烟后显示） -->
       <div v-if="selectedRecord && selectedRecord.cigCode" class="position-settings-section">
+        <div class="position-header">
         <el-divider content-position="left">
           <el-icon><Setting /></el-icon>
           档位设置
         </el-divider>
         
-        <div class="position-grid">
+          <div class="position-view-toggle">
+            <el-button-group>
+              <el-button 
+                :type="positionViewMode === 'grid' ? 'primary' : ''"
+                size="small"
+                @click="switchPositionView('grid')"
+              >
+                <el-icon><DataBoard /></el-icon>
+                表格视图
+              </el-button>
+              <el-button 
+                :type="positionViewMode === 'encoding' ? 'primary' : ''"
+                size="small"
+                @click="switchPositionView('encoding')"
+              >
+                <el-icon><Document /></el-icon>
+                编码视图
+              </el-button>
+              <el-button 
+                size="small"
+                @click="switchPositionView('3d')"
+                :disabled="!hasChartData"
+              >
+                <el-icon><TrendCharts /></el-icon>
+                三维图表
+              </el-button>
+            </el-button-group>
+          </div>
+        </div>
+        
+        <!-- 表格视图 -->
+        <div v-if="positionViewMode === 'grid'" class="position-grid">
           <div v-for="(position, index) in positionData" :key="`d${30 - index}`" class="position-item">
             <span class="position-label">D{{ 30 - index }}:</span>
             <el-input-number
@@ -138,7 +174,152 @@
               :step="1"
               size="small"
               style="width: 90px"
+              :disabled="isFormDisabled"
+              @change="handlePositionChange"
             />
+          </div>
+        </div>
+        
+        <!-- 三维图表弹窗 -->
+        <el-dialog
+          v-model="show3DChart"
+          :title="`${(selectedRecord && selectedRecord.cigName) || '卷烟'} - 各区域档位投放分布`"
+          width="95%"
+          height="85vh"
+          :destroy-on-close="true"
+          :close-on-click-modal="false"
+          :close-on-press-escape="true"
+          :show-close="true"
+          draggable
+          class="chart-dialog"
+          @opened="handleDialogOpened"
+        >
+          <Position3DChart 
+            ref="position3DChart"
+            :selectedRecord="selectedRecord"
+            :tableData="tableData"
+            style="height: 1125px;"
+          />
+          <template #footer>
+            <div class="dialog-footer">
+              <el-button @click="show3DChart = false">关闭</el-button>
+              <el-button 
+                type="primary" 
+                @click="exportChart"
+                :disabled="!hasChartData"
+              >
+                导出图表
+              </el-button>
+            </div>
+          </template>
+        </el-dialog>
+        
+        <!-- 编码化表达输入区域 (仅编码视图时显示) -->
+        <div v-if="positionViewMode === 'encoding'" class="encoded-expression-section">
+          <el-divider content-position="left">
+            <el-icon><Document /></el-icon>
+            编码化表达
+          </el-divider>
+          
+          <div class="encoded-expression-input-container">
+            <el-form-item label="编码表达" class="encoded-expression-form-item">
+              <el-input
+                v-model="encodedExpressionInput"
+                type="textarea"
+                :rows="6"
+                placeholder="显示选中卷烟的所有区域聚合编码表达，每行一个不同的档位设置组合"
+                style="width: 600px"
+                :readonly="!selectedRecord || !selectedRecord.cigCode || isEncodingDisabled"
+                :disabled="isEncodingDisabled"
+                @input="handleEncodedExpressionInput"
+                @change="handleEncodedExpressionChange"
+                resize="vertical"
+              />
+              
+              <el-button 
+                type="primary" 
+                size="small"
+                @click="handleUpdateFromEncodedExpression"
+                :loading="updatingFromEncoded"
+                :disabled="!isEncodedExpressionChanged || !selectedRecord || !encodedExpressionValidation.isValid"
+                style="margin-left: 10px"
+              >
+                <el-icon><Check /></el-icon>
+                更新记录
+              </el-button>
+              
+              <el-button 
+                v-if="hasAnyChanges"
+                size="small"
+                @click="resetEditMode"
+                style="margin-left: 10px"
+              >
+                <el-icon><RefreshLeft /></el-icon>
+                重置修改
+              </el-button>
+            </el-form-item>
+            
+            <!-- 解码信息显示 -->
+            <div v-if="decodedExpressionDisplay" class="decoded-expression-display">
+              <el-alert
+                title="解码表达式"
+                type="info"
+                :closable="false"
+                show-icon
+                :description="decodedExpressionDisplay"
+              />
+            </div>
+            
+            <!-- 编码表达式实时验证状态 -->
+            <div class="encoded-expression-validation">
+              <el-alert
+                :title="encodedExpressionValidation.title"
+                :type="encodedExpressionValidation.type"
+                :description="encodedExpressionValidation.message"
+                :closable="false"
+                show-icon
+              />
+            </div>
+            
+            <!-- 编码表达提示信息 -->
+            <div v-if="encodedExpressionHint" class="encoded-expression-hint">
+              <el-alert
+                :title="encodedExpressionHint"
+                type="info"
+                :closable="false"
+                show-icon
+              />
+            </div>
+            
+            <!-- 编辑模式状态显示 -->
+            <div v-if="editMode !== 'none'" class="edit-mode-status">
+              <el-alert
+                v-if="editMode === 'encoding'"
+                title="编码修改模式"
+                type="info"
+                :closable="false"
+                show-icon
+              >
+                <template #default>
+                  <p>当前正在修改编码表达式，其他表单字段已被锁定</p>
+                  <p>要修改其他字段，请先点击"重置修改"按钮</p>
+                </template>
+              </el-alert>
+              
+              <el-alert
+                v-if="editMode === 'form'"
+                title="表单修改模式"
+                type="warning"
+                :closable="false"
+                show-icon
+              >
+                <template #default>
+                  <p>当前正在修改表单设置，编码表达式字段已被锁定</p>
+                  <p>要修改编码表达式，请先点击"重置修改"按钮</p>
+                </template>
+              </el-alert>
+            </div>
+            
           </div>
         </div>
         
@@ -162,6 +343,7 @@
             重置档位
           </el-button>
           <el-button 
+            v-if="positionViewMode === 'grid'"
             type="success" 
             size="small"
             @click="handleAddNewArea"
@@ -171,6 +353,7 @@
             新增投放区域
           </el-button>
           <el-button 
+            v-if="positionViewMode === 'grid'"
             type="danger" 
             size="small"
             @click="handleDeleteAreas"
@@ -181,8 +364,8 @@
           </el-button>
         </div>
         
-        <!-- 删除投放区域选择框（仅在有现有区域时显示） -->
-        <div v-if="selectedRecord && selectedRecord.allAreas && selectedRecord.allAreas.length > 0" class="delete-area-section">
+        <!-- 删除投放区域选择框（仅在表格视图且有现有区域时显示） -->
+        <div v-if="positionViewMode === 'grid' && selectedRecord && selectedRecord.allAreas && selectedRecord.allAreas.length > 0" class="delete-area-section">
           <el-divider content-position="left">
             <el-icon><Delete /></el-icon>
             选择要删除的投放区域
@@ -254,9 +437,10 @@
 </template>
 
 <script>
-import { Search, RefreshLeft, Download, ArrowDown, LocationInformation, Setting, Check, Plus, Delete } from '@element-plus/icons-vue'
+import { Search, RefreshLeft, Download, ArrowDown, LocationInformation, Setting, Check, Plus, Delete, Document, DataBoard, TrendCharts } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { cigaretteDistributionAPI } from '@/services/api'
+import Position3DChart from './Position3DChart.vue'
 
 export default {
   name: 'SearchForm',
@@ -279,7 +463,11 @@ export default {
     Setting,
     Check,
     Plus,
-    Delete
+    Delete,
+    Document,
+    DataBoard,
+    TrendCharts,
+    Position3DChart
   },
   data() {
     return {
@@ -333,7 +521,20 @@ export default {
       // 保存状态
       savingPositions: false,
       // 要删除的投放区域
-      areasToDelete: []
+      areasToDelete: [],
+      // 编码化表达相关
+      encodedExpressionInput: '',
+      originalEncodedExpression: '',
+      updatingFromEncoded: false,
+      // 一致性检查相关
+      originalFormState: null,
+      isConsistencyCheckEnabled: true,
+      // 编辑模式：'none'(无修改)、'encoding'(只能修改编码)、'form'(只能修改表单)
+      editMode: 'none',
+      // 档位设置显示模式：'grid'(表格视图)、'encoding'(编码视图)、'3d'(三维图视图)
+      positionViewMode: 'grid',
+      // 三维图表弹窗显示状态
+      show3DChart: false
     }
   },
   computed: {
@@ -403,6 +604,234 @@ export default {
              this.selectedRecord.allAreas.length > 1 && // 至少要保留一个区域
              this.areasToDelete && 
              this.areasToDelete.length > 0
+    },
+    // 检查编码表达是否已变更
+    isEncodedExpressionChanged() {
+      return this.encodedExpressionInput.trim() !== this.originalEncodedExpression.trim()
+    },
+    // 解码表达显示（显示每个记录的独立解码）
+    decodedExpressionDisplay() {
+      if (!this.selectedRecord) {
+        return ''
+      }
+      
+      // 获取选中卷烟的所有相关记录
+      const relatedRecords = this.getRelatedRecords(this.selectedRecord)
+      
+      if (relatedRecords.length === 0) {
+        return ''
+      }
+      
+      // 为每个记录生成解码表达式
+      const decodedExpressions = []
+      
+      relatedRecords.forEach((record, index) => {
+        let decodedExpression = ''
+        
+        // 优先使用后端提供的解码表达式
+        if (record.decodedExpression) {
+          decodedExpression = record.decodedExpression
+        } else {
+          // 生成该记录的解码表达式
+          decodedExpression = this.generateRecordDecodedExpression(record)
+        }
+        
+        decodedExpressions.push(`${index + 1}. ${decodedExpression}`)
+      })
+      
+      return decodedExpressions.join('\n')
+    },
+    
+    // 生成单个记录的解码表达式
+    generateRecordDecodedExpression(record) {
+      try {
+        let decoded = ''
+        
+        // 投放方式
+        decoded += record.deliveryMethod || '未知投放方式'
+        
+        // 扩展投放类型
+        if (record.deliveryEtype && record.deliveryEtype !== 'NULL') {
+          decoded += `、${record.deliveryEtype}`
+        }
+        
+        // 投放区域
+        if (record.deliveryArea) {
+          decoded += `、${record.deliveryArea}`
+        }
+        
+        // 档位设置摘要
+        const positionSummary = this.getPositionSummary(record)
+        if (positionSummary) {
+          decoded += `、${positionSummary}`
+        }
+        
+        return decoded
+      } catch (error) {
+        console.warn('生成解码表达式失败:', error)
+        return '解码失败'
+      }
+    },
+    
+    // 获取档位设置摘要
+    getPositionSummary(record) {
+      const positions = []
+      for (let i = 30; i >= 1; i--) {
+        const value = record[`d${i}`] || 0
+        if (value > 0) {
+          positions.push(`D${i}=${value}`)
+        }
+      }
+      
+      if (positions.length === 0) {
+        return '无档位设置'
+      }
+      
+      // 简化显示
+      if (positions.length > 3) {
+        return `档位设置：${positions.slice(0, 3).join('、')}等${positions.length}个档位`
+      } else {
+        return `档位设置：${positions.join('、')}`
+      }
+    },
+    // 编码表达式实时验证状态
+    encodedExpressionValidation() {
+      if (!this.encodedExpressionInput || !this.encodedExpressionInput.trim()) {
+        return {
+          isValid: true,
+          type: 'info',
+          title: '请输入编码表达式',
+          message: '支持多行输入，每行一个编码表达式'
+        }
+      }
+      
+      // 执行实时验证
+      const validation = this.validateEncodedExpressions(this.encodedExpressionInput)
+      
+      if (validation.isValid) {
+        return {
+          isValid: true,
+          type: 'success',
+          title: '编码表达式验证通过',
+          message: validation.warnings.join(', ')
+        }
+      } else {
+        return {
+          isValid: false,
+          type: 'error',
+          title: '编码表达式验证失败',
+          message: validation.errors.join('; ')
+        }
+      }
+    },
+    
+    // 编码表达提示信息
+    encodedExpressionHint() {
+      if (!this.encodedExpressionInput) {
+        return '请选中卷烟记录以显示编码表达'
+      }
+      if (this.isEncodedExpressionChanged) {
+        if (this.hasOtherFormChanges) {
+          return '编码表达和其他设置均已修改，需要通过一致性验证'
+        }
+        return '编码表达已修改，点击"更新记录"按钮保存更改'
+      }
+      
+      // 统计显示的编码表达数量
+      const lines = this.encodedExpressionInput.split('\n').filter(line => line.trim())
+      const lineCount = lines.length
+      
+      if (lineCount > 1) {
+        return `当前显示 ${lineCount} 条不同档位设置的区域聚合编码表达式`
+      } else {
+        return '编码格式：投放类型+扩展类型（区域编码）（档位投放量编码）'
+      }
+    },
+    
+    // 检查是否有其他表单变更（档位、投放类型、区域等）
+    hasOtherFormChanges() {
+      return this.hasPositionChanges || this.hasDeliverySettingsChanges
+    },
+    
+    // 检查档位数据是否发生变更
+    hasPositionChanges() {
+      if (!this.originalFormState || !this.selectedRecord) return false
+      
+      return this.positionData.some((val, index) => 
+        val !== (this.originalFormState.positionData[index] || 0)
+      )
+    },
+    
+    // 检查投放设置是否发生变更（投放类型、扩展类型、投放区域）
+    hasDeliverySettingsChanges() {
+      if (!this.originalFormState || !this.selectedRecord) return false
+      
+      // 检查投放类型变更
+      const hasDeliveryMethodChange = this.searchForm.distributionType !== this.originalFormState.distributionType
+      
+      // 检查扩展投放类型变更
+      const hasExtendedTypeChange = this.searchForm.extendedType !== this.originalFormState.extendedType
+      
+      // 检查投放区域变更
+      const currentAreas = (this.searchForm.distributionArea || []).sort()
+      const originalAreas = (this.originalFormState.distributionArea || []).sort()
+      const hasAreaChanges = JSON.stringify(currentAreas) !== JSON.stringify(originalAreas)
+      
+      return hasDeliveryMethodChange || hasExtendedTypeChange || hasAreaChanges
+    },
+    
+    // 是否需要一致性验证
+    needsConsistencyCheck() {
+      return this.isEncodedExpressionChanged && this.hasOtherFormChanges && this.isConsistencyCheckEnabled
+    },
+    
+    // 获取变更摘要
+    changesSummary() {
+      const changes = []
+      
+      if (this.isEncodedExpressionChanged) {
+        changes.push('编码表达')
+      }
+      
+      if (this.hasPositionChanges) {
+        changes.push('档位设置')
+      }
+      
+      if (this.hasDeliverySettingsChanges) {
+        const deliveryChanges = []
+        if (this.originalFormState && this.searchForm.distributionType !== this.originalFormState.distributionType) {
+          deliveryChanges.push('投放类型')
+        }
+        if (this.originalFormState && this.searchForm.extendedType !== this.originalFormState.extendedType) {
+          deliveryChanges.push('扩展投放类型')  
+        }
+        if (this.originalFormState && JSON.stringify((this.searchForm.distributionArea || []).sort()) !== JSON.stringify((this.originalFormState.distributionArea || []).sort())) {
+          deliveryChanges.push('投放区域')
+        }
+        changes.push(...deliveryChanges)
+      }
+      
+      return changes
+    },
+    
+    // 编码表达字段是否禁用（当处于表单修改模式时禁用）
+    isEncodingDisabled() {
+      return this.editMode === 'form'
+    },
+    
+    // 表单字段是否禁用（当处于编码修改模式时禁用）
+    isFormDisabled() {
+      return this.editMode === 'encoding'
+    },
+    
+    // 是否有任何修改
+    hasAnyChanges() {
+      return this.editMode !== 'none'
+    },
+    
+    // 是否有图表数据
+    hasChartData() {
+      return this.selectedRecord && this.selectedRecord.cigCode && this.tableData.length > 0
     }
   },
   watch: {
@@ -437,6 +866,15 @@ export default {
           // 加载档位数据
           this.loadPositionData(newRecord)
           
+          // 加载编码化表达
+          this.loadEncodedExpression(newRecord)
+          
+          // 保存原始表单状态用于一致性检查
+          this.saveOriginalFormState()
+          
+          // 重置编辑模式
+          this.editMode = 'none'
+          
           console.log('选中记录更新并自动填充:', {
             record: newRecord,
             form: this.searchForm
@@ -445,6 +883,13 @@ export default {
           // 清空档位数据和删除选择
           this.positionData = new Array(30).fill(0)
           this.areasToDelete = []
+          // 清空编码化表达
+          this.encodedExpressionInput = ''
+          this.originalEncodedExpression = ''
+          // 清空原始状态
+          this.originalFormState = null
+          // 重置编辑模式
+          this.editMode = 'none'
         }
       },
       immediate: true
@@ -456,13 +901,114 @@ export default {
       if (!this.selectedRecord) {
         this.searchForm.extendedType = ''
         this.searchForm.distributionArea = []
+      } else {
+        // 当有选中记录时，设置为表单修改模式
+        this.setEditMode('form')
       }
     },
     handleExtendedTypeChange() {
       // 扩展投放类型变化时重置区域选择（仅当非自动填充时）
       if (!this.selectedRecord) {
         this.searchForm.distributionArea = []
+      } else {
+        // 当有选中记录时，设置为表单修改模式
+        this.setEditMode('form')
       }
+    },
+    
+    // 处理投放区域变化
+    handleDistributionAreaChange() {
+      if (this.selectedRecord && this.selectedRecord.cigCode) {
+        this.setEditMode('form')
+      }
+    },
+    
+    // 处理档位数据变化
+    handlePositionChange() {
+      if (this.selectedRecord && this.selectedRecord.cigCode) {
+        this.setEditMode('form')
+      }
+    },
+    
+    // 设置编辑模式
+    setEditMode(mode) {
+      if (this.editMode === 'none') {
+        this.editMode = mode
+        console.log(`切换到${mode === 'encoding' ? '编码修改' : '表单修改'}模式`)
+      }
+    },
+    
+    // 重置编辑模式
+    resetEditMode() {
+      this.editMode = 'none'
+      
+      // 重置编码表达
+      this.loadEncodedExpression(this.selectedRecord)
+      
+      // 重置表单数据
+      if (this.selectedRecord) {
+        // 重新填充投放类型信息
+        if (this.selectedRecord.deliveryMethod) {
+          this.searchForm.distributionType = this.selectedRecord.deliveryMethod
+        }
+        
+        // 重新填充扩展投放类型
+        if (this.selectedRecord.deliveryEtype) {
+          this.searchForm.extendedType = this.selectedRecord.deliveryEtype
+        }
+        
+        // 重新填充投放区域
+        if (this.selectedRecord.allAreas && Array.isArray(this.selectedRecord.allAreas)) {
+          this.searchForm.distributionArea = [...this.selectedRecord.allAreas]
+        } else if (this.selectedRecord.deliveryArea) {
+          this.searchForm.distributionArea = [this.selectedRecord.deliveryArea]
+        }
+        
+        // 重新加载档位数据
+        this.loadPositionData(this.selectedRecord)
+        
+        // 重新保存原始表单状态
+        this.saveOriginalFormState()
+      }
+      
+      ElMessage.success('已重置修改状态')
+      console.log('重置编辑模式')
+    },
+    
+    // 切换档位显示视图
+    switchPositionView(mode) {
+      if (mode === '3d') {
+        // 如果选择三维图表，直接打开弹窗
+        this.open3DChart()
+      } else {
+        // 其他模式正常切换
+        this.positionViewMode = mode
+        console.log(`切换档位显示模式: ${mode}`)
+      }
+    },
+    
+    // 打开三维图表弹窗
+    open3DChart() {
+      if (!this.hasChartData) {
+        ElMessage.warning('请先选择一个卷烟记录')
+        return
+      }
+      this.show3DChart = true
+      console.log('打开三维图表弹窗')
+    },
+    
+    // 对话框打开完成事件
+    handleDialogOpened() {
+      console.log('Dialog opened, reinitializing chart...')
+      // 对话框完全打开后重新初始化图表
+      if (this.$refs.position3DChart) {
+        this.$refs.position3DChart.reinitChart()
+      }
+    },
+    
+    // 导出图表功能
+    exportChart() {
+      ElMessage.info('图表导出功能正在开发中...')
     },
     handleSearch() {
       // 至少需要选择一个时间条件或卷烟名称
@@ -607,6 +1153,14 @@ export default {
       if (!this.isPositionDataValid) {
         ElMessage.error('请检查档位数据，至少设置一个档位值')
         return
+      }
+      
+      // 一致性检查：如果同时修改了编码表达和档位设置
+      if (this.needsConsistencyCheck) {
+        const checkResult = await this.performConsistencyCheck()
+        if (!checkResult.passed) {
+          return // 一致性检查未通过，终止操作
+        }
       }
       
       try {
@@ -821,6 +1375,817 @@ export default {
         console.error('删除投放区域失败:', error)
         ElMessage.error(`删除失败: ${error.message}`)
       }
+    },
+    
+    // =================== 编码化表达功能方法 ===================
+    
+    // 保存原始表单状态
+    saveOriginalFormState() {
+      this.originalFormState = {
+        distributionType: this.searchForm.distributionType,
+        extendedType: this.searchForm.extendedType,
+        distributionArea: [...(this.searchForm.distributionArea || [])],
+        positionData: [...this.positionData],
+        encodedExpression: this.encodedExpressionInput
+      }
+      
+      console.log('保存原始表单状态:', this.originalFormState)
+    },
+    
+    // 加载编码化表达（支持多记录聚合显示）
+    loadEncodedExpression(record) {
+      if (!record) {
+        this.encodedExpressionInput = ''
+        this.originalEncodedExpression = ''
+        return
+      }
+      
+      // 获取选中卷烟的所有相关记录
+      const relatedRecords = this.getRelatedRecords(record)
+      
+      // 按档位设置分组，生成聚合编码表达
+      const groupedExpressions = this.generateAggregatedExpressions(relatedRecords)
+      
+      // 将多个编码表达式按行显示
+      const multiLineExpressions = groupedExpressions.join('\n')
+      
+      this.encodedExpressionInput = multiLineExpressions
+      this.originalEncodedExpression = multiLineExpressions
+      
+      console.log('加载编码化表达:', {
+        cigName: record.cigName,
+        relatedRecordsCount: relatedRecords.length,
+        groupedExpressionsCount: groupedExpressions.length,
+        multiLineExpressions: multiLineExpressions
+      })
+    },
+    
+    // 获取选中卷烟的所有相关记录
+    getRelatedRecords(selectedRecord) {
+      if (!this.tableData || !selectedRecord) {
+        return [selectedRecord].filter(Boolean)
+      }
+      
+      // 查找同一卷烟同一时间的所有记录
+      const relatedRecords = this.tableData.filter(record => 
+        record.cigCode === selectedRecord.cigCode &&
+        record.cigName === selectedRecord.cigName &&
+        record.year === selectedRecord.year &&
+        record.month === selectedRecord.month &&
+        record.weekSeq === selectedRecord.weekSeq
+      )
+      
+      return relatedRecords.length > 0 ? relatedRecords : [selectedRecord]
+    },
+    
+    // 生成每个记录的独立编码表达式
+    generateAggregatedExpressions(records) {
+      if (!records || records.length === 0) {
+        return []
+      }
+      
+      // 为每个记录生成独立的编码表达式
+      const expressions = []
+      
+      records.forEach(record => {
+        let expression = ''
+        
+        // 优先使用后端提供的编码表达式
+        if (record.encodedExpression) {
+          expression = record.encodedExpression
+        } else {
+          // 生成该记录的编码表达式
+          expression = this.generateRecordEncodedExpression(record)
+        }
+        
+        expressions.push(expression)
+      })
+      
+      return expressions
+    },
+    
+    // 生成单个记录的编码表达式
+    generateRecordEncodedExpression(record) {
+      try {
+        // 1. 生成投放类型编码
+        let typeCode = this.getDeliveryTypeCode(record)
+        
+        // 2. 生成区域编码
+        let areaCode = this.getAreaCode(record.deliveryArea, record.deliveryEtype)
+        
+        // 3. 生成档位投放量编码
+        const positionCode = this.generatePositionCode(record)
+        
+        // 4. 组合完整编码
+        if (record.deliveryMethod === '按档位统一投放') {
+          return `${typeCode}（${positionCode}）`
+        } else {
+          return `${typeCode}（${areaCode}）（${positionCode}）`
+        }
+      } catch (error) {
+        console.warn('生成编码表达式失败:', error)
+        return ''
+      }
+    },
+    
+    // 获取投放类型编码
+    getDeliveryTypeCode(record) {
+      if (record.deliveryMethod === '按档位统一投放') {
+        return 'A'
+      } else if (record.deliveryMethod === '按档位扩展投放') {
+        let code = 'B'
+        // 添加扩展类型编码
+        if (record.deliveryEtype === '档位+区县') {
+          code += '1'
+        } else if (record.deliveryEtype === '档位+市场类型') {
+          code += '2'
+        } else if (record.deliveryEtype === '档位+城乡分类代码') {
+          code += '4'
+        } else if (record.deliveryEtype === '档位+业态') {
+          code += '5'
+        }
+        return code
+      }
+      return 'A' // 默认
+    },
+    
+    // 获取区域编码
+    getAreaCode(deliveryArea, deliveryEtype) {
+      if (!deliveryArea) return ''
+      
+      // 根据扩展投放类型映射区域编码
+      const areaMapping = {
+        '档位+区县': {
+          '城区': '1',
+          '丹江': '2', 
+          '房县': '3',
+          '郧西': '4',
+          '郧阳': '5',
+          '竹山': '6',
+          '竹溪': '7'
+        },
+        '档位+市场类型': {
+          '城网': 'C',
+          '农网': 'N'
+        },
+        '档位+城乡分类代码': {
+          '主城区': '①',
+          '城乡结合区': '②', 
+          '镇中心区': '③',
+          '镇乡结合区': '④',
+          '特殊区域': '⑤',
+          '乡中心区': '⑥',
+          '村庄': '⑦'
+        },
+        '档位+业态': {
+          '便利店': 'a',
+          '超市': 'b',
+          '商场': 'c',
+          '烟草专卖店': 'd',
+          '娱乐服务类': 'e',
+          '其他': 'f'
+        }
+      }
+      
+      const mapping = areaMapping[deliveryEtype]
+      if (mapping && mapping[deliveryArea]) {
+        return mapping[deliveryArea]
+      }
+      
+      // 如果没有找到映射，返回区域名称首字母或简化表示
+      return deliveryArea.charAt(0)
+    },
+    
+    // 生成档位投放量编码
+    generatePositionCode(record) {
+      const positionGroups = []
+      let currentValue = null
+      let currentCount = 0
+      
+      // 从D30到D1遍历，统计连续相同值的档位数量
+      for (let i = 30; i >= 1; i--) {
+        const value = record[`d${i}`] || 0
+        
+        if (value === currentValue) {
+          currentCount++
+        } else {
+          // 处理前一组
+          if (currentValue !== null && currentCount > 0) {
+            positionGroups.push(`${currentCount}×${currentValue}`)
+          }
+          
+          // 开始新的一组
+          currentValue = value
+          currentCount = 1
+        }
+      }
+      
+      // 处理最后一组
+      if (currentValue !== null && currentCount > 0) {
+        positionGroups.push(`${currentCount}×${currentValue}`)
+      }
+      
+      return positionGroups.filter(group => !group.endsWith('×0')).join('+') || '无档位设置'
+    },
+    
+    // 按档位设置分组记录
+    groupRecordsByPositions(records) {
+      const grouped = {}
+      
+      records.forEach(record => {
+        // 生成档位设置的唯一标识
+        const positionValues = []
+        for (let i = 30; i >= 1; i--) {
+          const value = record[`d${i}`] || 0
+          if (value > 0) {
+            positionValues.push(`D${i}:${value}`)
+          }
+        }
+        
+        const positionKey = positionValues.length > 0 ? positionValues.join(',') : '无档位设置'
+        
+        if (!grouped[positionKey]) {
+          grouped[positionKey] = []
+        }
+        grouped[positionKey].push(record)
+      })
+      
+      return grouped
+    },
+    
+    // 处理编码表达输入
+    handleEncodedExpressionInput(value) {
+      // 输入过程中的实时处理
+      if (this.selectedRecord && this.selectedRecord.cigCode) {
+        this.setEditMode('encoding')
+      }
+      console.log('编码表达输入变化:', value)
+    },
+    
+    // 处理编码表达变化
+    handleEncodedExpressionChange() {
+      // 输入完成后的处理
+      if (this.isEncodedExpressionChanged) {
+        ElMessage.info('编码表达已修改，可点击"更新记录"按钮保存')
+      }
+    },
+    
+    // 从编码表达更新记录（基于新的批量更新接口）
+    async handleUpdateFromEncodedExpression() {
+      if (!this.selectedRecord || !this.selectedRecord.cigCode) {
+        ElMessage.error('请先选中一个卷烟记录')
+        return
+      }
+      
+      if (!this.isEncodedExpressionChanged) {
+        ElMessage.warning('编码表达未发生变化')
+        return
+      }
+      
+      if (!this.encodedExpressionInput.trim()) {
+        ElMessage.error('编码表达不能为空')
+        return
+      }
+      
+      try {
+        this.updatingFromEncoded = true
+        
+        // 步骤1：验证编码表达式
+        console.log('开始验证编码表达式...')
+        const validation = this.validateEncodedExpressions(this.encodedExpressionInput)
+        
+        if (!validation.isValid) {
+          // 显示验证错误
+          const errorMessage = validation.errors.join('\n')
+          ElMessage.error({
+            dangerouslyUseHTMLString: false,
+            message: `编码表达式验证失败:\n${errorMessage}`,
+            duration: 5000
+          })
+          return
+        }
+        
+        // 显示验证信息
+        if (validation.warnings.length > 0) {
+          ElMessage.success({
+            message: validation.warnings.join(', '),
+            duration: 3000
+          })
+        }
+        
+        // 步骤2：准备编码表达式列表
+        const expressions = this.encodedExpressionInput.split('\n')
+          .map(line => line.trim())
+          .filter(line => line.length > 0)
+        
+        console.log('准备批量更新，编码表达式列表:', expressions)
+        
+        // 步骤3：构建批量更新请求数据
+        const batchUpdateData = {
+          cigCode: this.selectedRecord.cigCode,
+          cigName: this.selectedRecord.cigName,
+          year: this.selectedRecord.year,
+          month: this.selectedRecord.month,
+          weekSeq: this.selectedRecord.weekSeq,
+          encodedExpressions: expressions,
+          remark: `基于编码表达式的批量更新，共${expressions.length}条表达式`
+        }
+        
+        console.log('批量更新请求数据:', batchUpdateData)
+        
+        // 步骤4：调用新的批量更新接口
+        const response = await cigaretteDistributionAPI.batchUpdateFromExpressions(batchUpdateData)
+        
+        if (response.data.success) {
+          // 根据操作类型显示不同的成功消息
+          let successMessage = response.data.message
+          
+          if (response.data.operation === '投放类型变更') {
+            successMessage += `\n删除了${response.data.deletedRecords}条记录，创建了${response.data.createdRecords}条记录`
+          } else if (response.data.operation === '增量更新') {
+            successMessage += `\n新增${response.data.newAreas}个区域，更新${response.data.updatedAreas}个区域，删除${response.data.deletedAreas}个区域`
+          }
+          
+          ElMessage.success({
+            message: successMessage,
+            duration: 4000
+          })
+          
+          // 更新本地状态
+          this.originalEncodedExpression = this.encodedExpressionInput
+          
+          // 触发数据刷新
+          this.$emit('position-updated', {
+            cigCode: batchUpdateData.cigCode,
+            updateData: batchUpdateData,
+            updateType: 'batchEncodedExpression',
+            operationType: response.data.operation,
+            result: response.data
+          })
+          
+          // 重置编辑模式
+          this.editMode = 'none'
+          
+        } else {
+          throw new Error(response.data.message || '批量更新失败')
+        }
+        
+      } catch (error) {
+        console.error('编码表达式批量更新失败:', error)
+        
+        // 根据错误类型显示不同的错误消息
+        let errorMessage = error.message
+        if (error.response && error.response.data) {
+          errorMessage = error.response.data.message || errorMessage
+        }
+        
+        ElMessage.error({
+          message: `批量更新失败: ${errorMessage}`,
+          duration: 5000
+        })
+      } finally {
+        this.updatingFromEncoded = false
+      }
+    },
+    
+    // 公开方法：外部更新搜索表单（供Home组件调用）
+    updateSearchForm(searchParams) {
+      if (searchParams) {
+        this.searchForm.year = searchParams.year
+        this.searchForm.month = searchParams.month
+        this.searchForm.week = searchParams.week
+        console.log('外部更新搜索表单:', searchParams)
+      }
+    },
+    
+    // =================== 一致性检查方法 ===================
+    
+    // 执行一致性检查
+    async performConsistencyCheck() {
+      try {
+        console.log('开始执行一致性检查...')
+        
+        // 解析编码表达
+        const parsedEncoding = this.parseEncodedExpression(this.encodedExpressionInput)
+        
+        // 检查一致性
+        const inconsistencies = this.checkConsistency(parsedEncoding)
+        
+        if (inconsistencies.length === 0) {
+          console.log('一致性检查通过')
+          return { passed: true }
+        }
+        
+        // 显示一致性冲突对话框
+        const result = await this.showConsistencyDialog(inconsistencies)
+        return result
+        
+      } catch (error) {
+        console.error('一致性检查过程中发生错误:', error)
+        ElMessage.warning('一致性检查失败，建议分别保存各项设置')
+        return { passed: false }
+      }
+    },
+    
+    // 解析编码表达式（基于编码规则表的完整实现）
+    parseEncodedExpression(encoded) {
+      const parsed = {
+        deliveryType: '',
+        extendedType: '',
+        deliveryTypeCode: '',
+        extendedTypeCode: '',
+        areaCodes: [],
+        areaNames: [],
+        positionCoding: '',
+        positionData: new Array(30).fill(0),
+        isValid: false,
+        error: ''
+      }
+      
+      try {
+        // 基本格式：B1（2+3+4）（5×9+5×8+10×7+10×6）
+        const trimmed = encoded.trim()
+        if (!trimmed) {
+          parsed.error = '编码表达式不能为空'
+          return parsed
+        }
+        
+        // 第一步：解析投放类型
+        const firstChar = trimmed.charAt(0).toUpperCase()
+        if (!['A', 'B', 'C'].includes(firstChar)) {
+          parsed.error = '投放类型编码错误，必须以A、B或C开头'
+          return parsed
+        }
+        
+        parsed.deliveryTypeCode = firstChar
+        switch (firstChar) {
+          case 'A':
+            parsed.deliveryType = '按档位统一投放'
+            break
+          case 'B':
+            parsed.deliveryType = '按档位扩展投放'
+            break
+          case 'C':
+            parsed.deliveryType = '按需投放'
+            break
+        }
+        
+        // 第二步：解析扩展投放类型（仅B类型需要）
+        if (firstChar === 'B') {
+          const secondChar = trimmed.charAt(1)
+          if (!['1', '2', '3', '4', '5'].includes(secondChar)) {
+            parsed.error = 'B类型投放必须指定扩展类型编码（1-5）'
+            return parsed
+          }
+          
+          parsed.extendedTypeCode = secondChar
+          switch (secondChar) {
+            case '1':
+              parsed.extendedType = '档位+区县'
+              break
+            case '2':
+              parsed.extendedType = '档位+市场类型'
+              break
+            case '3':
+              parsed.extendedType = '档位+区县+市场类型'
+              break
+            case '4':
+              parsed.extendedType = '档位+城乡分类代码'
+              break
+            case '5':
+              parsed.extendedType = '档位+业态'
+              break
+          }
+        }
+        
+        // 第三步：解析区域编码和投放量编码
+        const regex = /（([^）]+)）（([^）]+)）/
+        const match = trimmed.match(regex)
+        if (!match) {
+          parsed.error = '编码格式错误，应为：类型+扩展类型（区域编码）（投放量编码）'
+          return parsed
+        }
+        
+        const areaCodeStr = match[1]
+        const positionCodeStr = match[2]
+        
+        // 解析区域编码
+        const areaResult = this.parseAreaCodes(areaCodeStr, parsed.extendedTypeCode)
+        if (!areaResult.isValid) {
+          parsed.error = areaResult.error
+          return parsed
+        }
+        parsed.areaCodes = areaResult.areaCodes
+        parsed.areaNames = areaResult.areaNames
+        
+        // 解析投放量编码
+        const positionResult = this.parsePositionCoding(positionCodeStr)
+        if (!positionResult.isValid) {
+          parsed.error = positionResult.error
+          return parsed
+        }
+        parsed.positionCoding = positionCodeStr
+        parsed.positionData = positionResult.positionData
+        
+        parsed.isValid = true
+        
+      } catch (error) {
+        console.warn('编码表达解析失败:', error)
+        parsed.error = `解析异常: ${error.message}`
+      }
+      
+      return parsed
+    },
+    
+    // 解析区域编码
+    parseAreaCodes(areaCodeStr, extendedTypeCode) {
+      const result = {
+        areaCodes: [],
+        areaNames: [],
+        isValid: false,
+        error: ''
+      }
+      
+      try {
+        // 区域编码映射表
+        const areaMapping = {
+          '1': { // 档位+区县
+            '1': '城区', '2': '丹江', '3': '房县', '4': '郧西',
+            '5': '郧阳', '6': '竹山', '7': '竹溪'
+          },
+          '2': { // 档位+市场类型
+            'C': '城网', 'N': '农网'
+          },
+          '3': { // 档位+区县+市场类型（使用区县编码）
+            '1': '城区', '2': '丹江', '3': '房县', '4': '郧西',
+            '5': '郧阳', '6': '竹山', '7': '竹溪'
+          },
+          '4': { // 档位+城乡分类代码
+            '①': '主城区', '②': '城乡结合区', '③': '镇中心区', '④': '镇乡接合区',
+            '⑤': '特殊区域', '⑥': '乡中心区', '⑦': '村庄'
+          },
+          '5': { // 档位+业态
+            'a': '便利店', 'b': '超市', 'c': '商场', 'd': '烟草专业店',
+            'e': '娱乐服务类', 'f': '其他'
+          }
+        }
+        
+        const mapping = areaMapping[extendedTypeCode] || areaMapping['1'] // 默认使用区县编码
+        
+        // 拆分区域编码（用+分隔）
+        const codes = areaCodeStr.split('+').map(code => code.trim()).filter(code => code)
+        
+        if (codes.length === 0) {
+          result.error = '区域编码不能为空'
+          return result
+        }
+        
+        // 验证每个区域编码
+        for (const code of codes) {
+          if (!mapping[code]) {
+            result.error = `无效的区域编码: ${code}`
+            return result
+          }
+          result.areaCodes.push(code)
+          result.areaNames.push(mapping[code])
+        }
+        
+        result.isValid = true
+        
+      } catch (error) {
+        result.error = `区域编码解析异常: ${error.message}`
+      }
+      
+      return result
+    },
+    
+    // 解析投放量编码
+    parsePositionCoding(positionCodeStr) {
+      const result = {
+        positionData: new Array(30).fill(0),
+        isValid: false,
+        error: ''
+      }
+      
+      try {
+        // 投放量编码格式：5×9+5×8+10×7+10×6
+        // 表示：5个档位投放量9，5个档位投放量8，10个档位投放量7，10个档位投放量6
+        
+        const segments = positionCodeStr.split('+').map(seg => seg.trim()).filter(seg => seg)
+        
+        if (segments.length === 0) {
+          result.error = '投放量编码不能为空'
+          return result
+        }
+        
+        let totalPositions = 0
+        
+        // 解析每个分段
+        for (const segment of segments) {
+          const match = segment.match(/^(\d+)×(\d+)$/)
+          if (!match) {
+            result.error = `投放量编码格式错误: ${segment}，应为"档位数×投放量"格式`
+            return result
+          }
+          
+          const positionCount = parseInt(match[1])
+          const deliveryAmount = parseInt(match[2])
+          
+          if (positionCount <= 0 || positionCount > 30) {
+            result.error = `档位数量错误: ${positionCount}，应在1-30之间`
+            return result
+          }
+          
+          if (deliveryAmount < 0) {
+            result.error = `投放量不能为负数: ${deliveryAmount}`
+            return result
+          }
+          
+          totalPositions += positionCount
+        }
+        
+        // 验证总档位数必须为30
+        if (totalPositions !== 30) {
+          result.error = `总档位数必须为30，当前为: ${totalPositions}`
+          return result
+        }
+        
+        // 填充档位数据（从D30开始往下填）
+        let currentIndex = 0
+        for (const segment of segments) {
+          const match = segment.match(/^(\d+)×(\d+)$/)
+          const positionCount = parseInt(match[1])
+          const deliveryAmount = parseInt(match[2])
+          
+          for (let i = 0; i < positionCount; i++) {
+            result.positionData[currentIndex + i] = deliveryAmount
+          }
+          currentIndex += positionCount
+        }
+        
+        result.isValid = true
+        
+      } catch (error) {
+        result.error = `投放量编码解析异常: ${error.message}`
+      }
+      
+      return result
+    },
+    
+    // 验证编码表达式列表（用户要求的三个验证规则）
+    validateEncodedExpressions(expressions) {
+      const validation = {
+        isValid: false,
+        errors: [],
+        warnings: []
+      }
+      
+      try {
+        // 处理输入：按行分割并过滤空行
+        const lines = expressions.split('\n')
+          .map(line => line.trim())
+          .filter(line => line.length > 0)
+        
+        if (lines.length === 0) {
+          validation.errors.push('编码表达式列表不能为空')
+          return validation
+        }
+        
+        // 解析所有编码表达式
+        const parsedExpressions = []
+        for (const line of lines) {
+          const parsed = this.parseEncodedExpression(line)
+          if (!parsed.isValid) {
+            validation.errors.push(`编码表达式"${line}"解析失败: ${parsed.error}`)
+            return validation
+          }
+          parsedExpressions.push(parsed)
+        }
+        
+        // 验证规则1：仅允许存在一种投放类型（第一个字母一致）
+        const deliveryTypes = [...new Set(parsedExpressions.map(p => p.deliveryTypeCode))]
+        if (deliveryTypes.length > 1) {
+          validation.errors.push(`不允许存在多种投放类型，当前包含: ${deliveryTypes.join(', ')}`)
+          return validation
+        }
+        
+        // 验证规则2：不允许存在重复的投放区域编号
+        const allAreaCodes = []
+        for (const parsed of parsedExpressions) {
+          for (const areaCode of parsed.areaCodes) {
+            if (allAreaCodes.includes(areaCode)) {
+              validation.errors.push(`投放区域编号重复: ${areaCode}`)
+              return validation
+            }
+            allAreaCodes.push(areaCode)
+          }
+        }
+        
+        // 验证规则3：编码表达式的投放量部分必须为30个完整档位（这个在parsePositionCoding中已经验证）
+        // 这里再次检查以确保所有表达式都符合要求
+        for (const parsed of parsedExpressions) {
+          const totalPositions = parsed.positionData.length
+          if (totalPositions !== 30) {
+            validation.errors.push(`编码表达式的投放量部分必须包含30个完整档位，当前为: ${totalPositions}`)
+            return validation
+          }
+        }
+        
+        // 所有验证通过
+        validation.isValid = true
+        validation.parsedExpressions = parsedExpressions
+        
+        // 添加一些有用的信息
+        validation.warnings.push(`共验证了 ${lines.length} 条编码表达式`)
+        validation.warnings.push(`投放类型: ${parsedExpressions[0].deliveryType}`)
+        if (parsedExpressions[0].extendedType) {
+          validation.warnings.push(`扩展类型: ${parsedExpressions[0].extendedType}`)
+        }
+        validation.warnings.push(`涉及区域: ${allAreaCodes.length} 个`)
+        
+      } catch (error) {
+        validation.errors.push(`验证过程异常: ${error.message}`)
+      }
+      
+      return validation
+    },
+    
+    // 检查一致性
+    checkConsistency(parsedEncoding) {
+      const inconsistencies = []
+      
+      // 检查投放类型一致性
+      if (parsedEncoding.deliveryType && 
+          this.searchForm.distributionType && 
+          parsedEncoding.deliveryType !== this.searchForm.distributionType) {
+        inconsistencies.push({
+          type: '投放类型',
+          encoded: parsedEncoding.deliveryType,
+          current: this.searchForm.distributionType
+        })
+      }
+      
+      // 检查扩展投放类型一致性
+      if (parsedEncoding.extendedType && 
+          this.searchForm.extendedType && 
+          parsedEncoding.extendedType !== this.searchForm.extendedType) {
+        inconsistencies.push({
+          type: '扩展投放类型',
+          encoded: parsedEncoding.extendedType,
+          current: this.searchForm.extendedType
+        })
+      }
+      
+      // 这里可以添加更多的一致性检查逻辑
+      // 如档位数据一致性、区域一致性等
+      
+      return inconsistencies
+    },
+    
+    // 显示一致性检查对话框
+    async showConsistencyDialog(inconsistencies) {
+      const inconsistencyText = inconsistencies.map(item => 
+        `• ${item.type}: 编码表达为"${item.encoded}"，当前设置为"${item.current}"`
+      ).join('\n')
+      
+      const message = `检测到以下不一致项：\n\n${inconsistencyText}\n\n请选择处理方式：`
+      
+      try {
+        const result = await ElMessageBox.confirm(
+          message,
+          '数据一致性检查',
+          {
+            confirmButtonText: '强制更新（忽略冲突）',
+            cancelButtonText: '取消操作',
+            type: 'warning',
+            dangerouslyUseHTMLString: false,
+            customClass: 'consistency-check-dialog',
+            beforeClose: (action, instance, done) => {
+              if (action === 'confirm') {
+                instance.confirmButtonText = '强制更新中...'
+                instance.confirmButtonLoading = true
+                setTimeout(() => {
+                  done()
+                }, 300)
+              } else {
+                done()
+              }
+            }
+          }
+        )
+        
+        if (result === 'confirm') {
+          ElMessage.warning('已选择强制更新，将忽略一致性冲突')
+          return { passed: true, forced: true }
+        }
+        
+      } catch (error) {
+        if (error === 'cancel') {
+          ElMessage.info('已取消更新操作')
+        }
+      }
+      
+      return { passed: false }
     }
   }
 }
@@ -885,6 +2250,77 @@ export default {
   background: #f8f9fa;
   border-radius: 8px;
   border: 1px solid #e4e7ed;
+}
+
+.position-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.position-header .el-divider {
+  margin: 0;
+  flex: 1;
+}
+
+.position-view-toggle {
+  margin-left: 20px;
+}
+
+.position-view-toggle .el-button-group .el-button {
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+/* 三维图表弹窗样式 */
+.chart-dialog :deep(.el-dialog__header) {
+  background: linear-gradient(90deg, #409eff, #67c23a);
+  color: white;
+  padding: 20px 24px;
+  border-radius: 8px 8px 0 0;
+}
+
+.chart-dialog :deep(.el-dialog__title) {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.chart-dialog :deep(.el-dialog__close) {
+  color: white;
+  font-size: 18px;
+}
+
+.chart-dialog :deep(.el-dialog__close:hover) {
+  color: #f0f0f0;
+}
+
+.chart-dialog :deep(.el-dialog__body) {
+  padding: 0;
+  background: #f8f9fa;
+  min-height: 1125px;
+}
+
+.chart-dialog :deep(.el-dialog) {
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-dialog :deep(.el-dialog__footer) {
+  border-top: 1px solid #e4e7ed;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 0 0 8px 8px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 .position-grid {
@@ -997,6 +2433,182 @@ export default {
 
 .delete-area-tips .el-alert {
   margin: 8px 0;
+}
+
+/* 编码化表达区域样式 */
+.encoded-expression-section {
+  margin: 20px 0;
+  padding: 20px;
+  background: #f0f7ff;
+  border-radius: 8px;
+  border: 1px solid #409eff;
+}
+
+.encoded-expression-input-container {
+  margin-top: 15px;
+}
+
+.encoded-expression-form-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.encoded-expression-form-item :deep(.el-form-item__label) {
+  font-weight: 600;
+  color: #409eff;
+}
+
+.encoded-expression-form-item :deep(.el-input-group__prepend) {
+  background: #409eff;
+  color: white;
+  border-color: #409eff;
+}
+
+.encoded-expression-form-item :deep(.el-textarea__inner) {
+  font-family: 'Consolas', 'Monaco', 'Menlo', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  background: #fafbfc;
+  border: 1px solid #409eff;
+}
+
+.encoded-expression-form-item :deep(.el-textarea__inner:focus) {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+}
+
+.encoded-expression-form-item :deep(.el-textarea__inner[readonly]) {
+  background: #f5f7fa;
+  color: #c0c4cc;
+  cursor: not-allowed;
+}
+
+.decoded-expression-display {
+  margin-top: 15px;
+}
+
+.decoded-expression-display :deep(.el-alert__title) {
+  font-family: 'Microsoft YaHei', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.decoded-expression-display :deep(.el-alert__description) {
+  font-size: 12px;
+  color: #606266;
+  margin-top: 8px;
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+/* 编码表达式实时验证状态样式 */
+.encoded-expression-validation {
+  margin-top: 15px;
+}
+
+.encoded-expression-validation :deep(.el-alert__title) {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.encoded-expression-validation :deep(.el-alert__description) {
+  white-space: pre-line;
+  line-height: 1.6;
+  font-size: 13px;
+}
+
+/* 成功状态 */
+.encoded-expression-validation :deep(.el-alert--success) {
+  border-color: #67c23a;
+  background-color: #f0f9ff;
+}
+
+/* 错误状态 */
+.encoded-expression-validation :deep(.el-alert--error) {
+  border-color: #f56c6c;
+  background-color: #fef0f0;
+}
+
+/* 信息状态 */
+.encoded-expression-validation :deep(.el-alert--info) {
+  border-color: #909399;
+  background-color: #f4f4f5;
+}
+
+/* 编码表达提示信息样式 */
+.encoded-expression-hint {
+  margin-top: 15px;
+}
+
+.encoded-expression-hint :deep(.el-alert__title) {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.encoded-expression-hint :deep(.el-alert) {
+  border-color: #67c23a;
+  background-color: #f0f9ff;
+}
+
+/* 编辑模式状态样式 */
+.edit-mode-status {
+  margin-top: 15px;
+}
+
+.edit-mode-status :deep(.el-alert__description) {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #606266;
+  margin-top: 5px;
+}
+
+.edit-mode-status :deep(.el-alert__title) {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 一致性检查警告样式 */
+.consistency-warning {
+  margin-top: 15px;
+}
+
+.consistency-warning :deep(.el-alert) {
+  border-color: #e6a23c;
+}
+
+.consistency-warning :deep(.el-alert__title) {
+  font-weight: 600;
+  color: #e6a23c;
+}
+
+.consistency-warning :deep(.el-alert__description) p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+/* 一致性检查对话框样式 */
+:deep(.consistency-check-dialog) {
+  .el-message-box {
+    width: 500px;
+    border-radius: 12px;
+  }
+  
+  .el-message-box__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #e6a23c;
+  }
+  
+  .el-message-box__content {
+    padding: 20px 20px 30px;
+  }
+  
+  .el-message-box__message {
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
 }
 
 </style>

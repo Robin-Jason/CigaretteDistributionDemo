@@ -30,6 +30,12 @@ public class DemoTestData {
     @Column(name = "DELIVERY_AREA")
     private String deliveryArea;
     
+    @Column(name = "DELIVERY_METHOD")
+    private String deliveryMethod;
+    
+    @Column(name = "DELIVERY_ETYPE")
+    private String deliveryEtype;
+    
     @Column(name = "D30")
     private BigDecimal d30;
     
@@ -125,4 +131,7 @@ public class DemoTestData {
     
     @Column(name = "ACTUAL_DELIVERY")
     private BigDecimal actualDelivery;
+    
+    @Column(name = "DEPLOYINFO_CODE")
+    private String deployinfoCode;
 }

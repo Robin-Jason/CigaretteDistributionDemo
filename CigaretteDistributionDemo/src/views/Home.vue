@@ -1154,9 +1154,9 @@ export default {
 }
 
 .data-table-section {
-  flex: 1.2;
-  min-height: 280px;
-  max-height: 32vh;
+  flex: 1;
+  min-height: 200px;
+  max-height: 25vh;
   padding: 12px;
   background: white;
   border-radius: 8px;
@@ -1165,11 +1165,14 @@ export default {
 }
 
 .form-section {
-  flex: 0 0 auto;
+  flex: 1.5;
+  min-height: 300px;
+  max-height: 60vh;
   padding: 12px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
 }
 
 /* 生成分配方案结果弹窗样式 */

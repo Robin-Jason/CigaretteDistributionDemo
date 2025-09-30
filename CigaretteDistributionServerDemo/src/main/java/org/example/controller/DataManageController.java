@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.dto.BatchUpdateFromExpressionsRequestDto;
 import org.example.dto.QueryRequestDto;
 import org.example.dto.UpdateCigaretteRequestDto;
 import org.example.dto.DeleteAreasRequestDto;
@@ -9,6 +10,7 @@ import org.example.entity.DemoTestData;
 import org.example.repository.DemoTestAdvDataRepository;
 import org.example.repository.DemoTestDataRepository;
 import org.example.service.DataManagementService;
+import org.example.service.EncodeDecodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +43,9 @@ public class DataManageController {
     
     @Autowired
     private DemoTestDataRepository testDataRepository;
+    
+    @Autowired
+    private EncodeDecodeService encodeDecodeService;
 
     /**
      * 查询卷烟分配数据 - 返回原始数据并添加预投放量和实际投放量
@@ -57,7 +62,11 @@ public class DataManageController {
             // 按卷烟代码+名称分组计算总实际投放量
             Map<String, BigDecimal> totalActualDeliveryMap = calculateTotalActualDeliveryByTobacco(rawDataList);
             
-            // 直接返回原始数据，添加预投放量和实际投放量
+            // 按卷烟代码+名称分组，用于编码解码处理
+            Map<String, List<DemoTestData>> cigaretteGroupMap = rawDataList.stream()
+                .collect(java.util.stream.Collectors.groupingBy(data -> data.getCigCode() + "_" + data.getCigName()));
+            
+            // 返回原始数据，添加预投放量、实际投放量、编码表达和解码表达
             List<Map<String, Object>> result = new ArrayList<>();
             for (DemoTestData data : rawDataList) {
                 Map<String, Object> record = new HashMap<>();
@@ -70,16 +79,40 @@ public class DataManageController {
                 record.put("weekSeq", data.getWeekSeq());
                 record.put("remark", data.getBz());
 
-                // 获取预投放量、投放类型和扩展投放类型（从demo_test_ADVdata表）
+                // 获取预投放量（从demo_test_ADVdata表）和投放类型（从demo_test_data表）
                 Map<String, Object> advInfo = getAdvDataInfo(data.getCigCode(), data.getCigName());
                 record.put("advAmount", advInfo.get("advAmount")); // 预投放量
-                record.put("deliveryMethod", advInfo.get("deliveryMethod")); // 投放类型
-                record.put("deliveryEtype", advInfo.get("deliveryEtype")); // 扩展投放类型
+                record.put("deliveryMethod", data.getDeliveryMethod()); // 投放类型（从demo_test_data表）
+                record.put("deliveryEtype", data.getDeliveryEtype()); // 扩展投放类型（从demo_test_data表）
 
                 // 获取该卷烟所有区域的总实际投放量
                 String tobaccoKey = data.getCigCode() + "_" + data.getCigName();
                 BigDecimal totalActualDelivery = totalActualDeliveryMap.getOrDefault(tobaccoKey, BigDecimal.ZERO);
                 record.put("actualDelivery", totalActualDelivery);
+
+                // 为当前记录生成对应的编码表达和解码表达
+                List<DemoTestData> cigaretteRecords = cigaretteGroupMap.get(tobaccoKey);
+                
+                String encodedExpression = "";
+                String decodedExpression = "";
+                
+                if (cigaretteRecords != null && !cigaretteRecords.isEmpty()) {
+                    // 为该特定区域生成编码表达式
+                    encodedExpression = encodeDecodeService.encodeForSpecificArea(
+                        data.getCigCode(),
+                        data.getCigName(),
+                        data.getDeliveryMethod(),
+                        data.getDeliveryEtype(),
+                        data.getDeliveryArea(),
+                        cigaretteRecords
+                    );
+                    
+                    // 生成解码表达
+                    decodedExpression = encodeDecodeService.decode(encodedExpression);
+                }
+                
+                record.put("encodedExpression", encodedExpression);
+                record.put("decodedExpression", decodedExpression);
 
                 // 添加所有档位数据
                 record.put("d30", data.getD30());
@@ -310,5 +343,71 @@ public class DataManageController {
         }
         
         return totalActualDeliveryMap;
+    }
+
+    /**
+     * 根据编码表达式批量更新卷烟信息
+     * 前端传入某卷烟的多条编码表达式，控制层解码后调用DataManagementService进行更新
+     */
+    @PostMapping("/batch-update-from-expressions")
+    @CrossOrigin
+    public ResponseEntity<Map<String, Object>> batchUpdateFromExpressions(@Valid @RequestBody BatchUpdateFromExpressionsRequestDto request) {
+        log.info("接收编码表达式批量更新请求，卷烟: {} - {}, 编码表达式数量: {}", 
+                request.getCigCode(), request.getCigName(), request.getEncodedExpressions().size());
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // 1. 验证请求参数
+            if (request.getEncodedExpressions() == null || request.getEncodedExpressions().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "编码表达式列表不能为空");
+                response.put("error", "INVALID_PARAMETERS");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // 2. 调用DataManagementService的新批量更新方法
+            Map<String, Object> batchResult = dataManagementService.batchUpdateFromEncodedExpressions(
+                request.getCigCode(), 
+                request.getCigName(),
+                request.getYear(),
+                request.getMonth(),
+                request.getWeekSeq(),
+                request.getEncodedExpressions(),
+                request.getRemark()
+            );
+
+            // 3. 构建响应结果
+            boolean overallSuccess = (Boolean) batchResult.get("success");
+            response.put("success", overallSuccess);
+            response.put("message", batchResult.get("message"));
+            response.put("operation", batchResult.get("operation"));
+            response.put("totalExpressions", request.getEncodedExpressions().size());
+            
+            // 根据操作类型添加不同的统计信息
+            if (overallSuccess) {
+                if ("投放类型变更".equals(batchResult.get("operation"))) {
+                    response.put("deletedRecords", batchResult.get("deletedRecords"));
+                    response.put("createdRecords", batchResult.get("createdRecords"));
+                } else if ("增量更新".equals(batchResult.get("operation"))) {
+                    response.put("newAreas", batchResult.get("newAreas"));
+                    response.put("updatedAreas", batchResult.get("updatedAreas"));
+                    response.put("deletedAreas", batchResult.get("deletedAreas"));
+                }
+            }
+
+            log.info("编码表达式批量更新完成，卷烟: {} - {}, 操作类型: {}, 结果: {}", 
+                    request.getCigCode(), request.getCigName(), batchResult.get("operation"), 
+                    overallSuccess ? "成功" : "失败");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("编码表达式批量更新过程中发生系统错误", e);
+            response.put("success", false);
+            response.put("message", "系统内部错误: " + e.getMessage());
+            response.put("error", e.getClass().getSimpleName());
+            return ResponseEntity.internalServerError().body(response);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package org.example.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.entity.DemoTestData;
 import org.example.service.BusinessFormatDIstribution.BussinessFormatDistributionService;
 import org.example.service.CityUnifiedDistribution.CityPredictionService;
 import org.example.service.CountyDistribution.CountyCigaretteDistributionService;
@@ -42,6 +43,9 @@ public class DistributionCalculateService {
     
     @Autowired
     private CityPredictionService cityService;
+    
+    @Autowired
+    private EncodeDecodeService encodeDecodeService;
 
     
     // ==================== 一键生成分配方案并写回数据库服务 ====================
@@ -68,6 +72,17 @@ public class DistributionCalculateService {
             List<Map<String, Object>> advDataList = jdbcTemplate.queryForList(advDataSql, year, month, weekSeq);
             log.info("获取{}年{}月第{}周的预投放量数据数量: {}", year, month, weekSeq, advDataList.size());
             
+            // 调试日志：检查ADVdata表的第一条数据，查看字段情况
+            if (!advDataList.isEmpty()) {
+                Map<String, Object> firstRecord = advDataList.get(0);
+                log.debug("ADVdata表第一条记录字段检查:");
+                log.debug("  cig_code: {}", firstRecord.get("cig_code"));
+                log.debug("  cig_name: {}", firstRecord.get("cig_name"));
+                log.debug("  delivery_method: {}", firstRecord.get("delivery_method"));
+                log.debug("  delivery_etype: {}", firstRecord.get("delivery_etype"));
+                log.debug("  所有字段: {}", firstRecord.keySet());
+            }
+            
             int successCount = 0;
             int totalCount = 0;
             
@@ -79,6 +94,9 @@ public class DistributionCalculateService {
                 BigDecimal adv = (BigDecimal) advData.get("adv");
                 String deliveryArea = (String) advData.get("delivery_area");
                 String deliveryEtype = (String) advData.get("delivery_etype");
+                
+                // 调试日志：检查从ADVdata读取的关键字段值
+                log.debug("处理卷烟: {} - {}, delivery_etype: {}", cigCode, cigName, deliveryEtype);
                 // 从demo_test_ADVdata表中获取对应的日期信息
                 // 处理year字段可能是Date类型的情况
                 Integer advYear = extractYearFromData(advData.get("year"));
@@ -101,6 +119,10 @@ public class DistributionCalculateService {
                         List<String> targetList;
                         BigDecimal[][] allocationMatrix;
                         String deliveryMethod = (String) advData.get("delivery_method");
+                        
+                        // 调试日志：检查关键字段值
+                        log.debug("卷烟: {} - {}, deliveryMethod: {}, deliveryEtype: {}", 
+                                 cigCode, cigName, deliveryMethod, deliveryEtype);
                         
                         // 按投放方式分类处理
                         if ("按档位统一投放".equals(deliveryMethod)) {
@@ -160,7 +182,7 @@ public class DistributionCalculateService {
                         if (!targetList.isEmpty() && allocationMatrix != null) {
                             // 写回数据库，使用demo_test_ADVdata表中的日期信息
                             boolean writeBackSuccess = writeBackToDatabase(allocationMatrix, targetList, 
-                                cigCode, cigName, advYear, advMonth, advWeekSeq, deliveryEtype);
+                                cigCode, cigName, advYear, advMonth, advWeekSeq, deliveryMethod, deliveryEtype);
                             
                             if (writeBackSuccess) {
                                 successCount++;
@@ -319,19 +341,28 @@ public class DistributionCalculateService {
                                       Integer year, 
                                       Integer month, 
                                       Integer weekSeq,
+                                      String deliveryMethod,
                                       String deliveryEtype) {
         try {
-            String insertSql = "INSERT INTO demo_test_data (cig_code, cig_name, delivery_area, year, month, week_seq, " +
-                "d30, d29, d28, d27, d26, d25, d24, d23, d22, d21, d20, d19, d18, d17, d16, d15, d14, d13, d12, d11, d10, d9, d8, d7, d6, d5, d4, d3, d2, d1, actual_delivery, bz) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+            // 调试日志：检查writeBackToDatabase接收到的参数
+            log.debug("writeBackToDatabase - 卷烟: {} - {}, deliveryMethod: {}, deliveryEtype: {}", 
+                     cigCode, cigName, deliveryMethod, deliveryEtype);
+            
+            // 构建所有区域的DemoTestData记录，用于编码表达式生成
+            List<DemoTestData> allCigaretteRecords = buildAllCigaretteRecords(cigCode, cigName, deliveryMethod, deliveryEtype, allocationMatrix, targetList);
+            
+            String insertSql = "INSERT INTO demo_test_data (cig_code, cig_name, delivery_area, delivery_method, delivery_etype, year, month, week_seq, " +
+                "d30, d29, d28, d27, d26, d25, d24, d23, d22, d21, d20, d19, d18, d17, d16, d15, d14, d13, d12, d11, d10, d9, d8, d7, d6, d5, d4, d3, d2, d1, actual_delivery, deployinfo_code, bz) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE " +
+                "delivery_method=VALUES(delivery_method), delivery_etype=VALUES(delivery_etype), " +
                 "d30=VALUES(d30), d29=VALUES(d29), d28=VALUES(d28), d27=VALUES(d27), d26=VALUES(d26), " +
                 "d25=VALUES(d25), d24=VALUES(d24), d23=VALUES(d23), d22=VALUES(d22), d21=VALUES(d21), " +
                 "d20=VALUES(d20), d19=VALUES(d19), d18=VALUES(d18), d17=VALUES(d17), d16=VALUES(d16), " +
                 "d15=VALUES(d15), d14=VALUES(d14), d13=VALUES(d13), d12=VALUES(d12), d11=VALUES(d11), " +
                 "d10=VALUES(d10), d9=VALUES(d9), d8=VALUES(d8), d7=VALUES(d7), d6=VALUES(d6), " +
                 "d5=VALUES(d5), d4=VALUES(d4), d3=VALUES(d3), d2=VALUES(d2), d1=VALUES(d1), " +
-                "actual_delivery=VALUES(actual_delivery), bz=VALUES(bz)";
+                "actual_delivery=VALUES(actual_delivery), deployinfo_code=VALUES(deployinfo_code), bz=VALUES(bz)";
             
             // 为每个目标（区域或业态类型）执行插入或更新
             for (int i = 0; i < targetList.size(); i++) {
@@ -348,8 +379,12 @@ public class DistributionCalculateService {
                     throw new RuntimeException(errorMessage, e);
                 }
                 
+                // 为当前区域生成对应的编码表达式
+                String currentAreaEncodedExpression = encodeDecodeService.encodeForSpecificArea(
+                    cigCode, cigName, deliveryMethod, deliveryEtype, target, allCigaretteRecords);
+                
                 Object[] params = {
-                    cigCode, cigName, target, year, month, weekSeq,
+                    cigCode, cigName, target, deliveryMethod, deliveryEtype, year, month, weekSeq,
                     allocationMatrix[i][0],  // D30
                     allocationMatrix[i][1],  // D29
                     allocationMatrix[i][2],  // D28
@@ -381,18 +416,24 @@ public class DistributionCalculateService {
                     allocationMatrix[i][28], // D2
                     allocationMatrix[i][29], // D1
                     actualDelivery,          // ACTUAL_DELIVERY
+                    currentAreaEncodedExpression,  // DEPLOYINFO_CODE - 该区域所属的编码表达式
                     "算法自动生成"
                 };
                 
-                jdbcTemplate.update(insertSql, params);
-                log.debug("目标 {} 的分配矩阵已写入数据库", target);
+                // 调试日志：检查SQL执行前的关键参数值
+                log.debug("SQL执行参数 - target: {}, deliveryMethod: {}, deliveryEtype: {}, encodedExpression: {}", 
+                         target, deliveryMethod, deliveryEtype, currentAreaEncodedExpression);
+                
+                int updatedRows = jdbcTemplate.update(insertSql, params);
+                log.debug("目标 {} 的分配矩阵已写入数据库，影响行数: {}", target, updatedRows);
             }
             
             log.info("卷烟 {} 的分配矩阵已成功写回数据库", cigName);
             return true;
             
         } catch (Exception e) {
-            log.error("写回数据库失败，卷烟: {}, 错误: {}", cigName, e.getMessage(), e);
+            log.error("写回数据库失败，卷烟: {} - {}, deliveryMethod: {}, deliveryEtype: {}, 错误: {}", 
+                     cigCode, cigName, deliveryMethod, deliveryEtype, e.getMessage(), e);
             return false;
         }
     }
@@ -575,5 +616,59 @@ public class DistributionCalculateService {
         } catch (Exception e) {
             return BigDecimal.ZERO;
         }
+    }
+    
+    /**
+     * 构建所有区域的DemoTestData记录列表
+     * 用于编码表达式生成
+     */
+    private List<DemoTestData> buildAllCigaretteRecords(String cigCode, String cigName, String deliveryMethod, String deliveryEtype,
+                                                      BigDecimal[][] allocationMatrix, List<String> targetList) {
+        List<DemoTestData> cigaretteRecords = new ArrayList<>();
+        
+        for (int i = 0; i < targetList.size(); i++) {
+            DemoTestData record = new DemoTestData();
+            record.setCigCode(cigCode);
+            record.setCigName(cigName);
+            record.setDeliveryArea(targetList.get(i));
+            record.setDeliveryMethod(deliveryMethod);
+            record.setDeliveryEtype(deliveryEtype);
+            
+            // 设置30个档位的分配值
+            record.setD30(allocationMatrix[i][0]);
+            record.setD29(allocationMatrix[i][1]);
+            record.setD28(allocationMatrix[i][2]);
+            record.setD27(allocationMatrix[i][3]);
+            record.setD26(allocationMatrix[i][4]);
+            record.setD25(allocationMatrix[i][5]);
+            record.setD24(allocationMatrix[i][6]);
+            record.setD23(allocationMatrix[i][7]);
+            record.setD22(allocationMatrix[i][8]);
+            record.setD21(allocationMatrix[i][9]);
+            record.setD20(allocationMatrix[i][10]);
+            record.setD19(allocationMatrix[i][11]);
+            record.setD18(allocationMatrix[i][12]);
+            record.setD17(allocationMatrix[i][13]);
+            record.setD16(allocationMatrix[i][14]);
+            record.setD15(allocationMatrix[i][15]);
+            record.setD14(allocationMatrix[i][16]);
+            record.setD13(allocationMatrix[i][17]);
+            record.setD12(allocationMatrix[i][18]);
+            record.setD11(allocationMatrix[i][19]);
+            record.setD10(allocationMatrix[i][20]);
+            record.setD9(allocationMatrix[i][21]);
+            record.setD8(allocationMatrix[i][22]);
+            record.setD7(allocationMatrix[i][23]);
+            record.setD6(allocationMatrix[i][24]);
+            record.setD5(allocationMatrix[i][25]);
+            record.setD4(allocationMatrix[i][26]);
+            record.setD3(allocationMatrix[i][27]);
+            record.setD2(allocationMatrix[i][28]);
+            record.setD1(allocationMatrix[i][29]);
+            
+            cigaretteRecords.add(record);
+        }
+        
+        return cigaretteRecords;
     }
 }
