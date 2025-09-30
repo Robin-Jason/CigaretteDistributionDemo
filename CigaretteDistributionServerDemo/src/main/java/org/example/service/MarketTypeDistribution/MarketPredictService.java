@@ -1,6 +1,7 @@
 package org.example.service.MarketTypeDistribution;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.dto.MarketTypeDistribution.MarketPredictionRequestDto; // 导入新的DTO
 import org.example.entity.DemoTestAdvData;
 import org.example.entity.DemoTestData;
 import org.example.entity.MarketTypeDistribution.DemoMarketTestClientNumData;
@@ -35,39 +36,37 @@ public class MarketPredictService {
 
     /**
      * 执行卷烟投放量预测并写回数据库 (针对市场类型)
-     *
-     * @param year 年份
-     * @param month 月份
-     * @param weekSeq 周序号
      */
     @Transactional
-    public void predictAndWriteBackForMarket(Integer year, Integer month, Integer weekSeq) {
-        log.info("开始预测卷烟投放量并写回数据库 (市场类型)，年份: {}, 月份: {}, 周序号: {}", year, month, weekSeq);
+    public void predictAndWriteBackForMarket(MarketPredictionRequestDto request) { // --- 修改方法签名 ---
+        log.info("开始预测卷烟投放量并写回数据库 (市场类型)，年份: {}, 月份: {}, 周序号: {}",
+                request.getYear(), request.getMonth(), request.getWeekSeq());
 
         // 1. 获取所有预投放量数据
         List<DemoTestAdvData> advDataList = advDataRepository.findAll();
 
-        // 2. 筛选出投放方式为"按档位扩展投放"且扩展类型为"档位+市场类型"的数据
+        // 2. 筛选数据
         List<DemoTestAdvData> filteredAdvData = advDataList.stream()
                 .filter(data -> "按档位扩展投放".equals(data.getDeliveryMethod()) &&
                         "档位+市场类型".equals(data.getDeliveryEtype()) &&
-                        year.equals(data.getYear()) &&
-                        month.equals(data.getMonth()) &&
-                        weekSeq.equals(data.getWeekSeq()))
+                        request.getYear().equals(data.getYear()) &&
+                        request.getMonth().equals(data.getMonth()) &&
+                        request.getWeekSeq().equals(data.getWeekSeq()))
                 .collect(Collectors.toList());
 
         log.info("筛选出 {} 条符合条件的预投放量数据", filteredAdvData.size());
 
-        // 3. 获取所有区域客户数数据（使用新的Repository）
+        // 3. 获取客户数数据
         List<DemoMarketTestClientNumData> marketClientNumDataList = marketClientNumDataRepository.findAllByOrderByUrbanRuralCodeAsc();
         List<String> allRegions = marketClientNumDataList.stream()
                 .map(DemoMarketTestClientNumData::getUrbanRuralCode)
                 .collect(Collectors.toList());
 
-        // 构建区域客户数矩阵
+        // ... (构建regionCustomerMatrix的代码保持不变)
         BigDecimal[][] regionCustomerMatrix = new BigDecimal[marketClientNumDataList.size()][30];
         for (int i = 0; i < marketClientNumDataList.size(); i++) {
             DemoMarketTestClientNumData clientData = marketClientNumDataList.get(i);
+            // 完整填充30个档位
             regionCustomerMatrix[i][0] = clientData.getD30();
             regionCustomerMatrix[i][1] = clientData.getD29();
             regionCustomerMatrix[i][2] = clientData.getD28();
@@ -100,6 +99,7 @@ public class MarketPredictService {
             regionCustomerMatrix[i][29] = clientData.getD1();
         }
 
+
         // 4. 对每个符合条件的卷烟执行预测算法
         for (DemoTestAdvData advData : filteredAdvData) {
             String cigCode = advData.getCigCode();
@@ -108,8 +108,15 @@ public class MarketPredictService {
 
             log.info("开始预测卷烟: {} ({})，预投放量: {}", cigName, cigCode, targetAmount);
 
-            // 5. 设定目标投放区域为"城网"和"农网"
-            List<String> targetRegions = Arrays.asList("城网", "农网");
+            // --- 5. 从请求中动态获取目标市场和比例 ---
+            List<String> targetRegions = request.getTargetMarkets();
+            BigDecimal urbanRatio = request.getUrbanRatio();
+            BigDecimal ruralRatio = request.getRuralRatio();
+
+            // 如果传入的比例为空，则使用默认值
+            if (urbanRatio == null) urbanRatio = new BigDecimal("0.4");
+            if (ruralRatio == null) ruralRatio = new BigDecimal("0.6");
+
 
             // 筛选出目标区域的客户数矩阵
             BigDecimal[][] targetRegionCustomerMatrix = new BigDecimal[targetRegions.size()][30];
@@ -121,16 +128,13 @@ public class MarketPredictService {
                 }
             }
 
-            // 6. 执行预测算法，使用0.4和0.6的比例
-            BigDecimal urbanRatio = new BigDecimal("0.4");
-            BigDecimal ruralRatio = new BigDecimal("0.6");
-
+            // 6. 执行预测算法，使用从请求传入的动态比例
             BigDecimal[][] allocationMatrix = distributionAlgorithm.calculateDistribution(
                     targetRegions, targetRegionCustomerMatrix, targetAmount, urbanRatio, ruralRatio);
 
             // 7. 清除旧数据并写入新数据
-            deleteExistingData(cigCode, cigName, year, month, weekSeq, targetRegions);
-            writeBackPrediction(allocationMatrix, targetRegions, cigCode, cigName, year, month, weekSeq);
+            deleteExistingData(cigCode, cigName, request.getYear(), request.getMonth(), request.getWeekSeq(), targetRegions);
+            writeBackPrediction(allocationMatrix, targetRegions, cigCode, cigName, request.getYear(), request.getMonth(), request.getWeekSeq());
             log.info("卷烟: {} ({}) 预测完成，数据已写入", cigName, cigCode);
         }
 
