@@ -1,6 +1,10 @@
 # 更新说明
 
-**项目clone到本地运行需要前端npm install重新安装一下依赖再npm run serve启动，后端同步一下maven依赖再mvn spring-boot:run启动**
+**项目clone到本地运行前进行如下步骤：**
+
+1. 前端npm install重新安装一下依赖再npm run serve启动
+2. 后端applicantion修改数据库账户和密码
+3. 后端同步一下maven依赖再mvn spring-boot:run启动
 
 ## 9.30
 

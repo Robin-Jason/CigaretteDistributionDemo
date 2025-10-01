@@ -321,8 +321,8 @@ export default {
           }
         },
         grid3D: {
-          boxWidth: 80,
-          boxDepth: 80,
+          boxWidth: 120,   // 增大3D网格宽度，提供更多空间
+          boxDepth: 120,   // 增大3D网格深度，提供更多空间
           boxHeight: 60,
           alpha: 25,
           beta: 40,
@@ -334,7 +334,7 @@ export default {
             panSensitivity: 1,
             alpha: 25,
             beta: 40,
-            distance: 200
+            distance: 250   // 增加观察距离，避免柱子显得过于密集
           },
           light: {
             main: {
@@ -352,6 +352,9 @@ export default {
           type: 'bar3D',
           data: this.chartData,
           shading: 'lambert',
+          // 增加柱子间距配置，解决重叠问题
+          barGap: 0.4,                // 同一类目下不同柱子的间距（40%间距）
+          barCategoryGap: 0.5,        // 不同类目间柱子的间距（50%间距）
           emphasis: {
             label: {
               show: true,
@@ -370,7 +373,10 @@ export default {
                 return colorMap.get(amount) || '#8B0000' // 默认深红色
               }
             })(this.colorMap),
-            opacity: 0.8
+            opacity: 0.8,
+            // 增加边框，进一步区分不同颜色的柱子
+            borderWidth: 1,
+            borderColor: 'rgba(255,255,255,0.3)'
           },
           label: {
             show: false,
