@@ -1,6 +1,7 @@
 package org.example.controller.DebugOrTest;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.example.dto.MarketTypeDistribution.MarketPredictionRequestDto;
 import org.example.service.MarketTypeDistribution.MarketPredictService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class MarketPredictController {
 
     @Autowired
-    private MarketPredictService marketPredictService;
+    private MarketPredictService marketPredictService; // 新增注入
 
     /**
      * 预测卷烟投放量并写回数据库 (市场类型)
@@ -29,15 +30,13 @@ public class MarketPredictController {
      */
     @PostMapping("/run-market-prediction-new")
     public ResponseEntity<Map<String, Object>> runMarketPredictionNew(@Valid @RequestBody MarketPredictionRequestDto request) {
-        log.info("接收到卷烟投放量预测请求 (市场类型)，年份: {}, 月份: {}, 周序号: {}, 目标市场: {}, 城网比例: {}, 农网比例: {}",
-                request.getYear(), request.getMonth(), request.getWeekSeq(),
-                request.getTargetMarkets(), request.getUrbanRatio(), request.getRuralRatio());
+        log.info("接收到卷烟投放量预测请求 (市场类型)，年份: {}, 月份: {}, 周序号: {}",
+                request.getYear(), request.getMonth(), request.getWeekSeq());
 
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // --- 修改此处，传递整个request对象 ---
-            marketPredictService.predictAndWriteBackForMarket(request);
+            marketPredictService.predictAndWriteBackForMarket(request.getYear(), request.getMonth(), request.getWeekSeq());
 
             response.put("success", true);
             response.put("message", "卷烟投放量预测成功，数据已写入demo_test_data表");

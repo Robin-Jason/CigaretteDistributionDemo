@@ -4,8 +4,6 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Max;
-import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 public class MarketPredictionRequestDto {
@@ -23,12 +21,4 @@ public class MarketPredictionRequestDto {
     @Min(value = 1, message = "周序号不能小于1")
     @Max(value = 5, message = "周序号不能大于5")
     private Integer weekSeq;
-
-    // --- 新增字段 ---
-    @NotNull(message = "目标市场列表不能为空")
-    private List<String> targetMarkets; // e.g., ["城网", "农网"] or just ["城网"]
-
-    private BigDecimal urbanRatio; // 城网比例，例如 0.4
-
-    private BigDecimal ruralRatio; // 农网比例，例如 0.6
 }
