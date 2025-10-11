@@ -1,9 +1,9 @@
 package org.example.service;
 
-import org.example.entity.DemoTestAdvData;
-import org.example.entity.DemoTestData;
-import org.example.repository.DemoTestAdvDataRepository;
-import org.example.repository.DemoTestDataRepository;
+import org.example.entity.CigaretteDistributionInfoData;
+import org.example.entity.CigaretteDistributionPredictionData;
+import org.example.repository.CigaretteDistributionInfoDataRepository;
+import org.example.repository.CigaretteDistributionPredictionDataRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -26,16 +26,16 @@ import static org.mockito.Mockito.*;
 public class CommonServiceTest {
 
     @Mock
-    private DemoTestAdvDataRepository advDataRepository;
+    private CigaretteDistributionInfoDataRepository advDataRepository;
 
     @Mock
-    private DemoTestDataRepository testDataRepository;
+    private CigaretteDistributionPredictionDataRepository testDataRepository;
 
     @Mock
     private JdbcTemplate jdbcTemplate;
 
     @InjectMocks
-    private CommonService commonService;
+    private org.example.service.impl.CommonServiceImpl commonService;
 
     @BeforeEach
     void setUp() {
@@ -52,13 +52,13 @@ public class CommonServiceTest {
         String deliveryEtype = "档位+城乡分类代码";
 
         // 模拟数据库返回的预投放量数据
-        List<DemoTestAdvData> mockAdvData = createMockAdvData(deliveryEtype);
+        List<CigaretteDistributionInfoData> mockAdvData = createMockAdvData(deliveryEtype);
         
         when(advDataRepository.findByYearAndMonthAndWeekSeq(year, month, weekSeq))
             .thenReturn(mockAdvData);
 
         // 执行测试
-        List<DemoTestAdvData> result = commonService.getAdvDataByDeliveryType(
+        List<CigaretteDistributionInfoData> result = commonService.getAdvDataByDeliveryType(
             deliveryEtype, year, month, weekSeq);
 
         // 验证结果
@@ -66,7 +66,7 @@ public class CommonServiceTest {
         assertEquals(2, result.size(), "应该返回2条匹配的数据");
         
         // 验证数据内容
-        DemoTestAdvData firstResult = result.get(0);
+        CigaretteDistributionInfoData firstResult = result.get(0);
         assertEquals("档位+城乡分类代码", firstResult.getDeliveryEtype(), 
             "投放类型应为'档位+城乡分类代码'");
         assertEquals("C001", firstResult.getCigCode(), "卷烟代码应正确");
@@ -81,10 +81,10 @@ public class CommonServiceTest {
     }
 
     @Test
-    @DisplayName("测试批量写入DemoTestData数据功能")
+    @DisplayName("测试批量写入CigaretteDistributionPredictionData数据功能")
     void testBatchInsertTestData() {
         // 准备测试数据
-        List<DemoTestData> testDataList = createMockTestDataList();
+        List<CigaretteDistributionPredictionData> testDataList = createMockTestDataList();
         
         // 模拟JPA Repository的saveAll方法
         when(testDataRepository.saveAll(testDataList))
@@ -103,7 +103,7 @@ public class CommonServiceTest {
         // 验证方法调用
         verify(testDataRepository, times(1)).saveAll(testDataList);
         
-        System.out.println("✅ 批量写入DemoTestData数据功能测试通过");
+        System.out.println("✅ 批量写入CigaretteDistributionPredictionData数据功能测试通过");
         System.out.println("📝 成功写入 " + result.get("successCount") + " 条测试数据");
     }
 
@@ -139,7 +139,7 @@ public class CommonServiceTest {
         String deliveryArea = "城镇";
         
         // 创建模拟的现有数据
-        List<DemoTestData> existingData = createMockTestDataForDelete(cigCode, cigName, year, month, weekSeq, deliveryArea);
+        List<CigaretteDistributionPredictionData> existingData = createMockTestDataForDelete(cigCode, cigName, year, month, weekSeq, deliveryArea);
         
         // 模拟Repository查询方法
         when(testDataRepository.findByYearAndMonthAndWeekSeqAndCigCodeAndDeliveryAreaIn(
@@ -234,11 +234,11 @@ public class CommonServiceTest {
     /**
      * 创建模拟的预投放量数据
      */
-    private List<DemoTestAdvData> createMockAdvData(String deliveryEtype) {
-        List<DemoTestAdvData> mockData = new ArrayList<>();
+    private List<CigaretteDistributionInfoData> createMockAdvData(String deliveryEtype) {
+        List<CigaretteDistributionInfoData> mockData = new ArrayList<>();
         
         // 创建匹配的数据
-        DemoTestAdvData data1 = new DemoTestAdvData();
+        CigaretteDistributionInfoData data1 = new CigaretteDistributionInfoData();
         data1.setCigCode("C001");
         data1.setCigName("测试卷烟A");
         data1.setDeliveryEtype("档位+城乡分类代码");
@@ -246,7 +246,7 @@ public class CommonServiceTest {
         data1.setDeliveryArea("城镇");
         mockData.add(data1);
         
-        DemoTestAdvData data2 = new DemoTestAdvData();
+        CigaretteDistributionInfoData data2 = new CigaretteDistributionInfoData();
         data2.setCigCode("C002");
         data2.setCigName("测试卷烟B");
         data2.setDeliveryEtype("档位+城乡分类代码");
@@ -255,7 +255,7 @@ public class CommonServiceTest {
         mockData.add(data2);
         
         // 创建不匹配的数据（不同投放类型）
-        DemoTestAdvData data3 = new DemoTestAdvData();
+        CigaretteDistributionInfoData data3 = new CigaretteDistributionInfoData();
         data3.setCigCode("C003");
         data3.setCigName("测试卷烟C");
         data3.setDeliveryEtype("档位+区县");
@@ -269,11 +269,11 @@ public class CommonServiceTest {
     /**
      * 创建模拟的测试数据列表
      */
-    private List<DemoTestData> createMockTestDataList() {
-        List<DemoTestData> testDataList = new ArrayList<>();
+    private List<CigaretteDistributionPredictionData> createMockTestDataList() {
+        List<CigaretteDistributionPredictionData> testDataList = new ArrayList<>();
         
         // 创建测试数据1
-        DemoTestData data1 = new DemoTestData();
+        CigaretteDistributionPredictionData data1 = new CigaretteDistributionPredictionData();
         data1.setCigCode("C001");
         data1.setCigName("测试卷烟A");
         data1.setYear(2024);
@@ -289,7 +289,7 @@ public class CommonServiceTest {
         testDataList.add(data1);
         
         // 创建测试数据2
-        DemoTestData data2 = new DemoTestData();
+        CigaretteDistributionPredictionData data2 = new CigaretteDistributionPredictionData();
         data2.setCigCode("C002");
         data2.setCigName("测试卷烟B");
         data2.setYear(2024);
@@ -305,7 +305,7 @@ public class CommonServiceTest {
         testDataList.add(data2);
         
         // 创建测试数据3
-        DemoTestData data3 = new DemoTestData();
+        CigaretteDistributionPredictionData data3 = new CigaretteDistributionPredictionData();
         data3.setCigCode("C003");
         data3.setCigName("测试卷烟C");
         data3.setYear(2024);
@@ -326,13 +326,13 @@ public class CommonServiceTest {
     /**
      * 创建模拟的测试数据用于删除测试
      */
-    private List<DemoTestData> createMockTestDataForDelete(String cigCode, String cigName, 
+    private List<CigaretteDistributionPredictionData> createMockTestDataForDelete(String cigCode, String cigName, 
                                                           Integer year, Integer month, Integer weekSeq, 
                                                           String deliveryArea) {
-        List<DemoTestData> testDataList = new ArrayList<>();
+        List<CigaretteDistributionPredictionData> testDataList = new ArrayList<>();
         
         // 创建匹配的测试数据
-        DemoTestData data = new DemoTestData();
+        CigaretteDistributionPredictionData data = new CigaretteDistributionPredictionData();
         data.setCigCode(cigCode);
         data.setCigName(cigName);
         data.setYear(year);

@@ -23,32 +23,10 @@
      <main class="main-content">
        <!-- 数据导入功能区域 -->
        <section class="import-section">
-         <div class="import-buttons-row">
-           <el-button 
-             type="primary" 
-             size="default"
-             @click="showBasicInfoImportDialog"
-           >
-             <el-icon><DocumentAdd /></el-icon>
-             导入卷烟投放基本信息
-           </el-button>
-           <el-button 
-             type="success" 
-             size="default"
-             @click="showCustomerDataImportDialog"
-           >
-             <el-icon><DataAnalysis /></el-icon>
-             导入区域客户数
-           </el-button>
-           <el-button 
-             type="warning" 
-             size="default"
-             @click="showGeneratePlanDialog"
-           >
-             <el-icon><Cpu /></el-icon>
-             生成分配方案
-           </el-button>
-         </div>
+         <ImportTable 
+           @import-success="handleImportSuccess"
+           @data-refresh="handleDataRefresh"
+         />
        </section>
        
        <!-- 上方数据表格区域 -->
@@ -80,280 +58,15 @@
 
     </main>
     
-    <!-- 卷烟投放基本信息导入对话框 -->
-    <el-dialog
-      v-model="basicInfoImportDialogVisible"
-      title="导入卷烟投放基本信息"
-      width="500px"
-      :close-on-click-modal="false"
-    >
-      <el-form :model="basicInfoTimeForm" label-width="80px">
-        <el-form-item label="年份" required>
-          <el-select 
-            v-model="basicInfoTimeForm.year" 
-            placeholder="选择年份"
-            style="width: 100%"
-          >
-            <el-option 
-              v-for="year in yearOptions" 
-              :key="year" 
-              :label="year" 
-              :value="year"
-            />
-          </el-select>
-        </el-form-item>
-        
-        <el-form-item label="月份" required>
-          <el-select 
-            v-model="basicInfoTimeForm.month" 
-            placeholder="选择月份"
-            style="width: 100%"
-          >
-            <el-option 
-              v-for="month in monthOptions" 
-              :key="month" 
-              :label="`${month}月`" 
-              :value="month"
-            />
-          </el-select>
-        </el-form-item>
-        
-        <el-form-item label="周序号" required>
-          <el-select 
-            v-model="basicInfoTimeForm.weekSeq" 
-            placeholder="选择周序号"
-            style="width: 100%"
-          >
-            <el-option 
-              v-for="week in weekOptions" 
-              :key="week" 
-              :label="`第${week}周`" 
-              :value="week"
-            />
-          </el-select>
-        </el-form-item>
-        
-        <el-form-item label="选择文件" required>
-          <el-upload
-            ref="basicInfoUpload"
-            class="basic-info-upload"
-            :auto-upload="false"
-            :show-file-list="true"
-            accept=".xlsx,.xls"
-            :limit="1"
-            :file-list="basicInfoFileList"
-            :before-upload="handleBasicInfoBeforeUpload"
-            :on-remove="handleBasicInfoRemove"
-          >
-            <el-button type="primary">
-              <el-icon><Plus /></el-icon>
-              选择Excel文件
-            </el-button>
-          </el-upload>
-          <div class="upload-tip">支持Excel格式(.xlsx, .xls)，文件大小不超过10MB</div>
-        </el-form-item>
-      </el-form>
-      
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="basicInfoImportDialogVisible = false">取消</el-button>
-          <el-button 
-            type="primary" 
-            @click="handleBasicInfoImport"
-            :loading="basicInfoImporting"
-            :disabled="!canImportBasicInfo"
-          >
-            确定导入
-          </el-button>
-        </span>
-      </template>
-    </el-dialog>
-    
-    <!-- 区域客户数导入对话框 -->
-    <el-dialog
-      v-model="customerDataImportDialogVisible"
-      title="导入区域客户数"
-      width="600px"
-      :close-on-click-modal="false"
-    >
-      <el-form :model="customerImportForm" label-width="120px">
-        <el-form-item label="投放类型" required>
-          <el-select
-            v-model="customerImportForm.distributionType"
-            placeholder="请选择投放类型"
-            style="width: 100%"
-            @change="handleCustomerImportTypeChange"
-          >
-            <el-option label="按档位统一投放" value="按档位统一投放" />
-            <el-option label="按档位扩展投放" value="按档位扩展投放" />
-          </el-select>
-        </el-form-item>
-        
-        <el-form-item 
-          v-if="customerImportForm.distributionType === '按档位扩展投放'" 
-          label="扩展投放类型" 
-          required
-        >
-          <el-select
-            v-model="customerImportForm.extendedType"
-            placeholder="请选择扩展投放类型"
-            style="width: 100%"
-          >
-            <el-option label="档位+区县" value="档位+区县" />
-            <el-option label="档位+城乡分类代码" value="档位+城乡分类代码" />
-            <el-option label="档位+市场类型" value="档位+市场类型" />
-            <el-option label="档位+业态" value="档位+业态" />
-          </el-select>
-        </el-form-item>
-        
-        <el-form-item label="选择文件" required>
-          <el-upload
-            ref="customerDataUpload"
-            class="customer-data-upload"
-            :auto-upload="false"
-            :show-file-list="true"
-            accept=".xlsx,.xls"
-            :limit="1"
-            :file-list="customerDataFileList"
-            :before-upload="handleCustomerDataBeforeUpload"
-            :on-remove="handleCustomerDataRemove"
-          >
-            <el-button type="primary">
-              <el-icon><Plus /></el-icon>
-              选择Excel文件
-            </el-button>
-          </el-upload>
-          <div class="upload-tip">支持Excel格式(.xlsx, .xls)，文件大小不超过10MB</div>
-        </el-form-item>
-      </el-form>
-      
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="customerDataImportDialogVisible = false">取消</el-button>
-          <el-button 
-            type="primary" 
-            @click="handleCustomerDataImport"
-            :loading="customerDataImporting"
-            :disabled="!canImportCustomerData"
-          >
-            确定导入
-          </el-button>
-        </span>
-      </template>
-    </el-dialog>
-    
-    <!-- 生成分配方案对话框 -->
-    <el-dialog
-      v-model="generatePlanDialogVisible"
-      title="生成分配方案"
-      width="500px"
-      :close-on-click-modal="false"
-    >
-      <div class="generate-plan-content">
-        <div class="plan-description">
-          <el-alert
-            title="分配方案生成说明"
-            type="info"
-            :closable="false"
-            show-icon
-          >
-            <template #default>
-              <p>系统将根据选定时间的卷烟投放基本信息和区域客户数据，自动计算生成各卷烟的档位分配方案。</p>
-              <p>请选择需要生成分配方案的时间范围：</p>
-            </template>
-          </el-alert>
-        </div>
-        
-        <el-divider />
-        
-        <el-form :model="generatePlanForm" label-width="80px">
-          <el-form-item label="年份" required>
-            <el-select 
-              v-model="generatePlanForm.year" 
-              placeholder="选择年份"
-              style="width: 100%"
-            >
-              <el-option 
-                v-for="year in yearOptions" 
-                :key="year" 
-                :label="year" 
-                :value="year"
-              />
-            </el-select>
-          </el-form-item>
-          
-          <el-form-item label="月份" required>
-            <el-select 
-              v-model="generatePlanForm.month" 
-              placeholder="选择月份"
-              style="width: 100%"
-            >
-              <el-option 
-                v-for="month in monthOptions" 
-                :key="month" 
-                :label="`${month}月`" 
-                :value="month"
-              />
-            </el-select>
-          </el-form-item>
-          
-          <el-form-item label="周序号" required>
-            <el-select 
-              v-model="generatePlanForm.weekSeq" 
-              placeholder="选择周序号"
-              style="width: 100%"
-            >
-              <el-option 
-                v-for="week in weekOptions" 
-                :key="week" 
-                :label="`第${week}周`" 
-                :value="week"
-              />
-            </el-select>
-          </el-form-item>
-        </el-form>
-        
-        <div class="generate-tips">
-          <el-alert
-            v-if="!isGeneratePlanTimeComplete"
-            title="请选择完整的时间信息后再生成分配方案"
-            type="warning"
-            :closable="false"
-            show-icon
-          />
-          <el-alert
-            v-else
-            :title="`将为 ${generatePlanForm.year}年${generatePlanForm.month}月第${generatePlanForm.weekSeq}周 生成分配方案`"
-            type="success"
-            :closable="false"
-            show-icon
-          />
-        </div>
-      </div>
-      
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="generatePlanDialogVisible = false">取消</el-button>
-          <el-button 
-            type="primary" 
-            @click="handleGeneratePlan"
-            :loading="generatingPlan"
-            :disabled="!canGeneratePlan"
-          >
-            {{ generatingPlan ? '生成中...' : '确定生成' }}
-          </el-button>
-        </span>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { Grid, DocumentAdd, DataAnalysis, Plus, Cpu } from '@element-plus/icons-vue'
+import { Grid } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import DataTable from '../components/DataTable.vue'
 import SearchForm from '../components/SearchForm.vue'
-import { cigaretteDistributionAPI } from '../services/api'
+import ImportTable from '../components/ImportTable.vue'
 
 export default {
   name: 'Home',
@@ -361,10 +74,7 @@ export default {
     Grid,
     DataTable,
     SearchForm,
-    DocumentAdd,
-    DataAnalysis,
-    Plus,
-    Cpu
+    ImportTable
   },
   data() {
     return {
@@ -372,94 +82,10 @@ export default {
       selectedCigaretteName: '',
       currentPositionData: {},
       selectedRecord: null,
-      tableData: [],
-      
-      // 卷烟投放基本信息导入
-      basicInfoImportDialogVisible: false,
-      basicInfoFileList: [],
-      basicInfoImporting: false,
-      basicInfoTimeForm: {
-        year: null,
-        month: null,
-        weekSeq: null
-      },
-      
-      // 区域客户数导入
-      customerDataImportDialogVisible: false,
-      customerDataFileList: [],
-      customerDataImporting: false,
-      customerImportForm: {
-        distributionType: '',
-        extendedType: ''
-      },
-      
-      // 生成分配方案
-      generatePlanDialogVisible: false,
-      generatePlanForm: {
-        year: null,
-        month: null,
-        weekSeq: null
-      },
-      generatingPlan: false
+      tableData: []
     }
   },
-  computed: {
-    // 年份选项
-    yearOptions() {
-      const currentYear = new Date().getFullYear()
-      const years = []
-      for (let year = currentYear - 2; year <= currentYear + 2; year++) {
-        years.push(year)
-      }
-      return years
-    },
-    
-    // 月份选项
-    monthOptions() {
-      return Array.from({ length: 12 }, (_, i) => i + 1)
-    },
-    
-    // 周序号选项
-    weekOptions() {
-      return [1, 2, 3, 4, 5]
-    },
-    
-    // 基本信息时间表单是否完整
-    isBasicInfoTimeComplete() {
-      return this.basicInfoTimeForm.year && 
-             this.basicInfoTimeForm.month && 
-             this.basicInfoTimeForm.weekSeq
-    },
-    
-    // 是否可以导入基本信息
-    canImportBasicInfo() {
-      return this.basicInfoFileList.length > 0 && 
-             this.isBasicInfoTimeComplete &&
-             !this.basicInfoImporting
-    },
-    
-    // 是否可以导入客户数据
-    canImportCustomerData() {
-      const hasFile = this.customerDataFileList.length > 0
-      const hasDistributionType = this.customerImportForm.distributionType
-      const hasExtendedType = this.customerImportForm.distributionType !== '按档位扩展投放' || 
-                              this.customerImportForm.extendedType
-      
-      return hasFile && hasDistributionType && hasExtendedType && !this.customerDataImporting
-    },
-    
-    // 生成分配方案时间表单是否完整
-    isGeneratePlanTimeComplete() {
-      return this.generatePlanForm.year && 
-             this.generatePlanForm.month && 
-             this.generatePlanForm.weekSeq
-    },
-    
-    // 是否可以生成分配方案
-    canGeneratePlan() {
-      return this.isGeneratePlanTimeComplete && !this.generatingPlan
-    }
-  },
+  computed: {},
   methods: {
     handleSearch(searchForm) {
       console.log('搜索参数:', searchForm)
@@ -708,299 +334,21 @@ export default {
       }
     },
     
-    // =================== 导入功能方法 ===================
+    // =================== 导入组件事件处理 ===================
     
-    // 显示基本信息导入对话框
-    showBasicInfoImportDialog() {
-      this.basicInfoImportDialogVisible = true
-    },
-    
-    // 显示客户数据导入对话框
-    showCustomerDataImportDialog() {
-      this.customerDataImportDialogVisible = true
-    },
-    
-    // 基本信息文件上传前检查
-    handleBasicInfoBeforeUpload(file) {
-      const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
-                      file.type === 'application/vnd.ms-excel'
-      const isLt10M = file.size / 1024 / 1024 < 10
+    // 处理导入成功事件
+    handleImportSuccess(event) {
+      console.log('导入成功事件:', event)
       
-      if (!isExcel) {
-        ElMessage.error('只能上传Excel文件!')
-        return false
-      }
-      if (!isLt10M) {
-        ElMessage.error('文件大小不能超过10MB!')
-        return false
-      }
-      
-      this.basicInfoFileList = [file]
-      return false // 阻止自动上传
-    },
-    
-    // 移除基本信息文件
-    handleBasicInfoRemove() {
-      this.basicInfoFileList = []
-    },
-    
-    // 导入基本信息
-    async handleBasicInfoImport() {
-      if (!this.canImportBasicInfo) {
-        ElMessage.warning('请检查文件和时间选择')
-        return
-      }
-      
-      this.basicInfoImporting = true
-      
-      try {
-        const formData = new FormData()
-        formData.append('file', this.basicInfoFileList[0])
-        formData.append('year', this.basicInfoTimeForm.year)
-        formData.append('month', this.basicInfoTimeForm.month)
-        formData.append('weekSeq', this.basicInfoTimeForm.weekSeq)
-        
-        // 调用后端导入接口
-        const response = await cigaretteDistributionAPI.importBasicInfo(formData)
-        
-        if (response.data.success) {
-          ElMessage.success(`基本信息导入成功！共导入 ${response.data.importCount} 条记录`)
-          
-          // 关闭对话框并清理文件
-          this.basicInfoImportDialogVisible = false
-          this.basicInfoFileList = []
-          this.basicInfoTimeForm = { year: null, month: null, weekSeq: null }
-          
-          // 刷新表格数据
-          if (this.$refs.dataTable) {
-            this.$refs.dataTable.handleRefresh()
-          }
-        } else {
-          throw new Error(response.data.message || '导入失败')
-        }
-      } catch (error) {
-        console.error('导入基本信息失败:', error)
-        ElMessage.error(`导入失败: ${error.message}`)
-      } finally {
-        this.basicInfoImporting = false
-      }
-    },
-    
-    // 客户数据投放类型变化
-    handleCustomerImportTypeChange(value) {
-      this.customerImportForm.extendedType = ''
-    },
-    
-    // 客户数据文件上传前检查
-    handleCustomerDataBeforeUpload(file) {
-      const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
-                      file.type === 'application/vnd.ms-excel'
-      const isLt10M = file.size / 1024 / 1024 < 10
-      
-      if (!isExcel) {
-        ElMessage.error('只能上传Excel文件!')
-        return false
-      }
-      if (!isLt10M) {
-        ElMessage.error('文件大小不能超过10MB!')
-        return false
-      }
-      
-      this.customerDataFileList = [file]
-      return false // 阻止自动上传
-    },
-    
-    // 移除客户数据文件
-    handleCustomerDataRemove() {
-      this.customerDataFileList = []
-    },
-    
-    // 导入客户数据
-    async handleCustomerDataImport() {
-      if (!this.canImportCustomerData) {
-        ElMessage.warning('请检查文件和投放类型选择')
-        return
-      }
-      
-      this.customerDataImporting = true
-      
-      try {
-        const formData = new FormData()
-        formData.append('file', this.customerDataFileList[0])
-        
-        // 注意：后端接口格式已更新，需要提供年份月份和序列号
-        // 年份月份暂时使用当前年月，实际使用中应该让用户选择
-        const currentDate = new Date()
-        formData.append('year', currentDate.getFullYear())
-        formData.append('month', currentDate.getMonth() + 1)
-        
-        // 映射投放类型为后端期望的格式
-        formData.append('deliveryMethod', this.customerImportForm.distributionType)
-        formData.append('deliveryEtype', this.customerImportForm.extendedType || 'NULL')
-        
-        // 根据投放类型映射序列号
-        const sequenceMapping = {
-          '按档位统一投放': 0,
-          '档位+区县': 1,
-          '档位+市场类型': 2,
-          '档位+城乡分类代码': 3,
-          '档位+业态': 4
-        }
-        
-        let sequenceNumber = 0
-        if (this.customerImportForm.distributionType === '按档位扩展投放' && this.customerImportForm.extendedType) {
-          sequenceNumber = sequenceMapping[this.customerImportForm.extendedType] || 0
-        }
-        formData.append('sequenceNumber', sequenceNumber)
-        
-        console.log('导入客户数据参数:', {
-          distributionType: this.customerImportForm.distributionType,
-          extendedType: this.customerImportForm.extendedType,
-          sequenceNumber: sequenceNumber
-        })
-        
-        // 调用后端导入接口
-        const response = await cigaretteDistributionAPI.importCustomerData(formData)
-        
-        if (response.data.success) {
-          ElMessage.success(`客户数据导入成功！共导入 ${response.data.importCount} 条记录`)
-          
-          // 关闭对话框并清理文件
-          this.customerDataImportDialogVisible = false
-          this.customerDataFileList = []
-          this.customerImportForm.distributionType = ''
-          this.customerImportForm.extendedType = ''
-          
-          // 刷新表格数据
-          if (this.$refs.dataTable) {
-            this.$refs.dataTable.handleRefresh()
-          }
-        } else {
-          throw new Error(response.data.message || '导入失败')
-        }
-      } catch (error) {
-        console.error('导入客户数据失败:', error)
-        ElMessage.error(`导入失败: ${error.message}`)
-      } finally {
-        this.customerDataImporting = false
-      }
-    },
-    
-    // =================== 生成分配方案功能方法 ===================
-    
-    // 显示生成分配方案对话框
-    showGeneratePlanDialog() {
-      this.generatePlanDialogVisible = true
-    },
-    
-    // 生成分配方案
-    async handleGeneratePlan() {
-      if (!this.canGeneratePlan) {
-        ElMessage.warning('请选择年份、月份和周序号')
-        return
-      }
-      
-      this.generatingPlan = true
-      
-      try {
-        const requestData = {
-          year: this.generatePlanForm.year,
-          month: this.generatePlanForm.month,
-          weekSeq: this.generatePlanForm.weekSeq
-        }
-        
-        console.log('生成分配方案请求数据:', requestData)
-        
-        // 调用后端生成分配方案接口
-        const response = await cigaretteDistributionAPI.generateDistributionPlan(requestData)
-        
-        console.log('生成分配方案响应数据:', response.data)
-        
-        if (response.data.success) {
-          // 构建详细的成功信息
-          const details = []
-          
-          if (response.data.totalCigarettes) {
-            details.push(`共处理 ${response.data.totalCigarettes} 种卷烟`)
-          }
-          
-          if (response.data.successfulAllocations) {
-            details.push(`成功分配 ${response.data.successfulAllocations} 种`)
-          }
-          
-          if (response.data.deletedRecords > 0) {
-            details.push(`删除 ${response.data.deletedRecords} 条旧记录`)
-          }
-          
-          if (response.data.processedCount) {
-            details.push(`生成 ${response.data.processedCount} 条新记录`)
-          }
-          
-          const message = details.length > 0 
-            ? `分配方案生成成功！${details.join('，')}`
-            : '分配方案生成成功！'
-          
-          // 显示简短的成功消息
-          ElMessage.success({
-            message: '分配方案生成成功！',
-            duration: 3000
-          })
-          
-          // 显示详细统计信息的弹窗
-          const statisticsDetails = []
-          
-          if (response.data.totalCigarettes !== undefined && response.data.totalCigarettes !== null) {
-            statisticsDetails.push(`📊 共处理卷烟种类：${response.data.totalCigarettes} 种`)
-          }
-          
-          if (response.data.successfulAllocations !== undefined && response.data.successfulAllocations !== null) {
-            statisticsDetails.push(`✅ 成功分配卷烟：${response.data.successfulAllocations} 种`)
-          }
-          
-          if (response.data.deletedRecords !== undefined && response.data.deletedRecords !== null) {
-            statisticsDetails.push(`🗑️ 删除旧记录：${response.data.deletedRecords} 条`)
-          }
-          
-          if (response.data.processedCount !== undefined && response.data.processedCount !== null) {
-            statisticsDetails.push(`📝 生成新记录：${response.data.processedCount} 条`)
-          }
-          
-          if (response.data.processingTime) {
-            statisticsDetails.push(`⏱️ 处理耗时：${response.data.processingTime}`)
-          }
-          
-          const messageHtml = `
-            <div style="text-align: center; line-height: 1.6;">
-              <p style="margin: 10px 0; font-weight: bold; color: #409EFF; font-size: 16px;">✅ 操作执行成功</p>
-              <hr style="margin: 15px 0; border: none; border-top: 1px solid #EBEEF5;">
-              <div style="text-align: left; line-height: 1.8;">
-                ${statisticsDetails.map(detail => `<p style="margin: 8px 0;">${detail}</p>`).join('')}
-              </div>
-            </div>
-          `
-          
-          this.$msgbox({
-            title: '生成分配方案完成',
-            message: messageHtml,
-            confirmButtonText: '确定',
-            type: 'success',
-            customClass: 'generation-result-dialog',
-            dangerouslyUseHTMLString: true
-          })
-          
-          // 关闭对话框并清理表单
-          this.generatePlanDialogVisible = false
-          this.generatePlanForm = { year: null, month: null, weekSeq: null }
-          
-          // 自动刷新卷烟投放数据统计表
+      if (event.type === 'generate-plan' && event.searchParams) {
+        // 如果是生成分配方案，自动刷新数据并设置搜索条件
           setTimeout(() => {
             console.log('自动刷新卷烟投放数据统计表，使用生成方案的时间范围...')
             
-            // 使用生成分配方案时的时间参数进行搜索
             const searchParams = {
-              year: requestData.year,
-              month: requestData.month,
-              week: requestData.weekSeq
+            year: event.searchParams.year,
+            month: event.searchParams.month,
+            week: event.searchParams.weekSeq
             }
             
             console.log('搜索参数:', searchParams)
@@ -1027,14 +375,16 @@ export default {
             }, 200) // 在搜索后再等200ms刷新表格
             
           }, 1000) // 增加到1秒，确保后端数据已保存
-        } else {
-          throw new Error(response.data.message || '生成分配方案失败')
-        }
-      } catch (error) {
-        console.error('生成分配方案失败:', error)
-        ElMessage.error(`生成失败: ${error.message}`)
-      } finally {
-        this.generatingPlan = false
+      }
+    },
+    
+    // 处理数据刷新事件
+    handleDataRefresh() {
+      console.log('数据刷新事件')
+      
+      // 刷新表格数据
+      if (this.$refs.dataTable) {
+        this.$refs.dataTable.handleRefresh()
       }
     }
   },
@@ -1100,59 +450,6 @@ export default {
   flex: 0 0 auto;
 }
 
-.import-buttons-row {
-  display: flex;
-  gap: 15px;
-  padding: 15px;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #409eff;
-}
-
-.import-buttons-row .el-button {
-  height: 40px;
-  padding: 0 20px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-/* 对话框样式 */
-.upload-tip {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #909399;
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-/* 生成分配方案对话框样式 */
-.generate-plan-content {
-  padding: 0;
-}
-
-.plan-description {
-  margin-bottom: 15px;
-}
-
-.plan-description p {
-  margin: 8px 0;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.generate-tips {
-  margin-top: 15px;
-}
-
-.generate-tips .el-alert {
-  margin: 10px 0;
-}
-
 .data-table-section {
   flex: 1;
   min-height: 200px;
@@ -1175,47 +472,4 @@ export default {
   overflow-y: auto;
 }
 
-/* 生成分配方案结果弹窗样式 */
-::v-deep .generation-result-dialog {
-  .el-message-box {
-    width: 480px;
-    border-radius: 12px;
-  }
-  
-  .el-message-box__title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #303133;
-  }
-  
-  .el-message-box__content {
-    padding: 20px 20px 30px;
-  }
-  
-  .el-message-box__message {
-    font-size: 14px;
-    line-height: 1.6;
-    
-    p {
-      margin: 8px 0;
-      display: flex;
-      align-items: center;
-      
-      &:first-child {
-        font-size: 16px;
-        justify-content: center;
-      }
-    }
-  }
-  
-  .el-message-box__btns {
-    padding: 10px 20px 20px;
-    
-    .el-button--primary {
-      padding: 10px 24px;
-      border-radius: 6px;
-      font-weight: 500;
-    }
-  }
-}
 </style>

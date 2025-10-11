@@ -100,7 +100,6 @@ public class BussinessFormatDistributionAlgorithm {
                                                BigDecimal targetAmount, 
                                                BigDecimal currentAmount,
                                                int lastFullGrade) {
-        int businessFormatCount = baseMatrix.length;
         BigDecimal[][] bestMatrix = deepCopyMatrix(baseMatrix);
         BigDecimal bestError = targetAmount.subtract(currentAmount).abs();
         

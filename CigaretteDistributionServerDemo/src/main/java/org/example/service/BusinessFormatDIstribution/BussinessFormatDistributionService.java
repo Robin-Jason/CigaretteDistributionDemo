@@ -2,10 +2,10 @@ package org.example.service.BusinessFormatDIstribution;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.example.entity.DemoTestData;
-import org.example.entity.BusinessFormatDIstribution.DemoTestBusinessFormatClientNumData;
-import org.example.repository.DemoTestDataRepository;
-import org.example.repository.BusinessFormatDIstribution.DemoTestBusinessFormatClientNumDataRepository;
+import org.example.entity.CigaretteDistributionPredictionData;
+import org.example.entity.RegionClientNumData;
+import org.example.repository.CigaretteDistributionPredictionDataRepository;
+import org.example.service.RegionClientNumDataService;
 import org.example.service.algorithm.BussinessFormatDistributionAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 public class BussinessFormatDistributionService {
     
     @Autowired
-    private DemoTestBusinessFormatClientNumDataRepository businessFormatClientNumDataRepository;
+    private RegionClientNumDataService regionClientNumDataService;
     
     @Autowired
-    private DemoTestDataRepository testDataRepository;
+    private CigaretteDistributionPredictionDataRepository testDataRepository;
     
     @Autowired
     private BussinessFormatDistributionAlgorithm distributionAlgorithm;
@@ -50,9 +50,10 @@ public class BussinessFormatDistributionService {
     public List<String> getAllBusinessFormatList() {
         if (allBusinessFormatList == null) {
             log.info("初始化业态类型列表");
-            allBusinessFormatList = businessFormatClientNumDataRepository.findAllByOrderByIdAsc()
+            String tableName = regionClientNumDataService.generateTableName("按档位扩展投放", "档位+业态", false);
+            allBusinessFormatList = regionClientNumDataService.findAllByTableName(tableName)
                     .stream()
-                    .map(DemoTestBusinessFormatClientNumData::getBusinessFormatCode)
+                    .map(RegionClientNumData::getRegion)
                     .filter(Objects::nonNull)
                     .distinct()
                     .collect(Collectors.toList());
@@ -68,15 +69,16 @@ public class BussinessFormatDistributionService {
     public BigDecimal[][] getBusinessFormatCustomerMatrix() {
         if (businessFormatCustomerMatrix == null) {
             log.info("初始化业态类型客户数矩阵");
-            List<DemoTestBusinessFormatClientNumData> businessFormatClientNumDataList = businessFormatClientNumDataRepository.findAllByOrderByIdAsc();
+            String tableName = regionClientNumDataService.generateTableName("按档位扩展投放", "档位+业态", false);
+            List<RegionClientNumData> businessFormatClientNumDataList = regionClientNumDataService.findAllByTableName(tableName);
             List<String> businessFormats = getAllBusinessFormatList();
             
             businessFormatCustomerMatrix = new BigDecimal[businessFormats.size()][30];
             
             for (int i = 0; i < businessFormats.size(); i++) {
                 String businessFormat = businessFormats.get(i);
-                DemoTestBusinessFormatClientNumData clientData = businessFormatClientNumDataList.stream()
-                        .filter(data -> businessFormat.equals(data.getBusinessFormatCode()))
+                RegionClientNumData clientData = businessFormatClientNumDataList.stream()
+                        .filter(data -> businessFormat.equals(data.getRegion()))
                         .findFirst()
                         .orElse(null);
                 
@@ -140,7 +142,7 @@ public class BussinessFormatDistributionService {
                 cigCode, cigName, year, month, weekSeq);
             
             // 1. 获取该卷烟在指定日期的所有投放区域记录
-            List<DemoTestData> cigaretteData = testDataRepository.findByCigCodeAndCigNameAndYearAndMonthAndWeekSeq(
+            List<CigaretteDistributionPredictionData> cigaretteData = testDataRepository.findByCigCodeAndCigNameAndYearAndMonthAndWeekSeq(
                 cigCode, cigName, year, month, weekSeq);
             
             if (cigaretteData.isEmpty()) {
@@ -156,7 +158,7 @@ public class BussinessFormatDistributionService {
             // 3. 计算所有目标投放业态类型的实际投放量总和
             BigDecimal totalActualAmount = BigDecimal.ZERO;
             
-            for (DemoTestData data : cigaretteData) {
+            for (CigaretteDistributionPredictionData data : cigaretteData) {
                 String deliveryArea = data.getDeliveryArea();
                 if (deliveryArea == null || deliveryArea.trim().isEmpty()) {
                     continue;
@@ -190,7 +192,7 @@ public class BussinessFormatDistributionService {
     /**
      * 为单个记录计算实际投放量
      */
-    public BigDecimal calculateActualAmountForRecord(DemoTestData data) {
+    public BigDecimal calculateActualAmountForRecord(CigaretteDistributionPredictionData data) {
         try {
             return calculateActualDistributionAmount(data.getCigCode(), data.getCigName(), 
                 data.getYear(), data.getMonth(), data.getWeekSeq());
@@ -206,43 +208,17 @@ public class BussinessFormatDistributionService {
     /**
      * 填充业态类型客户数据到矩阵
      */
-    private void populateBusinessFormatCustomerData(BigDecimal[][] matrix, int businessFormatIndex, DemoTestBusinessFormatClientNumData clientData) {
-        matrix[businessFormatIndex][0] = clientData.getD30();
-        matrix[businessFormatIndex][1] = clientData.getD29();
-        matrix[businessFormatIndex][2] = clientData.getD28();
-        matrix[businessFormatIndex][3] = clientData.getD27();
-        matrix[businessFormatIndex][4] = clientData.getD26();
-        matrix[businessFormatIndex][5] = clientData.getD25();
-        matrix[businessFormatIndex][6] = clientData.getD24();
-        matrix[businessFormatIndex][7] = clientData.getD23();
-        matrix[businessFormatIndex][8] = clientData.getD22();
-        matrix[businessFormatIndex][9] = clientData.getD21();
-        matrix[businessFormatIndex][10] = clientData.getD20();
-        matrix[businessFormatIndex][11] = clientData.getD19();
-        matrix[businessFormatIndex][12] = clientData.getD18();
-        matrix[businessFormatIndex][13] = clientData.getD17();
-        matrix[businessFormatIndex][14] = clientData.getD16();
-        matrix[businessFormatIndex][15] = clientData.getD15();
-        matrix[businessFormatIndex][16] = clientData.getD14();
-        matrix[businessFormatIndex][17] = clientData.getD13();
-        matrix[businessFormatIndex][18] = clientData.getD12();
-        matrix[businessFormatIndex][19] = clientData.getD11();
-        matrix[businessFormatIndex][20] = clientData.getD10();
-        matrix[businessFormatIndex][21] = clientData.getD9();
-        matrix[businessFormatIndex][22] = clientData.getD8();
-        matrix[businessFormatIndex][23] = clientData.getD7();
-        matrix[businessFormatIndex][24] = clientData.getD6();
-        matrix[businessFormatIndex][25] = clientData.getD5();
-        matrix[businessFormatIndex][26] = clientData.getD4();
-        matrix[businessFormatIndex][27] = clientData.getD3();
-        matrix[businessFormatIndex][28] = clientData.getD2();
-        matrix[businessFormatIndex][29] = clientData.getD1();
+    private void populateBusinessFormatCustomerData(BigDecimal[][] matrix, int businessFormatIndex, RegionClientNumData clientData) {
+        BigDecimal[] gradeArray = clientData.getGradeArray();
+        for (int j = 0; j < 30 && j < gradeArray.length; j++) {
+            matrix[businessFormatIndex][j] = gradeArray[j] != null ? gradeArray[j] : BigDecimal.ZERO;
+        }
     }
     
     /**
      * 计算单个业态类型的实际投放量
      */
-    private BigDecimal calculateBusinessFormatActualAmount(DemoTestData data, BigDecimal[] businessFormatCustomerData) {
+    private BigDecimal calculateBusinessFormatActualAmount(CigaretteDistributionPredictionData data, BigDecimal[] businessFormatCustomerData) {
         BigDecimal businessFormatActualAmount = BigDecimal.ZERO;
         
         // 获取该业态类型的档位投放量数组（按D30到D1的顺序）

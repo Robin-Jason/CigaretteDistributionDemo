@@ -100,7 +100,6 @@ public class UrbanRuralClassificationCodeDistributionAlgorithm {
                                                BigDecimal targetAmount, 
                                                BigDecimal currentAmount,
                                                int lastFullGrade) {
-        int regionCount = baseMatrix.length;
         BigDecimal[][] bestMatrix = deepCopyMatrix(baseMatrix);
         BigDecimal bestError = targetAmount.subtract(currentAmount).abs();
         

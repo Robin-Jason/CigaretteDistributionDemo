@@ -1,8 +1,8 @@
 package org.example.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.entity.DemoTestData;
-import org.example.repository.DemoTestDataRepository;
+import org.example.entity.CigaretteDistributionPredictionData;
+import org.example.service.DataManagementService;
 import org.example.service.DistributionCalculateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,7 @@ public class DistributionCalculateController {
     private DistributionCalculateService distributionService;
     
     @Autowired
-    private DemoTestDataRepository testDataRepository;
+    private DataManagementService dataManagementService;
     
     /**
      * 获取算法输出的分配矩阵并写回数据库
@@ -73,8 +72,8 @@ public class DistributionCalculateController {
         log.info("接收一键生成分配方案请求，年份: {}, 月份: {}, 周序号: {}", year, month, weekSeq);
         
         try {
-            // 1. 检查指定日期是否存在分配数据
-            List<DemoTestData> existingData = testDataRepository.findByYearAndMonthAndWeekSeq(year, month, weekSeq);
+            // 1. 检查指定日期是否存在分配数据（通过DataManagementService）
+            List<CigaretteDistributionPredictionData> existingData = dataManagementService.queryTestDataByTime(year, month, weekSeq);
             
             Map<String, Object> response = new HashMap<>();
             response.put("year", year);
@@ -85,18 +84,19 @@ public class DistributionCalculateController {
             if (!existingData.isEmpty()) {
                 log.info("发现指定日期已存在{}条分配数据，将先删除后重新分配", existingData.size());
                 
-                // 2. 删除现有分配数据
-                try {
-                    testDataRepository.deleteByYearAndMonthAndWeekSeq(year, month, weekSeq);
-                    log.info("成功删除{}年{}月第{}周的{}条现有分配数据", year, month, weekSeq, existingData.size());
+                // 2. 删除现有分配数据（通过DataManagementService）
+                Map<String, Object> deleteResult = dataManagementService.deleteDistributionDataByTime(year, month, weekSeq);
+                
+                if ((Boolean) deleteResult.get("success")) {
+                    log.info("成功删除{}年{}月第{}周的{}条现有分配数据", year, month, weekSeq, deleteResult.get("deletedCount"));
                     
                     response.put("deletedExistingData", true);
-                    response.put("deletedRecords", existingData.size());
+                    response.put("deletedRecords", deleteResult.get("deletedCount"));
                     
-                } catch (Exception deleteException) {
-                    log.error("删除现有分配数据失败", deleteException);
+                } else {
+                    log.error("删除现有分配数据失败: {}", deleteResult.get("message"));
                     response.put("success", false);
-                    response.put("message", "删除现有分配数据失败: " + deleteException.getMessage());
+                    response.put("message", "删除现有分配数据失败: " + deleteResult.get("message"));
                     response.put("error", "DELETE_FAILED");
                     return ResponseEntity.internalServerError().body(response);
                 }
@@ -111,8 +111,8 @@ public class DistributionCalculateController {
             Map<String, Object> allocationResult = distributionService.getAndwriteBackAllocationMatrix(year, month, weekSeq);
             
             if ((Boolean) allocationResult.get("success")) {
-                // 4. 分配成功，查询生成的分配记录数
-                List<DemoTestData> generatedData = testDataRepository.findByYearAndMonthAndWeekSeq(year, month, weekSeq);
+                // 4. 分配成功，查询生成的分配记录数（通过DataManagementService）
+                List<CigaretteDistributionPredictionData> generatedData = dataManagementService.queryTestDataByTime(year, month, weekSeq);
                 int processedCount = generatedData.size();
                 
                 // 5. 合并结果
@@ -135,8 +135,8 @@ public class DistributionCalculateController {
                 return ResponseEntity.ok(response);
                 
             } else {
-                // 5. 分配失败，但仍需统计可能已生成的记录数
-                List<DemoTestData> partialData = testDataRepository.findByYearAndMonthAndWeekSeq(year, month, weekSeq);
+                // 5. 分配失败，但仍需统计可能已生成的记录数（通过DataManagementService）
+                List<CigaretteDistributionPredictionData> partialData = dataManagementService.queryTestDataByTime(year, month, weekSeq);
                 int processedCount = partialData.size();
                 
                 response.put("success", false);
@@ -152,10 +152,10 @@ public class DistributionCalculateController {
         } catch (Exception e) {
             log.error("一键生成分配方案失败", e);
             
-            // 即使发生异常，也尝试统计已生成的记录数
+            // 即使发生异常，也尝试统计已生成的记录数（通过DataManagementService）
             int processedCount = 0;
             try {
-                List<DemoTestData> existingRecords = testDataRepository.findByYearAndMonthAndWeekSeq(year, month, weekSeq);
+                List<CigaretteDistributionPredictionData> existingRecords = dataManagementService.queryTestDataByTime(year, month, weekSeq);
                 processedCount = existingRecords.size();
             } catch (Exception countException) {
                 log.warn("统计已生成记录数时发生异常: {}", countException.getMessage());
@@ -185,8 +185,8 @@ public class DistributionCalculateController {
         log.info("接收总实际投放量计算请求，年份: {}, 月份: {}, 周序号: {}", year, month, weekSeq);
         
         try {
-            // 获取指定时间的数据
-            List<DemoTestData> rawDataList = testDataRepository.findByYearAndMonthAndWeekSeq(year, month, weekSeq);
+            // 获取指定时间的数据（通过DataManagementService）
+            List<CigaretteDistributionPredictionData> rawDataList = dataManagementService.queryTestDataByTime(year, month, weekSeq);
             
             if (rawDataList.isEmpty()) {
                 Map<String, Object> response = new HashMap<>();
@@ -196,8 +196,8 @@ public class DistributionCalculateController {
                 return ResponseEntity.ok(response);
             }
             
-            // 计算总实际投放量
-            Map<String, BigDecimal> totalActualDeliveryMap = calculateTotalActualDeliveryByTobacco(rawDataList);
+            // 计算总实际投放量（通过DistributionCalculateService）
+            Map<String, BigDecimal> totalActualDeliveryMap = distributionService.calculateTotalActualDeliveryByTobacco(rawDataList);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -219,44 +219,5 @@ public class DistributionCalculateController {
             response.put("message", "总实际投放量计算失败: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
-    }
-
-    /**
-     * 按卷烟代码+名称分组计算总实际投放量
-     * 新逻辑：直接从demo_test_data表中读取各区域的ACTUAL_DELIVERY字段进行求和
-     */
-    private Map<String, BigDecimal> calculateTotalActualDeliveryByTobacco(List<DemoTestData> rawDataList) {
-        Map<String, BigDecimal> totalActualDeliveryMap = new HashMap<>();
-        
-        // 按卷烟代码+名称分组
-        Map<String, List<DemoTestData>> groupedByTobacco = new HashMap<>();
-        for (DemoTestData data : rawDataList) {
-            String tobaccoKey = data.getCigCode() + "_" + data.getCigName();
-            groupedByTobacco.computeIfAbsent(tobaccoKey, k -> new ArrayList<>()).add(data);
-        }
-        
-        // 计算每个卷烟的总实际投放量
-        for (Map.Entry<String, List<DemoTestData>> entry : groupedByTobacco.entrySet()) {
-            String tobaccoKey = entry.getKey();
-            List<DemoTestData> tobaccoRecords = entry.getValue();
-            
-            BigDecimal totalActualDelivery = BigDecimal.ZERO;
-            
-            // 直接从数据库记录中累加各区域的ACTUAL_DELIVERY字段
-            for (DemoTestData data : tobaccoRecords) {
-                if (data.getActualDelivery() != null) {
-                    totalActualDelivery = totalActualDelivery.add(data.getActualDelivery());
-                    log.debug("卷烟 {} 区域 {} 实际投放量: {}", data.getCigName(), data.getDeliveryArea(), data.getActualDelivery());
-                } else {
-                    log.warn("卷烟 {} 区域 {} 的ACTUAL_DELIVERY字段为null", data.getCigName(), data.getDeliveryArea());
-                }
-            }
-            
-            totalActualDeliveryMap.put(tobaccoKey, totalActualDelivery);
-            log.debug("卷烟 {} 总实际投放量: {} (包含 {} 个区域)", 
-                     tobaccoKey.split("_")[1], totalActualDelivery, tobaccoRecords.size());
-        }
-        
-        return totalActualDeliveryMap;
     }
 }

@@ -6,10 +6,8 @@ const createApiInstance = (baseURL) => {
   const backendBaseUrl = process.env.VUE_APP_API_BASE_URL || `http://localhost:28080${baseURL}`
   const instance = axios.create({
     baseURL: backendBaseUrl,
-    timeout: 10000,
-    headers: {
-      'Content-Type': 'application/json'
-    }
+    timeout: 10000
+    // 不设置默认Content-Type，让每个请求自己决定
   })
   
   // 请求拦截器
@@ -58,22 +56,38 @@ export const cigaretteDistributionAPI = {
   
   // 查询卷烟分配数据
   queryDistribution(params) {
-    return dataApi.post('/query', params)
+    return dataApi.post('/query', params, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
   },
   
   // 更新卷烟信息（主要接口）
   updateCigaretteInfo(data) {
-    return dataApi.post('/update-cigarette', data)
+    return dataApi.post('/update-cigarette', data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
   },
   
   // 删除投放区域
   deleteDeliveryAreas(data) {
-    return dataApi.post('/delete-delivery-areas', data)
+    return dataApi.post('/delete-delivery-areas', data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
   },
   
   // 基于编码表达式批量更新投放信息
   batchUpdateFromExpressions(data) {
-    return dataApi.post('/batch-update-from-expressions', data)
+    return dataApi.post('/batch-update-from-expressions', data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
   },
   
   // =================== 分配计算接口 (/api/calculate) ===================
@@ -101,7 +115,7 @@ export const cigaretteDistributionAPI = {
   importBasicInfo(formData) {
     return importApi.post('/cigarette-info', formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        // 不设置Content-Type，让浏览器自动设置multipart/form-data和boundary
       }
     })
   },
@@ -110,7 +124,7 @@ export const cigaretteDistributionAPI = {
   importCustomerData(formData) {
     return importApi.post('/region-clientnum', formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        // 不设置Content-Type，让浏览器自动设置multipart/form-data和boundary
       }
     })
   },

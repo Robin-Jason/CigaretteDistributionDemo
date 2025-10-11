@@ -1,12 +1,12 @@
 package org.example.service.MarketTypeDistribution;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.entity.DemoTestAdvData;
-import org.example.entity.DemoTestData;
-import org.example.entity.MarketTypeDistribution.DemoMarketTestClientNumData;
-import org.example.repository.DemoTestAdvDataRepository;
-import org.example.repository.DemoTestDataRepository;
-import org.example.repository.MarketTypeDistribution.DemoMarketTestClientNumDataRepository;
+import org.example.entity.CigaretteDistributionInfoData;
+import org.example.entity.CigaretteDistributionPredictionData;
+import org.example.entity.RegionClientNumData;
+import org.example.repository.CigaretteDistributionInfoDataRepository;
+import org.example.repository.CigaretteDistributionPredictionDataRepository;
+import org.example.service.RegionClientNumDataService;
 import org.example.service.algorithm.MarketProportionalCigaretteDistributionAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,13 +22,13 @@ import java.util.stream.Collectors;
 public class MarketPredictService {
 
     @Autowired
-    private DemoTestAdvDataRepository advDataRepository;
+    private CigaretteDistributionInfoDataRepository advDataRepository;
 
     @Autowired
-    private DemoMarketTestClientNumDataRepository marketClientNumDataRepository;
+    private RegionClientNumDataService regionClientNumDataService;
 
     @Autowired
-    private DemoTestDataRepository testDataRepository;
+    private CigaretteDistributionPredictionDataRepository testDataRepository;
 
     @Autowired
     private MarketProportionalCigaretteDistributionAlgorithm distributionAlgorithm;
@@ -45,10 +45,10 @@ public class MarketPredictService {
         log.info("开始预测卷烟投放量并写回数据库 (市场类型)，年份: {}, 月份: {}, 周序号: {}", year, month, weekSeq);
 
         // 1. 获取所有预投放量数据
-        List<DemoTestAdvData> advDataList = advDataRepository.findAll();
+        List<CigaretteDistributionInfoData> advDataList = advDataRepository.findAll();
 
         // 2. 筛选出投放方式为"按档位扩展投放"且扩展类型为"档位+市场类型"的数据
-        List<DemoTestAdvData> filteredAdvData = advDataList.stream()
+        List<CigaretteDistributionInfoData> filteredAdvData = advDataList.stream()
                 .filter(data -> "按档位扩展投放".equals(data.getDeliveryMethod()) &&
                         "档位+市场类型".equals(data.getDeliveryEtype()) &&
                         year.equals(data.getYear()) &&
@@ -59,15 +59,15 @@ public class MarketPredictService {
         log.info("筛选出 {} 条符合条件的预投放量数据", filteredAdvData.size());
 
         // 3. 获取所有区域客户数数据（使用新的Repository）
-        List<DemoMarketTestClientNumData> marketClientNumDataList = marketClientNumDataRepository.findAllByOrderByUrbanRuralCodeAsc();
+        List<RegionClientNumData> marketClientNumDataList = regionClientNumDataService.findAllByTableName(regionClientNumDataService.generateTableName("按档位扩展投放", "档位+市场类型", false));
         List<String> allRegions = marketClientNumDataList.stream()
-                .map(DemoMarketTestClientNumData::getUrbanRuralCode)
+                .map(RegionClientNumData::getRegion)
                 .collect(Collectors.toList());
 
         // 构建区域客户数矩阵
         BigDecimal[][] regionCustomerMatrix = new BigDecimal[marketClientNumDataList.size()][30];
         for (int i = 0; i < marketClientNumDataList.size(); i++) {
-            DemoMarketTestClientNumData clientData = marketClientNumDataList.get(i);
+            RegionClientNumData clientData = marketClientNumDataList.get(i);
             regionCustomerMatrix[i][0] = clientData.getD30();
             regionCustomerMatrix[i][1] = clientData.getD29();
             regionCustomerMatrix[i][2] = clientData.getD28();
@@ -101,7 +101,7 @@ public class MarketPredictService {
         }
 
         // 4. 对每个符合条件的卷烟执行预测算法
-        for (DemoTestAdvData advData : filteredAdvData) {
+        for (CigaretteDistributionInfoData advData : filteredAdvData) {
             String cigCode = advData.getCigCode();
             String cigName = advData.getCigName();
             BigDecimal targetAmount = advData.getAdv();
@@ -143,7 +143,7 @@ public class MarketPredictService {
     private void deleteExistingData(String cigCode, String cigName, Integer year, Integer month, Integer weekSeq, List<String> regions) {
         log.info("开始删除卷烟 {} - {} 在 {}-{}-{} 的旧数据", cigName, cigCode, year, month, weekSeq);
         for (String region : regions) {
-            DemoTestData existingData = testDataRepository.findByCigCodeAndCigNameAndDeliveryAreaAndYearAndMonthAndWeekSeq(
+            CigaretteDistributionPredictionData existingData = testDataRepository.findByCigCodeAndCigNameAndDeliveryAreaAndYearAndMonthAndWeekSeq(
                     cigCode, cigName, region, year, month, weekSeq);
             if (existingData != null) {
                 testDataRepository.delete(existingData);
@@ -159,7 +159,7 @@ public class MarketPredictService {
                                      String cigCode, String cigName, Integer year, Integer month, Integer weekSeq) {
         for (int i = 0; i < targetRegions.size(); i++) {
             String region = targetRegions.get(i);
-            DemoTestData newData = new DemoTestData();
+            CigaretteDistributionPredictionData newData = new CigaretteDistributionPredictionData();
             newData.setCigCode(cigCode);
             newData.setCigName(cigName);
             newData.setDeliveryArea(region);
@@ -241,11 +241,11 @@ public class MarketPredictService {
      * 获取市场客户数矩阵
      */
     private BigDecimal[][] getMarketCustomerMatrix() {
-        List<DemoMarketTestClientNumData> allMarketData = marketClientNumDataRepository.findAllByOrderByUrbanRuralCodeAsc();
+        List<RegionClientNumData> allMarketData = regionClientNumDataService.findAllByTableName(regionClientNumDataService.generateTableName("按档位扩展投放", "档位+市场类型", false));
         
         BigDecimal[][] matrix = new BigDecimal[allMarketData.size()][30];
         for (int i = 0; i < allMarketData.size(); i++) {
-            DemoMarketTestClientNumData data = allMarketData.get(i);
+            RegionClientNumData data = allMarketData.get(i);
             matrix[i][0] = data.getD30() != null ? data.getD30() : BigDecimal.ZERO;
             matrix[i][1] = data.getD29() != null ? data.getD29() : BigDecimal.ZERO;
             matrix[i][2] = data.getD28() != null ? data.getD28() : BigDecimal.ZERO;

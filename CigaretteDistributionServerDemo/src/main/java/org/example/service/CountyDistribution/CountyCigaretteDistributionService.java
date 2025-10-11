@@ -1,12 +1,12 @@
 package org.example.service.CountyDistribution;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.entity.DemoTestAdvData;
-import org.example.entity.DemoTestData;
-import org.example.entity.CountyDistribution.DemoTestCountyClientNumData;
-import org.example.repository.DemoTestAdvDataRepository;
-import org.example.repository.DemoTestDataRepository;
-import org.example.repository.CountyDistribution.DemoTestCountyClientNumDataRepository;
+import org.example.entity.CigaretteDistributionInfoData;
+import org.example.entity.CigaretteDistributionPredictionData;
+import org.example.entity.RegionClientNumData;
+import org.example.repository.CigaretteDistributionInfoDataRepository;
+import org.example.repository.CigaretteDistributionPredictionDataRepository;
+import org.example.service.RegionClientNumDataService;
 import org.example.service.algorithm.countyCigaretteDistributionAlgorithm;
 import org.example.util.KmpMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +23,13 @@ import java.util.stream.Collectors;
 public class CountyCigaretteDistributionService {
 
     @Autowired
-    private DemoTestAdvDataRepository advDataRepository;
+    private CigaretteDistributionInfoDataRepository advDataRepository;
 
     @Autowired
-    private DemoTestCountyClientNumDataRepository countyClientNumDataRepository;
+    private RegionClientNumDataService regionClientNumDataService;
 
     @Autowired
-    private DemoTestDataRepository testDataRepository;
+    private CigaretteDistributionPredictionDataRepository testDataRepository;
 
     @Autowired
     private countyCigaretteDistributionAlgorithm distributionAlgorithm;
@@ -47,14 +47,14 @@ public class CountyCigaretteDistributionService {
         List<Map<String, Object>> results = new ArrayList<>();
         int successCount = 0;
 
-        List<DemoTestAdvData> advDataList = getAdvData();
+        List<CigaretteDistributionInfoData> advDataList = getAdvData();
         if (advDataList == null || advDataList.isEmpty()) {
             response.put("message", "预投放数据为空，无法执行预测");
             response.put("success", false);
             return response;
         }
 
-        List<DemoTestAdvData> countyAdvData = advDataList.stream()
+        List<CigaretteDistributionInfoData> countyAdvData = advDataList.stream()
                 .filter(adv -> "档位+区县".equals(adv.getDeliveryEtype()))
                 .collect(Collectors.toList());
 
@@ -65,10 +65,10 @@ public class CountyCigaretteDistributionService {
         }
 
         // 精确删除：只删除当前要处理的卷烟在其目标区县的旧数据，保留其他投放区域的数据
-        for (DemoTestAdvData advData : countyAdvData) {
+        for (CigaretteDistributionInfoData advData : countyAdvData) {
             List<String> targetCounties = getTargetCountyList(advData.getDeliveryArea());
             if (!targetCounties.isEmpty()) {
-                List<DemoTestData> oldCountyPredictions = testDataRepository.findByYearAndMonthAndWeekSeqAndCigCodeAndDeliveryAreaIn(
+                List<CigaretteDistributionPredictionData> oldCountyPredictions = testDataRepository.findByYearAndMonthAndWeekSeqAndCigCodeAndDeliveryAreaIn(
                     year, month, weekSeq, advData.getCigCode(), targetCounties);
                 if (!oldCountyPredictions.isEmpty()) {
                     testDataRepository.deleteAll(oldCountyPredictions);
@@ -79,7 +79,7 @@ public class CountyCigaretteDistributionService {
         }
 
 
-        for (DemoTestAdvData advData : countyAdvData) {
+        for (CigaretteDistributionInfoData advData : countyAdvData) {
             Map<String, Object> cigResult = new HashMap<>();
             cigResult.put("cigCode", advData.getCigCode());
             cigResult.put("cigName", advData.getCigName());
@@ -94,9 +94,9 @@ public class CountyCigaretteDistributionService {
 
                 BigDecimal[][] allocationMatrix = calculateDistributionMatrix(targetCounties, advData.getAdv());
 
-                List<DemoTestData> predictionsToSave = new ArrayList<>();
+                List<CigaretteDistributionPredictionData> predictionsToSave = new ArrayList<>();
                 for (int i = 0; i < targetCounties.size(); i++) {
-                    predictionsToSave.add(createDemoTestDataEntity(advData, targetCounties.get(i), allocationMatrix[i], year, month, weekSeq));
+                    predictionsToSave.add(createCigaretteDistributionPredictionDataEntity(advData, targetCounties.get(i), allocationMatrix[i], year, month, weekSeq));
                 }
                 testDataRepository.saveAll(predictionsToSave);
                 successCount++;
@@ -120,7 +120,7 @@ public class CountyCigaretteDistributionService {
     }
 
     @Cacheable("advData")
-    public List<DemoTestAdvData> getAdvData() {
+    public List<CigaretteDistributionInfoData> getAdvData() {
         log.info("正在从数据库获取预投放数据并缓存...");
         return advDataRepository.findAll();
     }
@@ -129,9 +129,10 @@ public class CountyCigaretteDistributionService {
     public List<String> getAllCountyList() {
         if (allCountyList == null) {
             log.info("正在从数据库初始化区县列表并缓存...");
-            allCountyList = countyClientNumDataRepository.findAllByOrderByIdAsc()
+            String tableName = regionClientNumDataService.generateTableName("按档位扩展投放", "档位+区县", false);
+            allCountyList = regionClientNumDataService.findAllByTableName(tableName)
                     .stream()
-                    .map(DemoTestCountyClientNumData::getCounty)
+                    .map(RegionClientNumData::getRegion)
                     .filter(Objects::nonNull)
                     .distinct()
                     .collect(Collectors.toList());
@@ -144,49 +145,24 @@ public class CountyCigaretteDistributionService {
     public BigDecimal[][] getCountyCustomerMatrix() {
         if (countyCustomerMatrix == null) {
             log.info("正在从数据库初始化区县客户矩阵并缓存...");
-            List<DemoTestCountyClientNumData> clientNumDataList = countyClientNumDataRepository.findAllByOrderByIdAsc();
+            String tableName = regionClientNumDataService.generateTableName("按档位扩展投放", "档位+区县", false);
+            List<RegionClientNumData> clientNumDataList = regionClientNumDataService.findAllByTableName(tableName);
             List<String> counties = getAllCountyList();
 
             countyCustomerMatrix = new BigDecimal[counties.size()][30];
 
             for (int i = 0; i < counties.size(); i++) {
                 String county = counties.get(i);
-                DemoTestCountyClientNumData clientData = clientNumDataList.stream()
-                        .filter(data -> county.equals(data.getCounty()))
+                RegionClientNumData clientData = clientNumDataList.stream()
+                        .filter(data -> county.equals(data.getRegion()))
                         .findFirst()
                         .orElse(null);
 
                 if (clientData != null) {
-                    countyCustomerMatrix[i][0] = clientData.getD30();
-                    countyCustomerMatrix[i][1] = clientData.getD29();
-                    countyCustomerMatrix[i][2] = clientData.getD28();
-                    countyCustomerMatrix[i][3] = clientData.getD27();
-                    countyCustomerMatrix[i][4] = clientData.getD26();
-                    countyCustomerMatrix[i][5] = clientData.getD25();
-                    countyCustomerMatrix[i][6] = clientData.getD24();
-                    countyCustomerMatrix[i][7] = clientData.getD23();
-                    countyCustomerMatrix[i][8] = clientData.getD22();
-                    countyCustomerMatrix[i][9] = clientData.getD21();
-                    countyCustomerMatrix[i][10] = clientData.getD20();
-                    countyCustomerMatrix[i][11] = clientData.getD19();
-                    countyCustomerMatrix[i][12] = clientData.getD18();
-                    countyCustomerMatrix[i][13] = clientData.getD17();
-                    countyCustomerMatrix[i][14] = clientData.getD16();
-                    countyCustomerMatrix[i][15] = clientData.getD15();
-                    countyCustomerMatrix[i][16] = clientData.getD14();
-                    countyCustomerMatrix[i][17] = clientData.getD13();
-                    countyCustomerMatrix[i][18] = clientData.getD12();
-                    countyCustomerMatrix[i][19] = clientData.getD11();
-                    countyCustomerMatrix[i][20] = clientData.getD10();
-                    countyCustomerMatrix[i][21] = clientData.getD9();
-                    countyCustomerMatrix[i][22] = clientData.getD8();
-                    countyCustomerMatrix[i][23] = clientData.getD7();
-                    countyCustomerMatrix[i][24] = clientData.getD6();
-                    countyCustomerMatrix[i][25] = clientData.getD5();
-                    countyCustomerMatrix[i][26] = clientData.getD4();
-                    countyCustomerMatrix[i][27] = clientData.getD3();
-                    countyCustomerMatrix[i][28] = clientData.getD2();
-                    countyCustomerMatrix[i][29] = clientData.getD1();
+                    BigDecimal[] gradeArray = clientData.getGradeArray();
+                    for (int j = 0; j < 30 && j < gradeArray.length; j++) {
+                        countyCustomerMatrix[i][j] = gradeArray[j] != null ? gradeArray[j] : BigDecimal.ZERO;
+                    }
                 }
             }
             log.info("区县客户矩阵初始化完成，大小为: {}x30", counties.size());
@@ -219,8 +195,8 @@ public class CountyCigaretteDistributionService {
         return distributionAlgorithm.calculateDistribution(targetCounties, targetCountyCustomerMatrix, targetAmount);
     }
 
-    private DemoTestData createDemoTestDataEntity(DemoTestAdvData advData, String county, BigDecimal[] allocation, Integer year, Integer month, Integer weekSeq) {
-        DemoTestData entity = new DemoTestData();
+    private CigaretteDistributionPredictionData createCigaretteDistributionPredictionDataEntity(CigaretteDistributionInfoData advData, String county, BigDecimal[] allocation, Integer year, Integer month, Integer weekSeq) {
+        CigaretteDistributionPredictionData entity = new CigaretteDistributionPredictionData();
         entity.setCigCode(advData.getCigCode());
         entity.setCigName(advData.getCigName());
         entity.setYear(year);

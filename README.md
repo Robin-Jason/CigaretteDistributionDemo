@@ -2,9 +2,23 @@
 
 **项目clone到本地运行前进行如下步骤：**
 
-1. 前端npm install重新安装一下依赖再npm run serve启动
+1. 前端npm install重新安装一下依赖再npm run serve启动（有冲突用--legacy-peer-deps绕过冲突）
 2. 后端applicantion修改数据库账户和密码
 3. 后端同步一下maven依赖再mvn spring-boot:run启动
+
+
+
+## 10.10
+
+1. 完成导入卷烟投放基本信息表和区域客户数表功能
+2. 将操作数据库表从原来的表重构为动态表名查询
+3. 重构Entity包，Repository包
+4. 改变服务层架构为接口+实现类的架构
+5. 重构服务层的数据CRUD功能，分配计算统一接口，表导入服务，新增SQL，RowMapper工具类等
+6. 将各类型卷烟分配计算服务的设计模式改为工厂模式，均存放于strategy包下
+7. 档位+城乡分类代码部分已重构
+
+
 
 ## 9.30
 

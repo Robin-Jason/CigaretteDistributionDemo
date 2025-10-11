@@ -16,7 +16,6 @@ import java.util.Map;
 @RequestMapping("/api/common")
 @CrossOrigin(origins = "*")
 public class CommonController {
-    
     /**
      * 健康检查接口
      */

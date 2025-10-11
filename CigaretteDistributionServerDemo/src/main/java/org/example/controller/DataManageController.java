@@ -5,11 +5,9 @@ import org.example.dto.BatchUpdateFromExpressionsRequestDto;
 import org.example.dto.QueryRequestDto;
 import org.example.dto.UpdateCigaretteRequestDto;
 import org.example.dto.DeleteAreasRequestDto;
-import org.example.entity.DemoTestAdvData;
-import org.example.entity.DemoTestData;
-import org.example.repository.DemoTestAdvDataRepository;
-import org.example.repository.DemoTestDataRepository;
+import org.example.entity.CigaretteDistributionPredictionData;
 import org.example.service.DataManagementService;
+import org.example.service.DistributionCalculateService;
 import org.example.service.EncodeDecodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,10 +37,7 @@ public class DataManageController {
     private DataManagementService dataManagementService;
     
     @Autowired
-    private DemoTestAdvDataRepository advDataRepository;
-    
-    @Autowired
-    private DemoTestDataRepository testDataRepository;
+    private DistributionCalculateService distributionCalculateService;
     
     @Autowired
     private EncodeDecodeService encodeDecodeService;
@@ -55,20 +50,20 @@ public class DataManageController {
         log.info("接收查询请求，年份: {}, 月份: {}, 周序号: {}", request.getYear(), request.getMonth(), request.getWeekSeq());
         
         try {
-            // 获取原始数据
-            List<DemoTestData> rawDataList = testDataRepository.findByYearAndMonthAndWeekSeq(
+            // 获取原始数据（通过服务层）
+            List<CigaretteDistributionPredictionData> rawDataList = dataManagementService.queryTestDataByTime(
                     request.getYear(), request.getMonth(), request.getWeekSeq());
             
-            // 按卷烟代码+名称分组计算总实际投放量
-            Map<String, BigDecimal> totalActualDeliveryMap = calculateTotalActualDeliveryByTobacco(rawDataList);
+            // 按卷烟代码+名称分组计算总实际投放量（通过DistributionCalculateService）
+            Map<String, BigDecimal> totalActualDeliveryMap = distributionCalculateService.calculateTotalActualDeliveryByTobacco(rawDataList);
             
             // 按卷烟代码+名称分组，用于编码解码处理
-            Map<String, List<DemoTestData>> cigaretteGroupMap = rawDataList.stream()
+            Map<String, List<CigaretteDistributionPredictionData>> cigaretteGroupMap = rawDataList.stream()
                 .collect(java.util.stream.Collectors.groupingBy(data -> data.getCigCode() + "_" + data.getCigName()));
             
             // 返回原始数据，添加预投放量、实际投放量、编码表达和解码表达
             List<Map<String, Object>> result = new ArrayList<>();
-            for (DemoTestData data : rawDataList) {
+            for (CigaretteDistributionPredictionData data : rawDataList) {
                 Map<String, Object> record = new HashMap<>();
                 record.put("id", data.getId());
                 record.put("cigCode", data.getCigCode());
@@ -79,8 +74,9 @@ public class DataManageController {
                 record.put("weekSeq", data.getWeekSeq());
                 record.put("remark", data.getBz());
 
-                // 获取预投放量（从demo_test_ADVdata表）和投放类型（从demo_test_data表）
-                Map<String, Object> advInfo = getAdvDataInfo(data.getCigCode(), data.getCigName());
+                // 获取预投放量（从对应的cigarette_distribution_info表）和投放类型（通过服务层）
+                Map<String, Object> advInfo = dataManagementService.getAdvDataInfo(data.getCigCode(), data.getCigName(), 
+                        data.getYear(), data.getMonth(), data.getWeekSeq());
                 record.put("advAmount", advInfo.get("advAmount")); // 预投放量
                 record.put("deliveryMethod", data.getDeliveryMethod()); // 投放类型（从demo_test_data表）
                 record.put("deliveryEtype", data.getDeliveryEtype()); // 扩展投放类型（从demo_test_data表）
@@ -91,7 +87,7 @@ public class DataManageController {
                 record.put("actualDelivery", totalActualDelivery);
 
                 // 为当前记录生成对应的编码表达和解码表达
-                List<DemoTestData> cigaretteRecords = cigaretteGroupMap.get(tobaccoKey);
+                List<CigaretteDistributionPredictionData> cigaretteRecords = cigaretteGroupMap.get(tobaccoKey);
                 
                 String encodedExpression = "";
                 String decodedExpression = "";
@@ -215,14 +211,14 @@ public class DataManageController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            // 2. 查询当前该卷烟的所有投放区域
-            List<DemoTestData> currentRecords = testDataRepository.findByYearAndMonthAndWeekSeq(
+            // 2. 查询当前该卷烟的所有投放区域（通过服务层）
+            List<CigaretteDistributionPredictionData> currentRecords = dataManagementService.queryTestDataByTime(
                     request.getYear(), request.getMonth(), request.getWeekSeq());
 
             List<String> currentAreas = currentRecords.stream()
                     .filter(record -> request.getCigCode().equals(record.getCigCode()) &&
                                     request.getCigName().equals(record.getCigName()))
-                    .map(DemoTestData::getDeliveryArea)
+                    .map(CigaretteDistributionPredictionData::getDeliveryArea)
                     .distinct()
                     .collect(java.util.stream.Collectors.toList());
 
@@ -281,69 +277,6 @@ public class DataManageController {
         }
     }
     
-    /**
-     * 获取预投放量、投放类型和扩展投放类型（从demo_test_ADVdata表）
-     */
-    private Map<String, Object> getAdvDataInfo(String cigCode, String cigName) {
-        Map<String, Object> result = new HashMap<>();
-        try {
-            DemoTestAdvData advData = advDataRepository.findByCigCodeAndCigName(cigCode, cigName);
-            if (advData != null) {
-                result.put("advAmount", advData.getAdv() != null ? advData.getAdv() : BigDecimal.ZERO);
-                result.put("deliveryMethod", advData.getDeliveryMethod() != null ? advData.getDeliveryMethod() : "");
-                result.put("deliveryEtype", advData.getDeliveryEtype() != null ? advData.getDeliveryEtype() : "");
-            } else {
-                result.put("advAmount", BigDecimal.ZERO);
-                result.put("deliveryMethod", "");
-                result.put("deliveryEtype", "");
-            }
-        } catch (Exception e) {
-            log.warn("获取预投放量和投放类型失败，卷烟代码: {}, 卷烟名称: {}, 错误: {}", cigCode, cigName, e.getMessage());
-            result.put("advAmount", BigDecimal.ZERO);
-            result.put("deliveryMethod", "");
-            result.put("deliveryEtype", "");
-        }
-        return result;
-    }
-
-    /**
-     * 按卷烟代码+名称分组计算总实际投放量
-     * 新逻辑：直接从demo_test_data表中读取各区域的ACTUAL_DELIVERY字段进行求和
-     */
-    private Map<String, BigDecimal> calculateTotalActualDeliveryByTobacco(List<DemoTestData> rawDataList) {
-        Map<String, BigDecimal> totalActualDeliveryMap = new HashMap<>();
-        
-        // 按卷烟代码+名称分组
-        Map<String, List<DemoTestData>> groupedByTobacco = new HashMap<>();
-        for (DemoTestData data : rawDataList) {
-            String tobaccoKey = data.getCigCode() + "_" + data.getCigName();
-            groupedByTobacco.computeIfAbsent(tobaccoKey, k -> new ArrayList<>()).add(data);
-        }
-        
-        // 计算每个卷烟的总实际投放量
-        for (Map.Entry<String, List<DemoTestData>> entry : groupedByTobacco.entrySet()) {
-            String tobaccoKey = entry.getKey();
-            List<DemoTestData> tobaccoRecords = entry.getValue();
-            
-            BigDecimal totalActualDelivery = BigDecimal.ZERO;
-            
-            // 直接从数据库记录中累加各区域的ACTUAL_DELIVERY字段
-            for (DemoTestData data : tobaccoRecords) {
-                if (data.getActualDelivery() != null) {
-                    totalActualDelivery = totalActualDelivery.add(data.getActualDelivery());
-                    log.debug("卷烟 {} 区域 {} 实际投放量: {}", data.getCigName(), data.getDeliveryArea(), data.getActualDelivery());
-                } else {
-                    log.warn("卷烟 {} 区域 {} 的ACTUAL_DELIVERY字段为null", data.getCigName(), data.getDeliveryArea());
-                }
-            }
-            
-            totalActualDeliveryMap.put(tobaccoKey, totalActualDelivery);
-            log.debug("卷烟 {} 总实际投放量: {} (包含 {} 个区域)", 
-                     tobaccoKey.split("_")[1], totalActualDelivery, tobaccoRecords.size());
-        }
-        
-        return totalActualDeliveryMap;
-    }
 
     /**
      * 根据编码表达式批量更新卷烟信息
