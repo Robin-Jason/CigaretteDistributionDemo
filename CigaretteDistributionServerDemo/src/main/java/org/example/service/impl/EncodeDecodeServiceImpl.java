@@ -20,6 +20,7 @@ public class EncodeDecodeServiceImpl implements EncodeDecodeService {
     // 投放类型编码映射
     private static final Map<String, String> DELIVERY_METHOD_CODES = new HashMap<String, String>() {{
         put("按档位统一投放", "A");
+        put("按档位投放", "A");  // 等价于"按档位统一投放"
         put("按档位扩展投放", "B");
         put("按需投放", "C");
     }};

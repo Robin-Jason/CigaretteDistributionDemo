@@ -433,7 +433,7 @@ public class DataManagementServiceImpl implements DataManagementService {
             
             // 计算该区域的实际投放量
             BigDecimal actualDelivery = distributionCalculateService.calculateActualDeliveryForRegion(area, 
-                request.getDistribution().toArray(new BigDecimal[0]), request.getDeliveryMethod(), request.getDeliveryEtype());
+                request.getDistribution().toArray(new BigDecimal[0]), request.getDeliveryMethod(), request.getDeliveryEtype(), null);
             
             // 生成编码表达 - 基于当前区域的数据生成简化编码  
             String encodedExpression = generateSingleAreaEncodedExpression(request, area);
@@ -487,7 +487,7 @@ public class DataManagementServiceImpl implements DataManagementService {
             
             // 计算该区域的实际投放量
             BigDecimal actualDelivery = distributionCalculateService.calculateActualDeliveryForRegion(area, 
-                request.getDistribution().toArray(new BigDecimal[0]), request.getDeliveryMethod(), request.getDeliveryEtype());
+                request.getDistribution().toArray(new BigDecimal[0]), request.getDeliveryMethod(), request.getDeliveryEtype(), null);
             
             // 生成编码表达 - 基于当前区域的数据生成简化编码
             String encodedExpression = generateSingleAreaEncodedExpression(request, area);
@@ -799,7 +799,7 @@ public class DataManagementServiceImpl implements DataManagementService {
             
             // 计算该区域的实际投放量
             BigDecimal actualDelivery = distributionCalculateService.calculateActualDeliveryForRegion(deliveryArea, 
-                parsedData.getGradeAllocations(), parsedData.getDeliveryMethod(), parsedData.getDeliveryEtype());
+                parsedData.getGradeAllocations(), parsedData.getDeliveryMethod(), parsedData.getDeliveryEtype(), remark);
             
             // 生成编码表达
             String encodedExpression = generateEncodedExpressionFromParsedData(cigCode, cigName, parsedData, deliveryArea);
@@ -860,7 +860,7 @@ public class DataManagementServiceImpl implements DataManagementService {
             
             // 计算该区域的实际投放量
             BigDecimal actualDelivery = distributionCalculateService.calculateActualDeliveryForRegion(deliveryArea, 
-                parsedData.getGradeAllocations(), parsedData.getDeliveryMethod(), parsedData.getDeliveryEtype());
+                parsedData.getGradeAllocations(), parsedData.getDeliveryMethod(), parsedData.getDeliveryEtype(), remark);
             
             // 生成编码表达
             String encodedExpression = generateEncodedExpressionFromParsedData(cigCode, cigName, parsedData, deliveryArea);

@@ -78,7 +78,7 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
             
             // 获取指定周期的预投放量数据
             String advDataSql = String.format("SELECT CIG_CODE as cig_code, CIG_NAME as cig_name, ADV as adv, DELIVERY_AREA as delivery_area, " +
-                               "DELIVERY_METHOD as delivery_method, DELIVERY_ETYPE as delivery_etype, %d as year, %d as month, %d as week_seq " +
+                               "DELIVERY_METHOD as delivery_method, DELIVERY_ETYPE as delivery_etype, remark, %d as year, %d as month, %d as week_seq " +
                                "FROM `%s`", year, month, weekSeq, tableName);
             List<Map<String, Object>> advDataList = jdbcTemplate.queryForList(advDataSql);
             log.info("从表 {} 获取{}年{}月第{}周的预投放量数据数量: {}", tableName, year, month, weekSeq, advDataList.size());
@@ -152,10 +152,11 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
                         List<String> targetList;
                         BigDecimal[][] allocationMatrix;
                         String deliveryMethod = (String) advData.get("delivery_method");
+                        String remark = (String) advData.get("remark");  // 获取备注字段
                         
                         // 调试日志：检查关键字段值
-                        log.debug("卷烟: {} - {}, deliveryMethod: {}, deliveryEtype: {}", 
-                                 cigCode, cigName, deliveryMethod, deliveryEtype);
+                        log.debug("卷烟: {} - {}, deliveryMethod: {}, deliveryEtype: {}, remark: {}", 
+                                 cigCode, cigName, deliveryMethod, deliveryEtype, remark);
                         
                         // 使用策略模式处理不同的投放类型
                         try {
@@ -188,7 +189,7 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
                         if (!targetList.isEmpty() && allocationMatrix != null) {
                             // 写回数据库，使用cigarette_distribution_info表中的日期信息
                             boolean writeBackSuccess = writeBackToDatabase(allocationMatrix, targetList, 
-                                cigCode, cigName, cigYear, cigMonth, cigWeekSeq, deliveryMethod, deliveryEtype);
+                                cigCode, cigName, cigYear, cigMonth, cigWeekSeq, deliveryMethod, deliveryEtype, remark);
                             
                             if (writeBackSuccess) {
                                 successCount++;
@@ -242,10 +243,11 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
      * @param allocationRow 档位分配数组，包含30个档位的分配值
      * @param deliveryMethod 投放方法
      * @param deliveryEtype 投放类型，用于确定客户数表
+     * @param remark 备注字段（用于判断是否双周上浮）
      * @return 计算得出的实际投放量
      */
     @Override
-    public BigDecimal calculateActualDeliveryForRegion(String target, BigDecimal[] allocationRow, String deliveryMethod, String deliveryEtype) {
+    public BigDecimal calculateActualDeliveryForRegion(String target, BigDecimal[] allocationRow, String deliveryMethod, String deliveryEtype, String remark) {
         if (target == null || target.trim().isEmpty()) {
             throw new IllegalArgumentException("目标区域不能为空");
         }
@@ -254,13 +256,14 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
             throw new IllegalArgumentException("档位分配数组必须包含30个档位(D30-D1)");
         }
         
-        if (deliveryEtype == null) {
-            throw new IllegalArgumentException("投放类型不能为空");
+        // 对于统一投放（按档位统一投放或按档位投放），deliveryEtype可以为null
+        if ("按档位扩展投放".equals(deliveryMethod) && deliveryEtype == null) {
+            throw new IllegalArgumentException("扩展投放类型不能为空");
         }
         
         try {
-            // 获取目标区域的客户数档位值
-            BigDecimal[] customerCounts = getCustomerCountsForTarget(target, deliveryMethod, deliveryEtype);
+            // 获取目标区域的客户数档位值，使用备注判断是否双周上浮
+            BigDecimal[] customerCounts = getCustomerCountsForTarget(target, deliveryMethod, deliveryEtype, remark);
             
             if (customerCounts == null || customerCounts.length != 30) {
                 throw new RuntimeException(String.format("无法获取区域 '%s' 的客户数档位数据", target));
@@ -321,7 +324,8 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
                                       Integer month, 
                                       Integer weekSeq,
                                       String deliveryMethod,
-                                      String deliveryEtype) {
+                                      String deliveryEtype,
+                                      String remark) {
         try {
             // 使用验证工具统一验证所有参数
             DistributionValidationUtils.validateWriteBackParams(
@@ -351,7 +355,7 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
                 // 严格按照公式计算该区域的实际投放量：∑（档位分配值 × 对应区域客户数档位值）
                 BigDecimal actualDelivery;
                 try {
-                    actualDelivery = calculateActualDeliveryForRegion(target, allocationMatrix[i], deliveryMethod, deliveryEtype);
+                    actualDelivery = calculateActualDeliveryForRegion(target, allocationMatrix[i], deliveryMethod, deliveryEtype, remark);
                 } catch (Exception e) {
                     String errorMessage = String.format("卷烟 '%s' 在区域 '%s' (投放类型: %s) 的实际投放量计算失败: %s", 
                         cigName, target, deliveryEtype, e.getMessage());
@@ -375,7 +379,13 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
                 predictionData.setWeekSeq(weekSeq);
                 predictionData.setActualDelivery(actualDelivery);
                 predictionData.setDeployinfoCode(currentAreaEncodedExpression);
-                predictionData.setBz("算法自动生成");
+                
+                // 对于包含双周上浮关键词的卷烟，保留原始备注；否则使用"算法自动生成"
+                if (TableNameGeneratorUtil.checkBiWeeklyFloatFromRemark(remark)) {
+                    predictionData.setBz(remark);  // 保留原始的双周上浮备注
+                } else {
+                    predictionData.setBz("算法自动生成");  // 默认备注
+                }
                 
                 // 使用GradeMatrixUtils设置30个档位值
                 GradeMatrixUtils.setGradesToEntity(predictionData, allocationMatrix[i]);
@@ -395,8 +405,9 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
             return true;
             
         } catch (Exception e) {
-            log.error("写回数据库失败，卷烟: {} - {}, deliveryMethod: {}, deliveryEtype: {}, 错误: {}", 
-                     cigCode, cigName, deliveryMethod, deliveryEtype, e.getMessage(), e);
+            log.error("写回数据库失败，卷烟: {} - {}, deliveryMethod: {}, deliveryEtype: {}, 错误类型: {}, 错误信息: {}", 
+                     cigCode, cigName, deliveryMethod, deliveryEtype, e.getClass().getSimpleName(), e.getMessage());
+            log.error("详细堆栈信息:", e);
             return false;
         }
     }
@@ -404,9 +415,14 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
     /**
      * 根据投放类型和目标区域获取客户数数组
      * 使用TableNameGeneratorUtil生成动态表名，从region_clientNum表获取数据
-     * 严格验证数据获取过程，确保计算基础数据的准确性  
+     * 严格验证数据获取过程，确保计算基础数据的准确性
+     * 
+     * @param target 目标区域
+     * @param deliveryMethod 投放方法  
+     * @param deliveryEtype 扩展投放类型
+     * @param remark 备注字段（用于判断是否双周上浮）
      */
-    private BigDecimal[] getCustomerCountsForTarget(String target, String deliveryMethod, String deliveryEtype) {
+    private BigDecimal[] getCustomerCountsForTarget(String target, String deliveryMethod, String deliveryEtype, String remark) {
         if (target == null || target.trim().isEmpty()) {
             throw new IllegalArgumentException("目标区域不能为空");
         }
@@ -415,15 +431,15 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
             throw new IllegalArgumentException("投放方法不能为空");
         }
         
-        if (deliveryEtype == null) {
-            throw new IllegalArgumentException("投放类型不能为空");
+        // 对于统一投放（按档位统一投放或按档位投放），deliveryEtype可以为null
+        if ("按档位扩展投放".equals(deliveryMethod) && deliveryEtype == null) {
+            throw new IllegalArgumentException("扩展投放类型不能为空");
         }
         
         try {
-            // 使用TableNameGeneratorUtil生成动态表名
-            // 假设不使用双周上浮功能，使用false
-            String tableName = TableNameGeneratorUtil.generateRegionClientTableName(deliveryMethod, deliveryEtype, false);
-            log.debug("查询区域客户数表: {} 目标区域: {}", tableName, target);
+            // 使用TableNameGeneratorUtil生成动态表名，根据备注判断是否双周上浮
+            String tableName = TableNameGeneratorUtil.generateRegionClientTableName(deliveryMethod, deliveryEtype, remark);
+            log.debug("查询区域客户数表: {} 目标区域: {} (备注: {})", tableName, target, remark);
             
             // 使用RegionClientNumDataService查询数据
             List<org.example.entity.RegionClientNumData> dataList = regionClientNumDataService.findByTableNameAndRegion(tableName, target);

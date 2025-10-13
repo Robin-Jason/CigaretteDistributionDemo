@@ -221,7 +221,7 @@ public class RegionClientNumDataServiceImpl implements RegionClientNumDataServic
     
     @Override
     public Integer getSequenceNumber(String deliveryMethod, String deliveryEtype) {
-        if ("按档位统一投放".equals(deliveryMethod)) {
+        if ("按档位统一投放".equals(deliveryMethod) || "按档位投放".equals(deliveryMethod)) {
             return 0;  // 全市统一投放
         } else if ("按档位扩展投放".equals(deliveryMethod)) {
             switch (deliveryEtype != null ? deliveryEtype : "") {

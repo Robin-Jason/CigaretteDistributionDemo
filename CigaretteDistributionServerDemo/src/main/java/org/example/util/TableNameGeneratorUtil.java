@@ -24,6 +24,7 @@ public class TableNameGeneratorUtil {
 
     // 投放类型序号映射常量
     private static final String UNIFIED_DELIVERY = "按档位统一投放";
+    private static final String UNIFIED_DELIVERY_ALT = "按档位投放";  // 等价于"按档位统一投放"
     private static final String EXTENDED_DELIVERY = "按档位扩展投放";
     private static final String COUNTY_TYPE = "档位+区县";
     private static final String MARKET_TYPE = "档位+市场类型";
@@ -108,10 +109,33 @@ public class TableNameGeneratorUtil {
     }
 
     /**
+     * 根据投放类型和备注生成区域客户数表名
+     * 
+     * @param deliveryMethod 投放方法
+     * @param deliveryEtype 扩展投放类型
+     * @param remark 备注字段内容（用于判断是否双周上浮）
+     * @return 区域客户数表名，格式为 "region_clientNum_{mainSeq}_{subSeq}"
+     */
+    public static String generateRegionClientTableName(String deliveryMethod, String deliveryEtype, String remark) {
+        validateDeliveryParameters(deliveryMethod, deliveryEtype);
+        
+        Integer mainSequence = getMainSequenceNumber(deliveryMethod, deliveryEtype);
+        Boolean isBiWeeklyFloat = checkBiWeeklyFloatFromRemark(remark);
+        Integer subSequence = getSubSequenceNumber(isBiWeeklyFloat);
+        
+        String tableName = String.format("%s_%d_%d", 
+                REGION_CLIENT_TABLE_PREFIX, mainSequence, subSequence);
+        
+        log.debug("Generated region client table name: {} (deliveryMethod: {}, deliveryEtype: {}, remark: {}, isBiWeeklyFloat: {})", 
+                tableName, deliveryMethod, deliveryEtype, remark, isBiWeeklyFloat);
+        return tableName;
+    }
+
+    /**
      * 根据投放类型组合获取主序号
      * 
      * 序号映射规则：
-     * - 按档位统一投放: 0
+     * - 按档位统一投放/按档位投放: 0
      * - 档位+区县: 1  
      * - 档位+市场类型: 2
      * - 档位+城乡分类代码: 3
@@ -122,7 +146,7 @@ public class TableNameGeneratorUtil {
      * @return 主序号 (0-4)
      */
     private static Integer getMainSequenceNumber(String deliveryMethod, String deliveryEtype) {
-        if (UNIFIED_DELIVERY.equals(deliveryMethod)) {
+        if (UNIFIED_DELIVERY.equals(deliveryMethod) || UNIFIED_DELIVERY_ALT.equals(deliveryMethod)) {
             return 0;
         } else if (EXTENDED_DELIVERY.equals(deliveryMethod)) {
             switch (deliveryEtype) {
@@ -140,6 +164,19 @@ public class TableNameGeneratorUtil {
         } else {
             throw new IllegalArgumentException("无效的投放方法: " + deliveryMethod);
         }
+    }
+
+    /**
+     * 检查备注是否包含双周上浮条件
+     * 
+     * @param remark 备注字段内容
+     * @return true 如果备注包含"两周一访上浮100%"，否则返回false
+     */
+    public static Boolean checkBiWeeklyFloatFromRemark(String remark) {
+        if (remark == null || remark.trim().isEmpty()) {
+            return false;
+        }
+        return remark.contains("两周一访上浮100%");
     }
 
     /**
@@ -203,8 +240,8 @@ public class TableNameGeneratorUtil {
      * @return 投放类型描述
      */
     public static String getDeliveryTypeDescription(String deliveryMethod, String deliveryEtype) {
-        if (UNIFIED_DELIVERY.equals(deliveryMethod)) {
-            return "按档位统一投放";
+        if (UNIFIED_DELIVERY.equals(deliveryMethod) || UNIFIED_DELIVERY_ALT.equals(deliveryMethod)) {
+            return deliveryMethod;  // 返回原始的投放方法名称
         } else if (EXTENDED_DELIVERY.equals(deliveryMethod)) {
             return deliveryEtype;
         } else {

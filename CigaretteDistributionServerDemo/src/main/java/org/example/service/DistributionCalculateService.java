@@ -75,11 +75,11 @@ public interface DistributionCalculateService {
      * @throws IllegalArgumentException 当违反计算公式或参数无效时抛出异常
      * 
      * @example
-     * calculateActualDeliveryForRegion("房县", [5.0, 3.0, 2.0, ...], "按档位扩展投放", "档位+区县")
-     * -> 从 region_clientNum_1_1 表获取房县的客户数数据
+     * calculateActualDeliveryForRegion("房县", [5.0, 3.0, 2.0, ...], "按档位扩展投放", "档位+区县", "两周一访上浮100%")
+     * -> 从 region_clientNum_1_2 表获取房县的客户数数据 (双周上浮)
      * -> 计算：5.0×房县D30客户数 + 3.0×房县D29客户数 + ... = 最终实际投放量
      */
-    BigDecimal calculateActualDeliveryForRegion(String target, BigDecimal[] allocationRow, String deliveryMethod, String deliveryEtype);
+    BigDecimal calculateActualDeliveryForRegion(String target, BigDecimal[] allocationRow, String deliveryMethod, String deliveryEtype, String remark);
     
     /**
      * 卷烟总投放量统计计算

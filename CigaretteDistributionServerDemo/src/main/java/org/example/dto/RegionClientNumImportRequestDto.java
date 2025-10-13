@@ -48,7 +48,7 @@ public class RegionClientNumImportRequestDto {
      * 4表示档位+业态
      */
     public Integer getSequenceNumber() {
-        if ("按档位统一投放".equals(deliveryMethod)) {
+        if ("按档位统一投放".equals(deliveryMethod) || "按档位投放".equals(deliveryMethod)) {
             return 0;
         } else if ("按档位扩展投放".equals(deliveryMethod)) {
             if ("档位+区县".equals(deliveryEtype)) {

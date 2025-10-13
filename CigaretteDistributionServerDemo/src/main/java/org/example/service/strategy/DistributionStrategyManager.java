@@ -61,6 +61,7 @@ public class DistributionStrategyManager {
      * 
      * @example
      * getStrategy("按档位统一投放", null) -> CityDistributionStrategy
+     * getStrategy("按档位投放", null) -> CityDistributionStrategy  
      * getStrategy("按档位扩展投放", "档位+区县") -> CountyDistributionStrategy
      */
     public DistributionStrategy getStrategy(String deliveryMethod, String deliveryEtype) {
@@ -127,7 +128,8 @@ public class DistributionStrategyManager {
      * @return 策略键
      */
     private String determineStrategyKey(String deliveryMethod, String deliveryEtype) {
-        if ("按档位统一投放".equals(deliveryMethod)) {
+        // 支持"按档位统一投放"和"按档位投放"两种等价表述
+        if ("按档位统一投放".equals(deliveryMethod) || "按档位投放".equals(deliveryMethod)) {
             return "全市统一投放";
         } else if ("按档位扩展投放".equals(deliveryMethod)) {
             // 对于扩展投放，直接使用投放类型作为策略键

@@ -58,7 +58,7 @@ public class CityPredictionService {
             log.info("正在处理卷烟: {} ({}), 投放方式: {}", advData.getCigName(), advData.getCigCode(), advData.getDeliveryMethod());
 
             // 判断是否为按档位统一投放
-            if (!"按档位统一投放".equals(advData.getDeliveryMethod())) {
+            if (!"按档位统一投放".equals(advData.getDeliveryMethod()) && !"按档位投放".equals(advData.getDeliveryMethod())) {
                 log.info("卷烟 {} 的投放方式为 {}，跳过全市统一分配", advData.getCigName(), advData.getDeliveryMethod());
                 continue;
             }

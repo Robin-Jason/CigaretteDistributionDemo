@@ -159,7 +159,7 @@ public class DistributionValidationUtils {
         validateNotEmpty(deliveryArea, "投放区域");
         
         // 验证投放方法的有效性
-        if (!"按档位统一投放".equals(deliveryMethod) && !"按档位扩展投放".equals(deliveryMethod)) {
+        if (!"按档位统一投放".equals(deliveryMethod) && !"按档位投放".equals(deliveryMethod) && !"按档位扩展投放".equals(deliveryMethod)) {
             throw new IllegalArgumentException("不支持的投放方法: " + deliveryMethod);
         }
         
