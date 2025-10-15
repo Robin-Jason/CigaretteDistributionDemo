@@ -175,6 +175,117 @@ public class CigaretteDistributionSqlBuilder {
                            tableName);
     }
     
+    /**
+     * 构建按卷烟删除所有记录的SQL
+     * 根据卷烟代码和名称删除该卷烟的所有分配记录（所有区域）
+     * 
+     * @param tableName 预测数据表名
+     * @return 删除SQL语句
+     * 
+     * @example
+     * buildDeleteCigaretteAllRecordsSql("cigarette_distribution_prediction_2025_9_3")
+     * -> "DELETE FROM cigarette_distribution_prediction_2025_9_3 WHERE CIG_CODE = ? AND CIG_NAME = ?"
+     */
+    public static String buildDeleteCigaretteAllRecordsSql(String tableName) {
+        return String.format("DELETE FROM %s WHERE CIG_CODE = ? AND CIG_NAME = ?", tableName);
+    }
+    
+    /**
+     * 构建检查表是否存在的SQL
+     * 查询information_schema判断指定表是否存在于当前数据库中
+     * 
+     * @return 检查表存在性的SQL语句
+     * 
+     * @example
+     * buildCheckTableExistsSql()
+     * -> "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?"
+     */
+    public static String buildCheckTableExistsSql() {
+        return "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?";
+    }
+    
+    /**
+     * 构建创建预测数据表的SQL
+     * 创建cigarette_distribution_prediction结构的动态表，包含所有必需字段
+     * 
+     * @param tableName 要创建的预测数据表名
+     * @return 创建表的SQL语句
+     * 
+     * @example
+     * buildCreatePredictionTableSql("cigarette_distribution_prediction_2025_9_3")
+     * -> "CREATE TABLE cigarette_distribution_prediction_2025_9_3 (...)"
+     */
+    public static String buildCreatePredictionTableSql(String tableName) {
+        return String.format(
+            "CREATE TABLE `%s` (" +
+            "`id` int NOT NULL AUTO_INCREMENT COMMENT '主键ID', " +
+            "`CIG_CODE` varchar(32) DEFAULT NULL COMMENT '卷烟代码', " +
+            "`CIG_NAME` varchar(100) DEFAULT NULL COMMENT '卷烟名称', " +
+            "`YEAR` year DEFAULT NULL COMMENT '年份', " +
+            "`MONTH` tinyint DEFAULT NULL COMMENT '月份', " +
+            "`WEEK_SEQ` tinyint DEFAULT NULL COMMENT '周序号', " +
+            "`DELIVERY_AREA` varchar(100) DEFAULT NULL COMMENT '投放区域', " +
+            "`DELIVERY_METHOD` varchar(50) DEFAULT NULL COMMENT '档位投放方式', " +
+            "`DELIVERY_ETYPE` varchar(50) DEFAULT NULL COMMENT '扩展投放方式', " +
+            "`D30` decimal(18,2) DEFAULT NULL COMMENT 'D30档位分配', " +
+            "`D29` decimal(18,2) DEFAULT NULL COMMENT 'D29档位分配', " +
+            "`D28` decimal(18,2) DEFAULT NULL COMMENT 'D28档位分配', " +
+            "`D27` decimal(18,2) DEFAULT NULL COMMENT 'D27档位分配', " +
+            "`D26` decimal(18,2) DEFAULT NULL COMMENT 'D26档位分配', " +
+            "`D25` decimal(18,2) DEFAULT NULL COMMENT 'D25档位分配', " +
+            "`D24` decimal(18,2) DEFAULT NULL COMMENT 'D24档位分配', " +
+            "`D23` decimal(18,2) DEFAULT NULL COMMENT 'D23档位分配', " +
+            "`D22` decimal(18,2) DEFAULT NULL COMMENT 'D22档位分配', " +
+            "`D21` decimal(18,2) DEFAULT NULL COMMENT 'D21档位分配', " +
+            "`D20` decimal(18,2) DEFAULT NULL COMMENT 'D20档位分配', " +
+            "`D19` decimal(18,2) DEFAULT NULL COMMENT 'D19档位分配', " +
+            "`D18` decimal(18,2) DEFAULT NULL COMMENT 'D18档位分配', " +
+            "`D17` decimal(18,2) DEFAULT NULL COMMENT 'D17档位分配', " +
+            "`D16` decimal(18,2) DEFAULT NULL COMMENT 'D16档位分配', " +
+            "`D15` decimal(18,2) DEFAULT NULL COMMENT 'D15档位分配', " +
+            "`D14` decimal(18,2) DEFAULT NULL COMMENT 'D14档位分配', " +
+            "`D13` decimal(18,2) DEFAULT NULL COMMENT 'D13档位分配', " +
+            "`D12` decimal(18,2) DEFAULT NULL COMMENT 'D12档位分配', " +
+            "`D11` decimal(18,2) DEFAULT NULL COMMENT 'D11档位分配', " +
+            "`D10` decimal(18,2) DEFAULT NULL COMMENT 'D10档位分配', " +
+            "`D9` decimal(18,2) DEFAULT NULL COMMENT 'D9档位分配', " +
+            "`D8` decimal(18,2) DEFAULT NULL COMMENT 'D8档位分配', " +
+            "`D7` decimal(18,2) DEFAULT NULL COMMENT 'D7档位分配', " +
+            "`D6` decimal(18,2) DEFAULT NULL COMMENT 'D6档位分配', " +
+            "`D5` decimal(18,2) DEFAULT NULL COMMENT 'D5档位分配', " +
+            "`D4` decimal(18,2) DEFAULT NULL COMMENT 'D4档位分配', " +
+            "`D3` decimal(18,2) DEFAULT NULL COMMENT 'D3档位分配', " +
+            "`D2` decimal(18,2) DEFAULT NULL COMMENT 'D2档位分配', " +
+            "`D1` decimal(18,2) DEFAULT NULL COMMENT 'D1档位分配', " +
+            "`BZ` varchar(255) DEFAULT NULL COMMENT '备注', " +
+            "`ACTUAL_DELIVERY` decimal(18,2) DEFAULT NULL COMMENT '实际投放量', " +
+            "`DEPLOYINFO_CODE` text COMMENT '部署信息编码', " +
+            "PRIMARY KEY (`id`), " +
+            "UNIQUE KEY `unique_cigarette_area` (`CIG_CODE`, `CIG_NAME`, `DELIVERY_AREA`, `YEAR`, `MONTH`, `WEEK_SEQ`) " +
+            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='卷烟分配预测数据表'",
+            tableName);
+    }
+    
+    /**
+     * 构建简单插入预测数据的SQL（不使用ON DUPLICATE KEY UPDATE）
+     * 用于在已清空表或新表中直接插入数据
+     * 
+     * @param tableName 预测数据表名
+     * @return 插入SQL语句
+     * 
+     * @example
+     * buildSimpleInsertSql("cigarette_distribution_prediction_2025_9_3")
+     * -> "INSERT INTO cigarette_distribution_prediction_2025_9_3 (...) VALUES (...)"
+     */
+    public static String buildSimpleInsertSql(String tableName) {
+        return String.format("INSERT INTO %s " +
+                "(CIG_CODE, CIG_NAME, YEAR, MONTH, WEEK_SEQ, DELIVERY_AREA, DELIVERY_METHOD, DELIVERY_ETYPE, " +
+                "D30, D29, D28, D27, D26, D25, D24, D23, D22, D21, D20, D19, D18, D17, D16, D15, D14, D13, D12, D11, D10, " +
+                "D9, D8, D7, D6, D5, D4, D3, D2, D1, BZ, ACTUAL_DELIVERY, DEPLOYINFO_CODE) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                tableName);
+    }
+    
     // ==================== 私有辅助方法 ====================
     
     /**

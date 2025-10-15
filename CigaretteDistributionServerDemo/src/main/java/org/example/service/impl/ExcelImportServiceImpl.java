@@ -303,19 +303,19 @@ public class ExcelImportServiceImpl implements ExcelImportService {
      * 验证卷烟投放基础信息数据结构
      */
     private boolean validateCigaretteInfoStructure(Map<String, Object> sampleRow) {
-        // 必须包含的列名（与init.sql表结构完全一致，除了自动生成的id字段）
-        List<String> requiredColumns = Arrays.asList(
+        // 定义了所有“核心”的必须列名，`remark` 在这里被视为可选列
+        List<String> requiredCoreColumns = Arrays.asList(
             "CIG_CODE", "CIG_NAME", "YEAR", "MONTH", "WEEK_SEQ", 
-            "URS", "ADV", "DELIVERY_METHOD", "DELIVERY_ETYPE", "DELIVERY_AREA", "remark"
+            "URS", "ADV", "DELIVERY_METHOD", "DELIVERY_ETYPE", "DELIVERY_AREA"
         );
         
         Set<String> actualColumns = sampleRow.keySet();
         log.info("Excel文件实际列名: {}", actualColumns);
-        log.info("要求的列名: {}", requiredColumns);
+        log.info("要求的核心列名: {}", requiredCoreColumns);
         
-        for (String column : requiredColumns) {
+        for (String column : requiredCoreColumns) {
             if (!actualColumns.contains(column)) {
-                log.warn("缺少必需列: {}，实际列名: {}", column, actualColumns);
+                log.warn("缺少必需的核心列: {}，实际列名: {}", column, actualColumns);
                 return false;
             }
         }
@@ -432,7 +432,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
         
         for (Map<String, Object> row : data) {
             try {
-                // 处理remark字段：将空字符串转换为null
+                // 安全地获取remark字段，如果Excel中不存在该列，get方法会返回null
                 Object remarkValue = row.get("remark");
                 if (remarkValue != null && remarkValue.toString().trim().isEmpty()) {
                     remarkValue = null;

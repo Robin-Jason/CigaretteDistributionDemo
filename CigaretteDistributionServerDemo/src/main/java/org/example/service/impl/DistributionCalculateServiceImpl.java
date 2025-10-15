@@ -314,7 +314,8 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
 
     // ==================== 私有辅助方法 ====================
     /**
-     * 将分配矩阵写回数据库（包含实际投放量计算）
+     * 将分配矩阵写回数据库（按卷烟覆盖逻辑）
+     * 新逻辑：如果表存在，先删除该卷烟的所有记录再插入新数据；如果表不存在，先创建表再插入数据
      */
     private boolean writeBackToDatabase(BigDecimal[][] allocationMatrix, 
                                       List<String> targetList,
@@ -336,19 +337,27 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
             log.debug("writeBackToDatabase - 卷烟: {} - {}, deliveryMethod: {}, deliveryEtype: {}", 
                      cigCode, cigName, deliveryMethod, deliveryEtype);
             
-            // 使用GradeMatrixUtils构建所有区域的预测数据记录，用于编码表达式生成
-            List<CigaretteDistributionPredictionData> allCigaretteRecords = GradeMatrixUtils.buildPredictionRecords(
-                cigCode, cigName, deliveryMethod, deliveryEtype, allocationMatrix, targetList);
-            
             // 生成动态表名
             String tableName = TableNameGeneratorUtil.generatePredictionTableName(year, month, weekSeq);
             log.debug("写回卷烟预测数据表: {}", tableName);
             
-            // 使用SQL构建工具类生成插入语句
+            // 验证表名安全性
             CigaretteDistributionSqlBuilder.validateSqlComponents(tableName, null);
-            String insertSql = CigaretteDistributionSqlBuilder.buildBatchInsertSql(tableName);
             
-            // 为每个目标（区域或业态类型）执行插入或更新
+            // 第1步：检查表是否存在，不存在则创建
+            ensurePredictionTableExists(tableName);
+            
+            // 第2步：删除该卷烟的所有现有记录（按卷烟覆盖逻辑）
+            deleteExistingCigaretteRecords(tableName, cigCode, cigName);
+            
+            // 第3步：使用GradeMatrixUtils构建所有区域的预测数据记录，用于编码表达式生成
+            List<CigaretteDistributionPredictionData> allCigaretteRecords = GradeMatrixUtils.buildPredictionRecords(
+                cigCode, cigName, deliveryMethod, deliveryEtype, allocationMatrix, targetList);
+            
+            // 第4步：使用简单插入SQL语句（不使用ON DUPLICATE KEY UPDATE）
+            String insertSql = CigaretteDistributionSqlBuilder.buildSimpleInsertSql(tableName);
+            
+            // 第5步：为每个目标（区域或业态类型）执行插入
             for (int i = 0; i < targetList.size(); i++) {
                 String target = targetList.get(i);
                 
@@ -397,11 +406,11 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
                 log.debug("SQL执行参数 - target: {}, deliveryMethod: {}, deliveryEtype: {}, encodedExpression: {}", 
                          target, deliveryMethod, deliveryEtype, currentAreaEncodedExpression);
                 
-                int updatedRows = jdbcTemplate.update(insertSql, params);
-                log.debug("目标 {} 的分配矩阵已写入数据库，影响行数: {}", target, updatedRows);
+                int insertedRows = jdbcTemplate.update(insertSql, params);
+                log.debug("目标 {} 的分配矩阵已写入数据库，影响行数: {}", target, insertedRows);
             }
             
-            log.info("卷烟 {} 的分配矩阵已成功写回数据库", cigName);
+            log.info("卷烟 {} 的分配矩阵已成功写回数据库（按卷烟覆盖模式）", cigName);
             return true;
             
         } catch (Exception e) {
@@ -483,6 +492,61 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
     
     // 已使用GradeMatrixUtils.buildPredictionRecords代替原有的buildAllCigaretteRecords方法
     // 已使用RegionClientNumDataService和RegionClientNumData.getGradeArray()代替原有的硬编码表查询
+    
+    /**
+     * 确保预测数据表存在，如果不存在则创建
+     * 使用SQL工具类检查表存在性并创建表
+     * 
+     * @param tableName 预测数据表名
+     */
+    private void ensurePredictionTableExists(String tableName) {
+        try {
+            // 检查表是否存在
+            String checkTableSql = CigaretteDistributionSqlBuilder.buildCheckTableExistsSql();
+            Integer tableExists = jdbcTemplate.queryForObject(checkTableSql, Integer.class, tableName);
+            
+            if (tableExists == null || tableExists == 0) {
+                // 表不存在，创建新表
+                String createTableSql = CigaretteDistributionSqlBuilder.buildCreatePredictionTableSql(tableName);
+                jdbcTemplate.execute(createTableSql);
+                log.info("成功创建预测数据表: {}", tableName);
+            } else {
+                log.debug("预测数据表已存在: {}", tableName);
+            }
+            
+        } catch (Exception e) {
+            String errorMessage = String.format("检查/创建预测数据表 '%s' 时发生错误: %s", tableName, e.getMessage());
+            log.error(errorMessage, e);
+            throw new RuntimeException(errorMessage, e);
+        }
+    }
+    
+    /**
+     * 删除指定卷烟的所有现有记录（按卷烟覆盖逻辑的第一步）
+     * 使用SQL工具类构建删除语句，删除该卷烟在所有区域的分配记录
+     * 
+     * @param tableName 预测数据表名
+     * @param cigCode 卷烟代码
+     * @param cigName 卷烟名称
+     */
+    private void deleteExistingCigaretteRecords(String tableName, String cigCode, String cigName) {
+        try {
+            // 使用SQL工具类构建按卷烟删除的SQL语句
+            String deleteSql = CigaretteDistributionSqlBuilder.buildDeleteCigaretteAllRecordsSql(tableName);
+            int deletedCount = jdbcTemplate.update(deleteSql, cigCode, cigName);
+            
+            if (deletedCount > 0) {
+                log.info("删除卷烟 {} - {} 的 {} 条现有记录", cigCode, cigName, deletedCount);
+            } else {
+                log.debug("卷烟 {} - {} 没有现有记录需要删除", cigCode, cigName);
+            }
+            
+        } catch (Exception e) {
+            String errorMessage = String.format("删除卷烟 '%s - %s' 现有记录时发生错误: %s", cigCode, cigName, e.getMessage());
+            log.error(errorMessage, e);
+            throw new RuntimeException(errorMessage, e);
+        }
+    }
     
     /**
      * 按卷烟代码+名称分组计算总实际投放量
