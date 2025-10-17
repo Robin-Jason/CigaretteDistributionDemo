@@ -138,7 +138,7 @@ public class CommonServiceImpl implements CommonService {
             CigaretteDistributionSqlBuilder.validateSqlComponents(tableName, fieldName);
             
             String sql;
-            if ("city_clientnum_data".equals(tableName)) {
+            if (tableName.startsWith("region_clientNum_0_")) {
                 // 按档位统一投放：只查询全市数据
                 sql = CigaretteDistributionSqlBuilder.buildCityMatrixSql(tableName, fieldName);
             } else {
