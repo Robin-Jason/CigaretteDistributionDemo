@@ -423,6 +423,18 @@
           <el-icon><ArrowDown /></el-icon>
           下一个
         </el-button>
+        <el-button 
+          type="warning" 
+          @click="handleFilterLargeDeviation"
+          :disabled="!tableData || tableData.length === 0"
+          :loading="filteringDeviation"
+        >
+          <el-icon><Filter /></el-icon>
+          筛选误差>200
+          <span v-if="largeDeviationRecords.length > 0" style="margin-left: 5px;">
+            ({{ currentDeviationIndex + 1 }}/{{ largeDeviationRecords.length }})
+          </span>
+        </el-button>
         <el-button @click="handleReset">
           <el-icon><RefreshLeft /></el-icon>
           重置
@@ -437,7 +449,7 @@
 </template>
 
 <script>
-import { Search, RefreshLeft, Download, ArrowDown, LocationInformation, Setting, Check, Plus, Delete, Document, DataBoard, TrendCharts } from '@element-plus/icons-vue'
+import { Search, RefreshLeft, Download, ArrowDown, LocationInformation, Setting, Check, Plus, Delete, Document, DataBoard, TrendCharts, Filter } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { cigaretteDistributionAPI } from '@/services/api'
 import Position3DChart from './Position3DChart.vue'
@@ -467,6 +479,7 @@ export default {
     Document,
     DataBoard,
     TrendCharts,
+    Filter,
     Position3DChart
   },
   data() {
@@ -534,7 +547,11 @@ export default {
       // 档位设置显示模式：'grid'(表格视图)、'encoding'(编码视图)、'3d'(三维图视图)
       positionViewMode: 'grid',
       // 三维图表弹窗显示状态
-      show3DChart: false
+      show3DChart: false,
+      // 误差筛选相关
+      largeDeviationRecords: [],  // 绝对误差>200的记录列表
+      currentDeviationIndex: -1,  // 当前选中的误差记录索引
+      filteringDeviation: false   // 筛选加载状态
     }
   },
   computed: {
@@ -1049,6 +1066,85 @@ export default {
       
       this.$emit('search-next')
     },
+    
+    // 筛选绝对误差大于200的卷烟
+    async handleFilterLargeDeviation() {
+      if (!this.tableData || this.tableData.length === 0) {
+        ElMessage.warning('暂无数据可筛选')
+        return
+      }
+      
+      this.filteringDeviation = true
+      
+      try {
+        // 1. 先触发数据刷新，确保获取最新数据（用户可能修改了档位）
+        console.log('刷新表格数据以获取最新的投放量信息...')
+        this.$emit('refresh-before-filter')
+        
+        // 等待数据刷新完成（给一点时间让表格刷新）
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // 2. 筛选出绝对误差大于200的记录
+        const deviationRecords = this.tableData.filter(record => {
+          const advAmount = parseFloat(record.advAmount) || 0
+          const actualDelivery = parseFloat(record.actualDelivery) || 0
+          const deviation = Math.abs(actualDelivery - advAmount)
+          return deviation > 200
+        })
+        
+        console.log('筛选出的误差>200记录:', deviationRecords)
+        
+        // 3. 如果没有符合条件的记录
+        if (deviationRecords.length === 0) {
+          ElMessage.info('没有找到绝对误差大于200的卷烟')
+          this.largeDeviationRecords = []
+          this.currentDeviationIndex = -1
+          return
+        }
+        
+        // 4. 第一次筛选或者记录列表已改变，重置索引
+        if (this.largeDeviationRecords.length === 0 || 
+            this.largeDeviationRecords.length !== deviationRecords.length) {
+          this.largeDeviationRecords = deviationRecords
+          this.currentDeviationIndex = 0
+        } else {
+          // 5. 循环选择下一个
+          this.currentDeviationIndex = (this.currentDeviationIndex + 1) % deviationRecords.length
+          this.largeDeviationRecords = deviationRecords
+        }
+        
+        // 6. 获取当前要选中的记录
+        const currentRecord = this.largeDeviationRecords[this.currentDeviationIndex]
+        
+        // 7. 计算误差信息
+        const advAmount = parseFloat(currentRecord.advAmount) || 0
+        const actualDelivery = parseFloat(currentRecord.actualDelivery) || 0
+        const deviation = Math.abs(actualDelivery - advAmount)
+        
+        // 8. 触发选中事件（通过父组件）
+        this.$emit('cigarette-name-matched', [currentRecord])
+        
+        // 9. 显示提示信息
+        ElMessage.success({
+          message: `已选中第 ${this.currentDeviationIndex + 1}/${this.largeDeviationRecords.length} 个误差记录\n卷烟：${currentRecord.cigName}\n预投放量：${advAmount.toFixed(2)}\n实际投放量：${actualDelivery.toFixed(2)}\n绝对误差：${deviation.toFixed(2)}`,
+          duration: 3000,
+          dangerouslyUseHTMLString: false
+        })
+        
+        console.log('已选中误差记录:', {
+          index: this.currentDeviationIndex + 1,
+          total: this.largeDeviationRecords.length,
+          record: currentRecord,
+          deviation: deviation
+        })
+        
+      } catch (error) {
+        console.error('筛选误差记录失败:', error)
+        ElMessage.error('筛选失败，请重试')
+      } finally {
+        this.filteringDeviation = false
+      }
+    },
     handleReset() {
       this.searchForm = {
         year: null,
@@ -1059,6 +1155,10 @@ export default {
         extendedType: '',
         distributionArea: ''
       }
+      // 重置误差筛选状态
+      this.largeDeviationRecords = []
+      this.currentDeviationIndex = -1
+      
       ElMessage.info('已重置搜索条件')
       this.$emit('reset')
     },

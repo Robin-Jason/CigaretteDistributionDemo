@@ -53,6 +53,7 @@
           @position-updated="handlePositionUpdated"
           @area-added="handleAreaAdded"
           @areas-deleted="handleAreasDeleted"
+          @refresh-before-filter="handleRefreshBeforeFilter"
         />
       </section>
 
@@ -383,6 +384,16 @@ export default {
       console.log('数据刷新事件')
       
       // 刷新表格数据
+      if (this.$refs.dataTable) {
+        this.$refs.dataTable.handleRefresh()
+      }
+    },
+    
+    // 处理筛选误差前的刷新事件
+    handleRefreshBeforeFilter() {
+      console.log('筛选误差前刷新数据')
+      
+      // 刷新表格数据以获取最新的实际投放量（用户可能修改了档位）
       if (this.$refs.dataTable) {
         this.$refs.dataTable.handleRefresh()
       }
