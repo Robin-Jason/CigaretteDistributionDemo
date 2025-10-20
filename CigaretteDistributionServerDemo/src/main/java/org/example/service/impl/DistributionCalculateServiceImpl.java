@@ -52,7 +52,18 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
      */
     @Override
     public Map<String, Object> getAndwriteBackAllocationMatrix(Integer year, Integer month, Integer weekSeq) {
+        // 调用带比例参数的方法，传null表示使用默认比例
+        return getAndwriteBackAllocationMatrix(year, month, weekSeq, null);
+    }
+    
+    @Override
+    public Map<String, Object> getAndwriteBackAllocationMatrix(Integer year, Integer month, Integer weekSeq, 
+                                                              Map<String, BigDecimal> marketRatios) {
         log.info("协调器：开始将分配矩阵写回数据库，年份: {}, 月份: {}, 周序号: {}", year, month, weekSeq);
+        if (marketRatios != null && !marketRatios.isEmpty()) {
+            log.info("接收市场类型比例参数 - 城网: {}, 农网: {}", 
+                    marketRatios.get("urbanRatio"), marketRatios.get("ruralRatio"));
+        }
         
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> writeBackResults = new ArrayList<>();
@@ -63,7 +74,7 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
             log.debug("查询卷烟投放基本信息表: {}", tableName);
             
             // 检查表是否存在
-            String checkTableSql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?";
+            String checkTableSql = CigaretteDistributionSqlBuilder.buildCheckTableExistsSql();
             Integer tableExists = jdbcTemplate.queryForObject(checkTableSql, Integer.class, tableName);
             
             if (tableExists == null || tableExists == 0) {
@@ -77,9 +88,7 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
             }
             
             // 获取指定周期的预投放量数据
-            String advDataSql = String.format("SELECT CIG_CODE as cig_code, CIG_NAME as cig_name, ADV as adv, DELIVERY_AREA as delivery_area, " +
-                               "DELIVERY_METHOD as delivery_method, DELIVERY_ETYPE as delivery_etype, remark, %d as year, %d as month, %d as week_seq " +
-                               "FROM `%s`", year, month, weekSeq, tableName);
+            String advDataSql = CigaretteDistributionSqlBuilder.buildAdvDataQuerySql(tableName, year, month, weekSeq);
             List<Map<String, Object>> advDataList = jdbcTemplate.queryForList(advDataSql);
             log.info("从表 {} 获取{}年{}月第{}周的预投放量数据数量: {}", tableName, year, month, weekSeq, advDataList.size());
             
@@ -162,9 +171,26 @@ public class DistributionCalculateServiceImpl implements DistributionCalculateSe
                         try {
                             DistributionStrategy strategy = strategyManager.getStrategy(deliveryMethod, deliveryEtype);
                             
-                            // 获取目标列表和计算分配矩阵
+                            // 获取目标列表
                             targetList = strategy.getTargetList(deliveryArea);
-                            allocationMatrix = strategy.calculateMatrix(targetList, adv);
+                            
+                            // 构建额外参数（用于档位+市场类型的比例参数）
+                            java.util.Map<String, Object> extraParams = new java.util.HashMap<>();
+                            if ("档位+市场类型".equals(deliveryEtype) && marketRatios != null) {
+                                // 从方法参数中读取城网和农网比例（前端传入）
+                                BigDecimal urbanRatioParam = marketRatios.get("urbanRatio");
+                                BigDecimal ruralRatioParam = marketRatios.get("ruralRatio");
+                                
+                                if (urbanRatioParam != null && ruralRatioParam != null) {
+                                    extraParams.put("urbanRatio", urbanRatioParam);
+                                    extraParams.put("ruralRatio", ruralRatioParam);
+                                    log.debug("卷烟: {} - {}, 使用前端传入的市场类型比例 - 城网: {}, 农网: {}", 
+                                             cigCode, cigName, urbanRatioParam, ruralRatioParam);
+                                }
+                            }
+                            
+                            // 计算分配矩阵（传递额外参数）
+                            allocationMatrix = strategy.calculateMatrix(targetList, adv, extraParams);
                             
                             // 设置结果信息
                             cigResult.put("targetType", strategy.getTargetTypeDescription());

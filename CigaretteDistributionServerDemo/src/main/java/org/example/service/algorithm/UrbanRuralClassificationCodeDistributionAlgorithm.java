@@ -42,36 +42,61 @@ public class UrbanRuralClassificationCodeDistributionAlgorithm {
         }
         
         try {
-            // 2. 粗调过程：从最高档位（D30）开始，逐列增加
+            // 2. 粗调过程：多轮从最高档位（D30）开始逐列增加，直到接近目标值
             BigDecimal currentAmount = BigDecimal.ZERO;
             int lastFullGrade = -1;
+            int roundCount = 0;
+            final int MAX_COARSE_ROUNDS = 100; // 最多100轮粗调
             
-            for (int grade = 0; grade < GRADE_COUNT; grade++) {
-                BigDecimal gradeAmount = BigDecimal.ZERO;
+            // 多轮迭代填充
+            while (roundCount < MAX_COARSE_ROUNDS) {
+                roundCount++;
+                boolean hasAdded = false;
                 
-                // 计算该档位所有区域增加1后的总投放量
-                for (int region = 0; region < regionCount; region++) {
-                    if (regionCustomerMatrix[region][grade] != null) {
-                        gradeAmount = gradeAmount.add(regionCustomerMatrix[region][grade]);
+                // 从D30到D1逐档位尝试整列+1
+                for (int grade = 0; grade < GRADE_COUNT; grade++) {
+                    BigDecimal gradeAmount = BigDecimal.ZERO;
+                    
+                    // 计算该档位所有区域增加1后的总投放量
+                    for (int region = 0; region < regionCount; region++) {
+                        if (regionCustomerMatrix[region][grade] != null) {
+                            gradeAmount = gradeAmount.add(regionCustomerMatrix[region][grade]);
+                        }
                     }
+                    
+                    // 如果增加该档位后总投放量超过目标值，停止本档位
+                    if (currentAmount.add(gradeAmount).compareTo(targetAmount) > 0) {
+                        break;
+                    }
+                    
+                    // 该档位所有区域都增加1
+                    for (int region = 0; region < regionCount; region++) {
+                        allocationMatrix[region][grade] = allocationMatrix[region][grade].add(BigDecimal.ONE);
+                    }
+                    
+                    currentAmount = currentAmount.add(gradeAmount);
+                    lastFullGrade = grade;
+                    hasAdded = true;
                 }
                 
-                // 如果增加该档位后总投放量超过目标值，停止并回退
-                if (currentAmount.add(gradeAmount).compareTo(targetAmount) > 0) {
+                // 如果本轮没有任何档位能够增加，说明已经达到极限
+                if (!hasAdded) {
+                    log.debug("粗调第{}轮：无法继续增加，停止粗调", roundCount);
                     break;
                 }
                 
-                // 该档位所有区域都增加1
-                for (int region = 0; region < regionCount; region++) {
-                    allocationMatrix[region][grade] = BigDecimal.ONE;
+                // 如果已经非常接近目标值（相差<5%），停止粗调
+                BigDecimal remaining = targetAmount.subtract(currentAmount);
+                BigDecimal remainingRate = remaining.divide(targetAmount, 4, BigDecimal.ROUND_HALF_UP);
+                if (remainingRate.abs().compareTo(new BigDecimal("0.05")) < 0) {
+                    log.debug("粗调第{}轮：已接近目标值（剩余{}%），停止粗调", 
+                        roundCount, remainingRate.multiply(new BigDecimal("100")));
+                    break;
                 }
-                
-                currentAmount = currentAmount.add(gradeAmount);
-                lastFullGrade = grade;
             }
             
-            log.info("城乡分类代码算法粗调完成，当前投放量: {}, 目标投放量: {}, 最后完整档位: {}", 
-                    currentAmount, targetAmount, lastFullGrade);
+            log.info("城乡分类代码算法粗调完成，经过{}轮迭代，当前投放量: {}, 目标投放量: {}, 最后完整档位: {}", 
+                    roundCount, currentAmount, targetAmount, lastFullGrade);
             
             // 3. 生成候选方案并选择最佳方案
             BigDecimal[][] bestMatrix = generateBestCandidate(allocationMatrix, regionCustomerMatrix, 

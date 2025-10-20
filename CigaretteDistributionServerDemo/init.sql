@@ -61,7 +61,7 @@ CREATE TABLE `cigarette_distribution_info_2025_9_3` (
   `DELIVERY_METHOD` varchar(50) DEFAULT NULL COMMENT '档位投放方式',
   `DELIVERY_ETYPE` varchar(50) DEFAULT NULL COMMENT '扩展投放方式',
   `DELIVERY_AREA` varchar(100) DEFAULT NULL COMMENT '投放区域',
-  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  `bz` varchar(255) DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -382,8 +382,8 @@ CREATE TABLE `region_clientNum_3_2` (
 # 档位+业态(非双周上浮)
 DROP TABLE IF EXISTS region_clientNum_4_1;
 CREATE TABLE `region_clientNum_4_1` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
-  `region` varchar(50) NOT NULL COMMENT '业态类型',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `region` varchar(50) DEFAULT NULL COMMENT '业态',
   `D30` decimal(18,2) DEFAULT NULL,
   `D29` decimal(18,2) DEFAULT NULL,
   `D28` decimal(18,2) DEFAULT NULL,
@@ -416,13 +416,13 @@ CREATE TABLE `region_clientNum_4_1` (
   `D1` decimal(18,2) DEFAULT NULL,
   `TOTAL` decimal(18,2) DEFAULT NULL COMMENT '总计',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='工具表-客户档位基本信息-业态';
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 # 档位+业态(双周上浮)
 DROP TABLE IF EXISTS region_clientNum_4_2;
 CREATE TABLE `region_clientNum_4_2` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
-  `region` varchar(50) NOT NULL COMMENT '业态类型',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `region` varchar(50) DEFAULT NULL COMMENT '业态',
   `D30` decimal(18,2) DEFAULT NULL,
   `D29` decimal(18,2) DEFAULT NULL,
   `D28` decimal(18,2) DEFAULT NULL,
@@ -455,4 +455,4 @@ CREATE TABLE `region_clientNum_4_2` (
   `D1` decimal(18,2) DEFAULT NULL,
   `TOTAL` decimal(18,2) DEFAULT NULL COMMENT '总计',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='工具表-客户档位基本信息-业态';
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

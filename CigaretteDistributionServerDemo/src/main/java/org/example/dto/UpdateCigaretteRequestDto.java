@@ -36,5 +36,5 @@ public class UpdateCigaretteRequestDto {
     @NotNull(message = "档位分配不能为空")
     private List<BigDecimal> distribution;
     
-    private String remark;
+    private String bz;
 }

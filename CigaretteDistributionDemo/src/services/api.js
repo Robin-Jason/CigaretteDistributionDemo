@@ -101,7 +101,18 @@ export const cigaretteDistributionAPI = {
   // 生成分配方案
   generateDistributionPlan(params) {
     // 注意：后端接口使用URL参数而非请求体
-    return calculateApi.post(`/generate-distribution-plan?year=${params.year}&month=${params.month}&weekSeq=${params.weekSeq}`)
+    // 新增：城网和农网分配比例参数（需要转换为小数格式 0.0-1.0）
+    let url = `/generate-distribution-plan?year=${params.year}&month=${params.month}&weekSeq=${params.weekSeq}`
+    
+    // 如果传入了比例参数，需要转换为小数格式（API要求0.0-1.0）
+    if (params.urbanRatio !== undefined && params.ruralRatio !== undefined) {
+      const urbanRatio = params.urbanRatio / 100  // 40 -> 0.4
+      const ruralRatio = params.ruralRatio / 100  // 60 -> 0.6
+      url += `&urbanRatio=${urbanRatio}&ruralRatio=${ruralRatio}`
+    }
+    // 如果不传比例参数，后端使用默认值（城网0.4，农网0.6）
+    
+    return calculateApi.post(url)
   },
   
   // 计算总实际投放量

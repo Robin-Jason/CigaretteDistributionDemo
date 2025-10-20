@@ -456,7 +456,7 @@ public class DataManagementServiceImpl implements DataManagementService {
             for (int i = 30; i >= 1; i--) {
                 params.add(gradeData.get("d" + i));
             }
-            params.add(request.getRemark());
+            params.add(request.getBz());
             params.add(actualDelivery);
             params.add(encodedExpression);
             params.add(request.getCigCode());
@@ -520,7 +520,7 @@ public class DataManagementServiceImpl implements DataManagementService {
             for (int i = 30; i >= 1; i--) {
                 params.add(gradeData.get("d" + i));
             }
-            params.add(request.getRemark());
+            params.add(request.getBz());
             params.add(actualDelivery);
             params.add(encodedExpression);
             

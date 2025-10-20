@@ -72,7 +72,7 @@ public class DataManageController {
                 record.put("year", data.getYear());
                 record.put("month", data.getMonth());
                 record.put("weekSeq", data.getWeekSeq());
-                record.put("remark", data.getBz());
+                record.put("bz", data.getBz());
 
                 // 获取预投放量（从对应的cigarette_distribution_info表）和投放类型（通过服务层）
                 Map<String, Object> advInfo = dataManagementService.getAdvDataInfo(data.getCigCode(), data.getCigName(), 
@@ -307,7 +307,7 @@ public class DataManageController {
                 request.getMonth(),
                 request.getWeekSeq(),
                 request.getEncodedExpressions(),
-                request.getRemark()
+                request.getBz()
             );
 
             // 3. 构建响应结果

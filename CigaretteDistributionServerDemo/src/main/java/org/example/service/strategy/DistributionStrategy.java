@@ -65,6 +65,22 @@ public interface DistributionStrategy {
     BigDecimal[][] calculateMatrix(List<String> targetList, BigDecimal targetAmount);
     
     /**
+     * 计算分配矩阵（支持额外参数）
+     * 某些策略（如档位+市场类型）需要额外参数（如城网/农网比例）
+     * 
+     * @param targetList 目标区域列表
+     * @param targetAmount 预投放量
+     * @param extraParams 额外参数Map，可选
+     * @return 分配矩阵 [区域数][档位数]
+     * 
+     * @default 默认实现调用不带额外参数的calculateMatrix方法
+     */
+    default BigDecimal[][] calculateMatrix(List<String> targetList, BigDecimal targetAmount, 
+                                          java.util.Map<String, Object> extraParams) {
+        return calculateMatrix(targetList, targetAmount);
+    }
+    
+    /**
      * 获取算法名称
      * 用于日志记录和调试
      * 

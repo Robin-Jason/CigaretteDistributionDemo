@@ -1,8 +1,10 @@
 package org.example.service.strategy;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.service.CityUnifiedDistribution.CityPredictionService;
+import org.example.service.CommonService;
+import org.example.service.algorithm.CityCigaretteDistributionAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -30,7 +32,10 @@ import java.util.List;
 public class CityDistributionStrategy implements DistributionStrategy {
     
     @Autowired
-    private CityPredictionService cityService;
+    private CommonService commonService;
+    
+    @Autowired
+    private CityCigaretteDistributionAlgorithm distributionAlgorithm;
     
     @Override
     public String getDeliveryType() {
@@ -56,7 +61,26 @@ public class CityDistributionStrategy implements DistributionStrategy {
         
         try {
             log.debug("使用城市算法计算全市统一分配，预投放量: {}", targetAmount);
-            BigDecimal[][] matrix = cityService.calculateCityDistributionMatrix(targetList, targetAmount);
+            
+            // 获取完整的全市客户数矩阵
+            BigDecimal[][] cityCustomerMatrix = getCityCustomerMatrix();
+            
+            // 对于全市统一投放，目标列表只有"全市"一个元素
+            BigDecimal[][] targetCityCustomerMatrix = new BigDecimal[targetList.size()][30];
+            
+            // 全市统一投放只使用第一行数据（全市汇总数据）
+            if (cityCustomerMatrix.length > 0) {
+                System.arraycopy(cityCustomerMatrix[0], 0, targetCityCustomerMatrix[0], 0, 30);
+            } else {
+                log.warn("未找到全市客户数数据，使用零值");
+                targetCityCustomerMatrix[0] = new BigDecimal[30];
+                for (int j = 0; j < 30; j++) {
+                    targetCityCustomerMatrix[0][j] = BigDecimal.ZERO;
+                }
+            }
+            
+            // 调用分配算法计算分配矩阵
+            BigDecimal[][] matrix = distributionAlgorithm.calculateDistribution(targetList, targetCityCustomerMatrix, targetAmount);
             
             if (matrix == null || matrix.length == 0) {
                 throw new RuntimeException("城市算法返回空分配矩阵");
@@ -79,5 +103,27 @@ public class CityDistributionStrategy implements DistributionStrategy {
     @Override
     public String getTargetTypeDescription() {
         return "全市统一投放";
+    }
+    
+    /**
+     * 获取全市客户数矩阵
+     * 从原Service类迁移而来，添加了缓存注解
+     */
+    @Cacheable("cityCustomerMatrix")
+    private BigDecimal[][] getCityCustomerMatrix() {
+        log.debug("通过CommonService获取全市客户数矩阵");
+        CommonService.RegionCustomerMatrix regionCustomerMatrixObj = 
+            commonService.buildRegionCustomerMatrix("按档位统一投放", null);
+        
+        // 将List<BigDecimal[]>转换为BigDecimal[][]以保持接口兼容性
+        List<BigDecimal[]> matrixList = regionCustomerMatrixObj.getCustomerMatrix();
+        BigDecimal[][] matrix = new BigDecimal[matrixList.size()][30];
+        
+        for (int i = 0; i < matrixList.size(); i++) {
+            matrix[i] = matrixList.get(i);
+        }
+        
+        log.debug("全市客户数矩阵获取完成，矩阵大小: {}x30", matrix.length);
+        return matrix;
     }
 }

@@ -29,5 +29,5 @@ public class BatchUpdateFromExpressionsRequestDto {
     @NotNull(message = "编码表达式列表不能为空")
     private List<String> encodedExpressions;
     
-    private String remark;
+    private String bz;
 }

@@ -32,15 +32,37 @@ public class DistributionCalculateController {
     
     /**
      * 获取算法输出的分配矩阵并写回数据库
+     * 
+     * @param year 年份
+     * @param month 月份
+     * @param weekSeq 周序号
+     * @param urbanRatio 城网比例（可选，仅用于档位+市场类型）
+     * @param ruralRatio 农网比例（可选，仅用于档位+市场类型）
      */
     @PostMapping("/write-back")
-    public ResponseEntity<Map<String, Object>> getAndwriteBackAllocationMatrix(@RequestParam Integer year, 
-                                                                       @RequestParam Integer month, 
-                                                                       @RequestParam Integer weekSeq) {
+    public ResponseEntity<Map<String, Object>> getAndwriteBackAllocationMatrix(
+            @RequestParam Integer year, 
+            @RequestParam Integer month, 
+            @RequestParam Integer weekSeq,
+            @RequestParam(required = false) BigDecimal urbanRatio,
+            @RequestParam(required = false) BigDecimal ruralRatio) {
+        
         log.info("接收写回请求，年份: {}, 月份: {}, 周序号: {}", year, month, weekSeq);
+        if (urbanRatio != null && ruralRatio != null) {
+            log.info("接收市场类型比例参数 - 城网: {}, 农网: {}", urbanRatio, ruralRatio);
+        }
         
         try {
-            Map<String, Object> result = distributionService.getAndwriteBackAllocationMatrix(year, month, weekSeq);
+            // 构建市场类型比例参数
+            Map<String, BigDecimal> marketRatios = null;
+            if (urbanRatio != null && ruralRatio != null) {
+                marketRatios = new HashMap<>();
+                marketRatios.put("urbanRatio", urbanRatio);
+                marketRatios.put("ruralRatio", ruralRatio);
+            }
+            
+            Map<String, Object> result = distributionService.getAndwriteBackAllocationMatrix(
+                year, month, weekSeq, marketRatios);
             
             if ((Boolean) result.get("success")) {
                 log.info("分配矩阵写回成功，成功: {}/{}", result.get("successCount"), result.get("totalCount"));
@@ -63,13 +85,26 @@ public class DistributionCalculateController {
      * 一键生成分配方案
      * 前端调用接口：generate-distribution-plan
      * 功能：删除指定日期的所有分配数据，重新执行各投放类型的算法分配并写回数据库
+     * 
+     * @param year 年份
+     * @param month 月份
+     * @param weekSeq 周序号
+     * @param urbanRatio 城网比例（可选，仅用于档位+市场类型）
+     * @param ruralRatio 农网比例（可选，仅用于档位+市场类型）
      */
     @PostMapping("/generate-distribution-plan")
     @Transactional
-    public ResponseEntity<Map<String, Object>> generateDistributionPlan(@RequestParam Integer year,
-                                                                        @RequestParam Integer month,
-                                                                        @RequestParam Integer weekSeq) {
+    public ResponseEntity<Map<String, Object>> generateDistributionPlan(
+            @RequestParam Integer year,
+            @RequestParam Integer month,
+            @RequestParam Integer weekSeq,
+            @RequestParam(required = false) BigDecimal urbanRatio,
+            @RequestParam(required = false) BigDecimal ruralRatio) {
+        
         log.info("接收一键生成分配方案请求，年份: {}, 月份: {}, 周序号: {}", year, month, weekSeq);
+        if (urbanRatio != null && ruralRatio != null) {
+            log.info("接收市场类型比例参数 - 城网: {}, 农网: {}", urbanRatio, ruralRatio);
+        }
         
         try {
             // 1. 检查指定日期是否存在分配数据（通过DataManagementService）
@@ -108,7 +143,17 @@ public class DistributionCalculateController {
             
             // 3. 执行算法分配并写回数据库
             log.info("开始执行各投放类型的算法分配...");
-            Map<String, Object> allocationResult = distributionService.getAndwriteBackAllocationMatrix(year, month, weekSeq);
+            
+            // 构建市场类型比例参数
+            Map<String, BigDecimal> marketRatios = null;
+            if (urbanRatio != null && ruralRatio != null) {
+                marketRatios = new HashMap<>();
+                marketRatios.put("urbanRatio", urbanRatio);
+                marketRatios.put("ruralRatio", ruralRatio);
+            }
+            
+            Map<String, Object> allocationResult = distributionService.getAndwriteBackAllocationMatrix(
+                year, month, weekSeq, marketRatios);
             
             if ((Boolean) allocationResult.get("success")) {
                 // 4. 分配成功，查询生成的分配记录数（通过DataManagementService）

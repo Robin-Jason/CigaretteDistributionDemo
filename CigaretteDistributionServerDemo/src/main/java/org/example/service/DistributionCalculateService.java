@@ -60,6 +60,37 @@ public interface DistributionCalculateService {
     Map<String, Object> getAndwriteBackAllocationMatrix(Integer year, Integer month, Integer weekSeq);
     
     /**
+     * 一键生成分配方案（支持市场类型比例参数）
+     * 
+     * 协调五种投放类型的算法计算完整的分配矩阵，并将结果写回数据库。
+     * 支持为"档位+市场类型"传入城网/农网比例参数。
+     * 
+     * @param year 年份（必填，2020-2099）
+     * @param month 月份（必填，1-12）
+     * @param weekSeq 周序号（必填，1-5）
+     * @param marketRatios 市场类型比例参数（可选，仅用于档位+市场类型）
+     *                     包含 urbanRatio（城网比例）和 ruralRatio（农网比例）
+     *                     如果为null或未提供比例，使用默认值40%/60%
+     * @return 写回结果Map，包含以下字段：
+     *         - success: 整体操作是否成功
+     *         - totalCigarettes: 处理的卷烟总数
+     *         - successCount: 成功计算的卷烟数
+     *         - failureCount: 失败的卷烟数
+     *         - algorithmStats: 各算法的统计信息
+     *         - detailedResults: 详细的分配结果列表
+     *         - message: 操作结果描述
+     * 
+     * @example
+     * Map<String, BigDecimal> ratios = new HashMap<>();
+     * ratios.put("urbanRatio", new BigDecimal("0.45"));
+     * ratios.put("ruralRatio", new BigDecimal("0.55"));
+     * getAndwriteBackAllocationMatrix(2025, 9, 3, ratios)
+     * -> "档位+市场类型"将使用45%/55%的城网/农网比例
+     */
+    Map<String, Object> getAndwriteBackAllocationMatrix(Integer year, Integer month, Integer weekSeq, 
+                                                        java.util.Map<String, java.math.BigDecimal> marketRatios);
+    
+    /**
      * 区域实际投放量计算
      * 
      * 严格按照标准公式计算卷烟在指定区域的实际投放量：

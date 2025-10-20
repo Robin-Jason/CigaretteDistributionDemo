@@ -45,8 +45,8 @@ public class CigaretteDistributionInfoData {
     @Column(name = "WEEK_SEQ")
     private Integer weekSeq;
     
-    @Column(name = "remark")
-    private String remark;
+    @Column(name = "bz")
+    private String bz;
     
     // 手动实现所有getter和setter方法
     public Integer getId() {
@@ -137,11 +137,11 @@ public class CigaretteDistributionInfoData {
         this.weekSeq = weekSeq;
     }
     
-    public String getRemark() {
-        return remark;
+    public String getBz() {
+        return bz;
     }
     
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setBz(String bz) {
+        this.bz = bz;
     }
 }

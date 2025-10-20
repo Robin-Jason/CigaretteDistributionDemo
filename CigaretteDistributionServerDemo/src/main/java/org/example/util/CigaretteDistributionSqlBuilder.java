@@ -111,6 +111,30 @@ public class CigaretteDistributionSqlBuilder {
         return String.format("SELECT * FROM %s WHERE DELIVERY_ETYPE = ?", tableName);
     }
     
+    /**
+     * 构建获取预投放量数据的SQL
+     * 用于从info表中查询卷烟的基础投放信息，包含所有必要字段
+     * 
+     * @param tableName 卷烟投放基础信息表名（如：cigarette_distribution_info_2024_1_2）
+     * @param year 年份
+     * @param month 月份
+     * @param weekSeq 周序号
+     * @return 查询SQL语句
+     * 
+     * @example
+     * buildAdvDataQuerySql("cigarette_distribution_info_2024_1_2", 2024, 1, 2)
+     * -> "SELECT CIG_CODE as cig_code, CIG_NAME as cig_name, ADV as adv, DELIVERY_AREA as delivery_area, 
+     *     DELIVERY_METHOD as delivery_method, DELIVERY_ETYPE as delivery_etype, bz as remark, 
+     *     2024 as year, 1 as month, 2 as week_seq FROM `cigarette_distribution_info_2024_1_2`"
+     */
+    public static String buildAdvDataQuerySql(String tableName, int year, int month, int weekSeq) {
+        return String.format(
+            "SELECT CIG_CODE as cig_code, CIG_NAME as cig_name, ADV as adv, DELIVERY_AREA as delivery_area, " +
+            "DELIVERY_METHOD as delivery_method, DELIVERY_ETYPE as delivery_etype, bz as remark, " +
+            "%d as year, %d as month, %d as week_seq FROM `%s`", 
+            year, month, weekSeq, tableName);
+    }
+    
     // ==================== 数据操作SQL ====================
     
     /**

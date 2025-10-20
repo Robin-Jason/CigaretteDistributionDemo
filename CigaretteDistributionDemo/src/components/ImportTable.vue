@@ -357,6 +357,69 @@
               />
             </el-select>
           </el-form-item>
+          
+          <el-divider content-position="left">
+            <span style="font-size: 13px; color: #606266;">
+              档位+市场类型分配比例
+              <el-tooltip content="仅用于投放方式为'档位+市场类型'的卷烟" placement="top">
+                <el-icon style="margin-left: 5px; cursor: help;"><QuestionFilled /></el-icon>
+              </el-tooltip>
+            </span>
+          </el-divider>
+          
+          <el-alert
+            title="比例参数说明"
+            type="info"
+            :closable="false"
+            show-icon
+            style="margin-bottom: 15px;"
+          >
+            <template #default>
+              <div style="font-size: 12px; line-height: 1.6;">
+                <p style="margin: 4px 0;">• 仅用于投放方式为"档位+市场类型"的卷烟</p>
+                <p style="margin: 4px 0;">• 其他投放方式（档位+区县、档位+城乡分类代码等）不受影响</p>
+                <p style="margin: 4px 0;">• 比例总和必须为100%</p>
+                <p style="margin: 4px 0;">• 不设置时使用默认值：城网40%，农网60%</p>
+              </div>
+            </template>
+          </el-alert>
+          
+          <el-form-item label="城网比例" required>
+            <el-input-number
+              v-model="generatePlanForm.urbanRatio"
+              :min="0"
+              :max="100"
+              :precision="0"
+              :step="5"
+              style="width: 100%"
+              @change="handleUrbanRatioChange"
+            >
+              <template #suffix>%</template>
+            </el-input-number>
+          </el-form-item>
+          
+          <el-form-item label="农网比例" required>
+            <el-input-number
+              v-model="generatePlanForm.ruralRatio"
+              :min="0"
+              :max="100"
+              :precision="0"
+              :step="5"
+              style="width: 100%"
+              @change="handleRuralRatioChange"
+            >
+              <template #suffix>%</template>
+            </el-input-number>
+          </el-form-item>
+          
+          <el-form-item>
+            <el-alert
+              :title="ratioValidationMessage"
+              :type="ratioValidationType"
+              :closable="false"
+              show-icon
+            />
+          </el-form-item>
         </el-form>
         
         <div class="generate-tips">
@@ -395,7 +458,7 @@
 </template>
 
 <script>
-import { DocumentAdd, DataAnalysis, Plus, Cpu } from '@element-plus/icons-vue'
+import { DocumentAdd, DataAnalysis, Plus, Cpu, QuestionFilled } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { cigaretteDistributionAPI } from '../services/api'
 
@@ -405,7 +468,8 @@ export default {
     DocumentAdd,
     DataAnalysis,
     Plus,
-    Cpu
+    Cpu,
+    QuestionFilled
   },
   emits: ['import-success', 'data-refresh'],
   data() {
@@ -437,7 +501,9 @@ export default {
       generatePlanForm: {
         year: null,
         month: null,
-        weekSeq: null
+        weekSeq: null,
+        urbanRatio: 40,  // 城网比例，默认40%
+        ruralRatio: 60   // 农网比例，默认60%
       },
       generatingPlan: false
     }
@@ -505,7 +571,33 @@ export default {
     
     // 是否可以生成分配方案
     canGeneratePlan() {
-      return this.isGeneratePlanTimeComplete && !this.generatingPlan
+      return this.isGeneratePlanTimeComplete && 
+             this.isRatioValid && 
+             !this.generatingPlan
+    },
+    
+    // 比例是否有效（城网+农网=100%）
+    isRatioValid() {
+      const total = this.generatePlanForm.urbanRatio + this.generatePlanForm.ruralRatio
+      return total === 100
+    },
+    
+    // 比例验证消息
+    ratioValidationMessage() {
+      const total = this.generatePlanForm.urbanRatio + this.generatePlanForm.ruralRatio
+      if (total === 100) {
+        return `比例设置正确：城网 ${this.generatePlanForm.urbanRatio}% + 农网 ${this.generatePlanForm.ruralRatio}% = 100%`
+      } else if (total > 100) {
+        return `比例总和超过100%，当前为 ${total}%，请调整`
+      } else {
+        return `比例总和不足100%，当前为 ${total}%，请调整`
+      }
+    },
+    
+    // 比例验证类型
+    ratioValidationType() {
+      const total = this.generatePlanForm.urbanRatio + this.generatePlanForm.ruralRatio
+      return total === 100 ? 'success' : 'warning'
     }
   },
   methods: {
@@ -1011,13 +1103,60 @@ export default {
     
     // 显示生成分配方案对话框
     showGeneratePlanDialog() {
+      // 重置为默认值
+      this.generatePlanForm.urbanRatio = 40
+      this.generatePlanForm.ruralRatio = 60
       this.generatePlanDialogVisible = true
+    },
+    
+    // 城网比例变化时自动调整农网比例
+    handleUrbanRatioChange(value) {
+      if (value === null || value === undefined) {
+        this.generatePlanForm.urbanRatio = 0
+        value = 0
+      }
+      
+      // 确保在0-100范围内
+      if (value < 0) {
+        this.generatePlanForm.urbanRatio = 0
+        value = 0
+      } else if (value > 100) {
+        this.generatePlanForm.urbanRatio = 100
+        value = 100
+      }
+      
+      // 自动调整农网比例
+      this.generatePlanForm.ruralRatio = 100 - value
+    },
+    
+    // 农网比例变化时自动调整城网比例
+    handleRuralRatioChange(value) {
+      if (value === null || value === undefined) {
+        this.generatePlanForm.ruralRatio = 0
+        value = 0
+      }
+      
+      // 确保在0-100范围内
+      if (value < 0) {
+        this.generatePlanForm.ruralRatio = 0
+        value = 0
+      } else if (value > 100) {
+        this.generatePlanForm.ruralRatio = 100
+        value = 100
+      }
+      
+      // 自动调整城网比例
+      this.generatePlanForm.urbanRatio = 100 - value
     },
     
     // 生成分配方案
     async handleGeneratePlan() {
       if (!this.canGeneratePlan) {
-        ElMessage.warning('请选择年份、月份和周序号')
+        if (!this.isGeneratePlanTimeComplete) {
+          ElMessage.warning('请选择完整的时间信息')
+        } else if (!this.isRatioValid) {
+          ElMessage.warning('请确保城网和农网比例总和为100%')
+        }
         return
       }
       
@@ -1027,10 +1166,17 @@ export default {
         const requestData = {
           year: this.generatePlanForm.year,
           month: this.generatePlanForm.month,
-          weekSeq: this.generatePlanForm.weekSeq
+          weekSeq: this.generatePlanForm.weekSeq,
+          urbanRatio: this.generatePlanForm.urbanRatio,  // 前端存储：百分比整数（如40）
+          ruralRatio: this.generatePlanForm.ruralRatio   // 前端存储：百分比整数（如60）
         }
         
-        console.log('生成分配方案请求数据:', requestData)
+        console.log('生成分配方案请求数据（前端格式）:', requestData)
+        console.log('发送给后端的格式（小数）:', {
+          ...requestData,
+          urbanRatio: requestData.urbanRatio / 100,  // 转换：40 -> 0.4
+          ruralRatio: requestData.ruralRatio / 100   // 转换：60 -> 0.6
+        })
         
         // 调用后端生成分配方案接口
         const response = await cigaretteDistributionAPI.generateDistributionPlan(requestData)
@@ -1088,7 +1234,13 @@ export default {
           
           // 关闭对话框并清理表单
           this.generatePlanDialogVisible = false
-          this.generatePlanForm = { year: null, month: null, weekSeq: null }
+          this.generatePlanForm = { 
+            year: null, 
+            month: null, 
+            weekSeq: null,
+            urbanRatio: 40,  // 重置为默认值
+            ruralRatio: 60   // 重置为默认值
+          }
           
           // 触发数据刷新事件
           this.$emit('data-refresh')

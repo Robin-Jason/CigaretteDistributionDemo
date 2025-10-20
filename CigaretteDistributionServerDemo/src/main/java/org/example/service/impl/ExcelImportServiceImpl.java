@@ -303,7 +303,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
      * 验证卷烟投放基础信息数据结构
      */
     private boolean validateCigaretteInfoStructure(Map<String, Object> sampleRow) {
-        // 定义了所有“核心”的必须列名，`remark` 在这里被视为可选列
+        // 定义了所有"核心"的必须列名，`bz` 在这里被视为可选列
         List<String> requiredCoreColumns = Arrays.asList(
             "CIG_CODE", "CIG_NAME", "YEAR", "MONTH", "WEEK_SEQ", 
             "URS", "ADV", "DELIVERY_METHOD", "DELIVERY_ETYPE", "DELIVERY_AREA"
@@ -370,7 +370,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
             "`DELIVERY_METHOD` varchar(50) DEFAULT NULL COMMENT '档位投放方式', " +
             "`DELIVERY_ETYPE` varchar(50) DEFAULT NULL COMMENT '扩展投放方式', " +
             "`DELIVERY_AREA` varchar(100) DEFAULT NULL COMMENT '投放区域', " +
-            "`remark` varchar(255) DEFAULT NULL COMMENT '备注', " +
+            "`bz` varchar(255) DEFAULT NULL COMMENT '备注', " +
             "PRIMARY KEY (`id`)" +
             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", tableName);
         
@@ -425,17 +425,17 @@ public class ExcelImportServiceImpl implements ExcelImportService {
      */
     private int insertCigaretteInfoData(String tableName, List<Map<String, Object>> data) {
         String sql = String.format(
-            "INSERT INTO `%s` (CIG_CODE, CIG_NAME, YEAR, MONTH, WEEK_SEQ, URS, ADV, DELIVERY_METHOD, DELIVERY_ETYPE, DELIVERY_AREA, remark) " +
+            "INSERT INTO `%s` (CIG_CODE, CIG_NAME, YEAR, MONTH, WEEK_SEQ, URS, ADV, DELIVERY_METHOD, DELIVERY_ETYPE, DELIVERY_AREA, bz) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", tableName);
         
         int insertedCount = 0;
         
         for (Map<String, Object> row : data) {
             try {
-                // 安全地获取remark字段，如果Excel中不存在该列，get方法会返回null
-                Object remarkValue = row.get("remark");
-                if (remarkValue != null && remarkValue.toString().trim().isEmpty()) {
-                    remarkValue = null;
+                // 安全地获取bz字段，如果Excel中不存在该列，get方法会返回null
+                Object bzValue = row.get("bz");
+                if (bzValue != null && bzValue.toString().trim().isEmpty()) {
+                    bzValue = null;
                 }
                 
                 jdbcTemplate.update(sql,
@@ -449,7 +449,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
                     row.get("DELIVERY_METHOD"),
                     row.get("DELIVERY_ETYPE"),
                     row.get("DELIVERY_AREA"),
-                    remarkValue);
+                    bzValue);
                 insertedCount++;
             } catch (Exception e) {
                 log.error("插入数据失败: {}", row, e);
