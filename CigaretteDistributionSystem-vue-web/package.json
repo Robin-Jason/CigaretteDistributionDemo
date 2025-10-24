@@ -1,0 +1,26 @@
+{
+  "name": "CigaretteDIstributionSystem-vue-web",
+  "version": "1.0.0",
+  "description": "卷烟投放管理系统前端项目",
+  "main": "index.js",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.0.10",
+    "axios": "^1.3.4",
+    "echarts": "^6.0.0",
+    "echarts-gl": "^2.0.9",
+    "element-plus": "^2.2.28",
+    "file-saver": "^2.0.5",
+    "vue": "^3.2.47",
+    "vue-echarts": "^8.0.0",
+    "vue-router": "^4.1.6",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "^4.5.19",
+    "@vue/compiler-sfc": "^3.2.47"
+  }
+}

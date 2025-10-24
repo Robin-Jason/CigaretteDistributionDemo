@@ -1,0 +1,17 @@
+version: '3.1'
+services:
+  vue-web:
+    image: vue-web
+    container_name: vue-web
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /data/vue-web/logs:/usr/local/openresty/nginx/logs:rw
+    networks:
+      - cigarette-network
+
+networks:
+  cigarette-network:
+    external: true

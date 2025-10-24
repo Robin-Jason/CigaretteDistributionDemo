@@ -1,0 +1,19 @@
+version: '3'
+services:
+  springboot-server:
+    image: springboot-server
+    container_name: springboot-server
+    restart: always
+    ports:
+      - "28080:28080"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /data/springboot/logs:/app/logs:rw
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - cigarette-network
+
+networks:
+  cigarette-network:
+    external: true
